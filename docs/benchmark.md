@@ -21,8 +21,9 @@
 |---|---|---|---|---|
 | Apple M3, Node 24.13, macOS (26 October 2026), verify and decide | 0.176 ms | 0.007 ms | 0.176 ms | about 28x |
 | Apple M3, Node 24.13, macOS (26 October 2026), verify only | 0.170 ms | 0.005 ms | 0.170 ms | about 29x |
+| GitHub Actions `ubuntu-latest`, 2 vCPUs (AMD EPYC 7763), Node 22.23 (26 October 2026, commit `eab371d`), verify and decide | 1.284 ms | 0.049 ms | 1.284 ms | about 3.9x |
 | GitHub Actions `ubuntu-latest`, 2 vCPUs (Intel Xeon Platinum 8573C), Node 22.23 (26 October 2026, commit `b6dbcdd`), verify only | 1.379 ms | 0.026 ms | 1.379 ms | about 3.6x |
 
-Every run prints its numbers in the `Bench` job log. GitHub's standard Linux runners have 2 vCPUs for private repositories and 4 for public ones, and are noisy: on the run above the signature path's p50 was 0.263 ms but its single slowest request took 6.6 ms. The budget applies to p99, which stayed at 1.4 ms, so CI has about 3.6x headroom on the signature path and far more on the IP path. If the signature p99 in CI starts creeping toward 5 ms, look at the runner before the code: the same commit runs eight times faster on a laptop.
+Every run prints its numbers in the `Bench` job log. GitHub's standard Linux runners have 2 vCPUs for private repositories and 4 for public ones, and are noisy: on the `b6dbcdd` run the signature path's p50 was 0.263 ms but its single slowest request took 6.6 ms. The budget applies to p99, which stayed at 1.4 ms, so CI has about 3.6x headroom on the signature path and far more on the IP path. If the signature p99 in CI starts creeping toward 5 ms, look at the runner before the code: the same commit runs eight times faster on a laptop.
 
 Almost all of the signature path is the Ed25519 verification itself (Web Crypto, inside Cloudflare's library). The IP path is a binary search over merged prefix ranges compiled when the directory loads. Policy evaluation adds about a microsecond: path patterns are compiled and sorted once, and each decision is a short scan plus map lookups.
