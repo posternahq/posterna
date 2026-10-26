@@ -139,15 +139,26 @@ type VerdictResult = {
   error?: string;         // set when a fail-open path was taken
 };
 verify(request, options?): Promise<VerdictResult>
-decide(result, { path, kind?: "page" | "signup" }): Decision
-type Decision = { action: Action; enforced: boolean; rule?: string; reason: string };
+// engine = createPolicyEngine(agentsYaml, { verifier })
+engine.decide(result, { path, kind?: "page" | "signup" }): Decision
+type Decision = {
+  action: Action;
+  enforced: boolean;
+  rule?: string;          // for example "paths./api/*.claimed_failed"
+  reason: string;
+  retryAfter?: number;    // seconds, for throttle
+  guarded?: boolean;      // the search-engine guard downgraded the action (5.4)
+  error?: string;         // set when a fail-open path was taken
+};
 ```
+
+`decide()` is a method of the policy engine, which holds the per-instance state the safety rails need (throttle buckets, breaker, guard history). It never throws.
 
 ### 4.7 Headers
 
 - Inbound: strip any `X-Agent-*` and `X-Posterna-*` headers from the incoming request before anything else, so no client can forge a verdict for the application or downstream services.
 - Outbound to the application (request headers, names configurable): `X-Agent-Verdict`, `X-Agent-Operator`, `X-Agent-Purpose`, `X-Agent-Method`.
-- On enforced responses: `X-Posterna-Action`.
+- On enforced responses: `X-Posterna-Action`, and `Cache-Control: no-store` so no shared cache serves one agent's refusal to anyone else.
 
 ### 4.8 Failing open
 
@@ -184,12 +195,16 @@ signup:                    # recommendations returned by decide(); the applicati
 emit: [robots.txt, content-signals]
 ```
 
+Every key but `version` is optional. The full reference is `docs/policy.md`; the JSON Schema is `packages/core/src/schema/agents.schema.json`. `posterna policy check` reports every error at once with its line and column.
+
 ### 5.2 Actions
 
 - Page and API traffic, enforced by the middleware: `allow`, `block` (403), `throttle` (429 with `Retry-After`; token bucket per operator per instance; rate as `N/sec|min|hour`).
 - Sign-up scopes, returned by `decide()` for the application to act on: `lift` (skip a friction step), `cap` (apply the app's own limits), `challenge` (hand to the app's existing CAPTCHA or similar). Posterna builds no challenge.
 
-Block body (text/plain): `This site's policy does not allow this agent ({operator}, {purpose}). Operators can get verified at https://posterna.com/operators`. Throttle body: `Rate limited by this site's agent policy. Retry after {n} seconds.`
+Block body (text/plain): `This site's policy does not allow this agent ({operator}, {purpose}). Operators can get verified at https://posterna.com/operators`. Throttle body: `Rate limited by this site's agent policy. Retry after {n} seconds.` `{operator}` and `{purpose}` are the directory slug and purpose, or `unknown`; nothing from the request appears in a response. Both responses carry `Content-Type: text/plain; charset=utf-8`, `Cache-Control: no-store` and `X-Posterna-Action`; throttle adds `Retry-After`.
+
+Throttle: a rate is N from 1 to 1,000,000. Each throttle rule keeps one bucket per operator (claims without an operator share one per rule) that holds N tokens and refills continuously at N per period. Within the rate the decision is `allow`, naming the rule; over it, `throttle` with `Retry-After` set to the whole seconds until the next token, rounded up, at least 1. Buckets count in monitor mode too, and at most 10,000 are kept.
 
 ### 5.3 Evaluation order
 
@@ -203,20 +218,31 @@ Block body (text/plain): `This site's policy does not allow this agent ({operato
 
 `unknown_automation` is only ever acted on by a rule that names it explicitly; no template sets it to anything but allow. A rule with `monitor: true`, or global `mode: monitor`, records the action with `enforced: false`.
 
+Path patterns start with `/` and match the request path without its query, case-sensitively. `*` matches any characters, including `/` and none; a pattern without `*` is exact. When several match, the most specific wins: an exact pattern beats a wildcard, then more literal characters win, then fewer wildcards, then the one written first. Within a path rule the verdict class key beats the purpose key, so a failed claim cannot borrow its claimed purpose's allowance. If the most specific matching rule has no key for the request, the next most specific is checked.
+
+Operator and purpose rules come before defaults, so they also apply to unverified and failed claims of that operator or purpose; `posterna policy check` warns when one of them is looser than the default for those classes.
+
+`enforced` is true only for a block or throttle the middleware applies, or a sign-up recommendation the application should act on; never for `allow`. Sign-up decisions (`kind: "signup"`) use only the `signup` section: the most specific matching scope's key for the verdict class, else `allow`.
+
 ### 5.4 Safety rails
 
-- Search-engine guard (`protect`, the default): agents flagged `search_engine` in the directory are never blocked or throttled when verified. A `claimed_failed` claim of a protected agent is enforced only if this instance has seen at least one verified request from that operator in the past 7 days and the breaker is not tripped for it; otherwise the action is downgraded to allow and recorded as `guarded`. `off` must be written explicitly.
-- Breaker: for operators verified by IP or rDNS, in a rolling 10 minute window per instance, if there are at least 20 claims and 50 percent or more are `claimed_failed`, all enforcement against that operator's claims is suspended for 60 minutes and the state is reported.
+- Search-engine guard (`protect`, the default): agents flagged `search_engine` in the directory are never blocked or throttled when verified. A `claimed_failed` or `declared_unverifiable` claim of a protected agent is enforced only if this instance has seen at least one verified request from that operator in the past 7 days and the breaker is not tripped for it; otherwise the action is downgraded to allow and recorded as `guarded`. A claim that names an operator but no agent is protected when any of that operator's agents is a search engine. `off` must be written explicitly.
+- Breaker: for operators verified by IP or rDNS, in a rolling 10 minute window per instance, if there are at least 20 claims and 50 percent or more are `claimed_failed`, all enforcement against that operator's claims is suspended for 60 minutes and the state is reported. Claims are the conclusive IP and rDNS outcomes (`verified_by_ip`, and `claimed_failed` with method `ip` or `rdns`) of page decisions, counted in one-minute slots. Counting continues while tripped, so the breaker trips again at once if failures are still at 50 percent or more when the hour ends.
 - Proxy guard: section 4.2.
-- Kill switches: the local environment variable, and the remote override delivered in the ingest response. The remote switch can only move an install to monitor, never to enforce. If the cloud is unreachable nothing changes.
+- Kill switches: the local environment variable, and the remote override delivered in the ingest response. The remote switch can only move an install to monitor, never to enforce: it accepts `"monitor"` (on) and `null` (off) and refuses anything else. If the cloud is unreachable nothing changes. `POSTERNA_MODE=monitor` is read when the engine starts and ignores case; no value of it enables enforcement.
 
 ### 5.5 Templates
 
-`monitor` (everything allow), `allow-list` (training blocked, everything else allowed), `saas-signup` (allow-list plus a signup scope with lift for verified and challenge for claimed_failed and unknown_automation). Every template starts with `mode: monitor`.
+`monitor` (everything allow), `allow-list` (training blocked, everything else allowed), `saas-signup` (allow-list plus a signup scope with lift for verified and challenge for claimed_failed and unknown_automation). Every template starts with `mode: monitor`. They ship as YAML in `@posterna/core/templates/`.
 
 ### 5.6 Emitters
 
 `posterna robots` writes robots.txt from the policy: one group per robots token for agents that honor robots, grouped by purpose, plus Content Signals. The policy engine enforces against agents that do not honor robots.txt.
+
+- `emit` chooses the parts: `robots.txt` for the agent groups, `content-signals` for the signal lines. Without `emit`, only an open `User-agent: *` group is written.
+- An agent's lines are the rules that apply to it when verified: operator, purpose and `defaults.verified` rules give `Disallow: /` or nothing, and path rules add `Allow` or `Disallow` lines where they differ from what covers them (an exact pattern ends in `$`, a trailing `*` is dropped). Agents allowed everywhere get no group; with the guard on, search engines get none. Throttle counts as allow. Tokens with the same lines share a group, and each token appears once.
+- Content Signals go in the `User-agent: *` group: `purposes.training` sets `ai-train`, `purposes.search` sets `search`, `purposes.user_fetch` sets `ai-input`; block is `no`, allow and throttle are `yes`, no rule means no signal. Path rules with those keys add path-scoped lines. Only the signal lines and a pointer to https://contentsignals.org/ are written, never a legal statement on the site's behalf.
+- The output states the rules whatever the mode.
 
 ## 6. Adapters
 
@@ -230,6 +256,7 @@ Block body (text/plain): `This site's policy does not allow this agent ({operato
 - `pathGroup` is the matched policy path pattern, else the first path segment (`/docs/*`), capped at 50 distinct groups per flush with the rest in `other`.
 - Flushes every 60 seconds, on process exit, and through `waitUntil` where the platform offers it. Exponential backoff; data older than 10 minutes is dropped. Never blocks a request.
 - Without a site key it runs local-only and sends nothing.
+- `state` comes from the policy engine's `state()` (`docs/policy.md`). `mode` is `enforce` only when agents.yaml says so and neither kill switch is on; `guarded` counts guard downgrades since the process started.
 
 Payload, `POST https://posterna.com/v1/ingest`, `Authorization: Bearer <site key>`, optionally gzip:
 

@@ -1,0 +1,47 @@
+{
+  "id": "policy/failure/fails-open",
+  "description": "Malformed input never blocks: the decision is allow, not enforced, with error set.",
+  "spec": [
+    "4.8",
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  unknown_automation: block\n",
+  "expected_state": {
+    "errors_at_least": 2
+  },
+  "steps": [
+    {
+      "result": {
+        "verdict": "not-a-verdict"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": true,
+        "response": null
+      }
+    },
+    {
+      "result": null,
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": true
+      }
+    }
+  ]
+}

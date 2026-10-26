@@ -1,0 +1,75 @@
+{
+  "id": "policy/order/human-always-allowed",
+  "description": "A person is allowed even when every class, purpose, path and sign-up rule blocks or challenges.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  verified: block\n  declared_unverifiable: block\n  claimed_failed: block\n  unknown_automation: block\npurposes:\n  training: block\n  search: block\n  user_fetch: block\n  agent: block\n  preview: block\n  ads: block\n  other: block\npaths:\n  \"/*\":\n    verified: block\n    claimed_failed: block\n    unknown_automation: block\nsignup:\n  \"/*\":\n    verified: challenge\n    declared_unverifiable: challenge\n    claimed_failed: challenge\n    unknown_automation: challenge\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "human",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "human",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "human",
+        "method": "none"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "human",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./*.unknown_automation",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 403,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "block"
+          },
+          "body": "This site's policy does not allow this agent (unknown, unknown). Operators can get verified at https://posterna.com/operators"
+        }
+      }
+    }
+  ]
+}

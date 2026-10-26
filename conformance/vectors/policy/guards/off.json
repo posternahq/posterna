@@ -1,0 +1,72 @@
+{
+  "id": "policy/guards/off",
+  "description": "With guards.search_engines: off, search engines are treated like any other agent.",
+  "spec": [
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\nguards:\n  search_engines: off\ndefaults:\n  claimed_failed: block\npurposes:\n  search: block\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "rdns"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.search",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "rdns"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.search",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "declared_unverifiable",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.search",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

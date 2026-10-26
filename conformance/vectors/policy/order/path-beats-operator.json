@@ -1,0 +1,61 @@
+{
+  "id": "policy/order/path-beats-operator",
+  "description": "A matching path rule comes before the operator rule.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\noperators:\n  anthropic:\n    training: block\npaths:\n  \"/docs/*\":\n    training: allow\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/docs/a"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "paths./docs/*.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/blog"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "operators.anthropic.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 403,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "block"
+          },
+          "body": "This site's policy does not allow this agent (anthropic, training). Operators can get verified at https://posterna.com/operators"
+        }
+      }
+    }
+  ]
+}

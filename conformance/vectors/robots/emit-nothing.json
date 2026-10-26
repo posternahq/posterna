@@ -1,0 +1,11 @@
+{
+  "id": "robots/emit-nothing",
+  "description": "Without an emit list, nothing but the open default group is written.",
+  "spec": [
+    "5.6"
+  ],
+  "type": "robots",
+  "directory": "fixtures/directory.json",
+  "policy": "version: 1\npurposes:\n  training: block\n",
+  "expected": "# robots.txt written by Posterna from agents.yaml.\n# Crawlers that honor robots.txt are asked to stay out of what the policy blocks.\n# The site's policy engine enforces against agents that do not.\n# agents.yaml emits nothing. Add emit: [robots.txt, content-signals] to write rules here.\n\nUser-agent: *\nAllow: /\n"
+}

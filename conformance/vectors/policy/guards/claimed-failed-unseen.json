@@ -1,0 +1,57 @@
+{
+  "id": "policy/guards/claimed-failed-unseen",
+  "description": "A failed search-engine claim is downgraded to allow and recorded as guarded when no verified request from that operator was seen in 7 days.",
+  "spec": [
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  claimed_failed: block\n",
+  "expected_state": {
+    "guarded": 2
+  },
+  "steps": [
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "rdns"
+      },
+      "context": {
+        "path": "/"
+      },
+      "repeat": 2,
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "guards.search_engines",
+        "retry_after": null,
+        "guarded": true,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "defaults.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

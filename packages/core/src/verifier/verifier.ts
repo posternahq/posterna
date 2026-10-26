@@ -67,6 +67,10 @@ export interface Verifier {
   /** Client address and host resolution for one request, for the debug route. */
   resolve(request: RequestLike, options?: VerifyCallOptions): ResolvedClient;
   state(): VerifierState;
+  /** The current directory record for an operator slug, if the directory has loaded. */
+  operator(slug: string): OperatorRecord | undefined;
+  /** Every operator in the current directory. Empty until it has loaded. */
+  operators(): OperatorRecord[];
   /**
    * Refreshes directory.json and keys.json now instead of waiting for the
    * schedule. A failure keeps the last good copy. Does nothing when refresh is off.
@@ -356,6 +360,12 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
         keysVersion: index?.keysVersion ?? null,
         reverseDnsAvailable: rdns.available,
       };
+    },
+    operator(slug) {
+      return store.index?.operators.get(slug);
+    },
+    operators() {
+      return [...(store.index?.operators.values() ?? [])];
     },
     async refresh() {
       await store.ready;

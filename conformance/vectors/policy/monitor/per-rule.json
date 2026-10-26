@@ -1,0 +1,82 @@
+{
+  "id": "policy/monitor/per-rule",
+  "description": "monitor: true on the deciding rule records the action as not enforced, even in enforce mode; other rules still enforce.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  claimed_failed: block\npaths:\n  \"/api/*\":\n    claimed_failed: block\n    monitor: true\n  \"/api/v2/*\":\n    claimed_failed: block\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/api/x"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "paths./api/*.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/api/v2/x"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./api/v2/*.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/home"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "defaults.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 403,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "block"
+          },
+          "body": "This site's policy does not allow this agent (anthropic, training). Operators can get verified at https://posterna.com/operators"
+        }
+      }
+    }
+  ]
+}

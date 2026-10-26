@@ -1,0 +1,137 @@
+{
+  "id": "policy/suspensions/remote-override",
+  "description": "The remote override can turn monitor on and off, and anything other than monitor or null is refused.",
+  "spec": [
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npurposes:\n  training: block\n",
+  "expected_state": {
+    "mode": "enforce",
+    "remote_override": null,
+    "suspensions": []
+  },
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "set_remote_override": "monitor",
+      "expected_accepted": true
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "set_remote_override": "enforce",
+      "expected_accepted": false
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "set_remote_override": null,
+      "expected_accepted": true
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "set_remote_override": "MONITOR",
+      "expected_accepted": false
+    },
+    {
+      "set_remote_override": 42,
+      "expected_accepted": false
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

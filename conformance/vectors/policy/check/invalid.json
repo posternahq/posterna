@@ -1,0 +1,107 @@
+{
+  "id": "policy/check/invalid",
+  "description": "Every error in a document is reported with the dotted path and line it belongs to.",
+  "spec": [
+    "5.1"
+  ],
+  "type": "policy_check",
+  "cases": [
+    {
+      "policy": "version: 1\nmode: enforced\ndefaults:\n  verifed: allow\n  human: block\npurposes:\n  training: throttle\n  search: { action: throttle, rate: 60/minute }\n  ads: { action: block, rate: 1/min }\noperators:\n  OpenAI:\n    agent: block\npaths:\n  api/*:\n    claimed_failed: block\n  \"/docs/*\":\n    monitor: \"true\"\nsignup:\n  /signup:\n    verified: block\nemit: [robots]\n",
+      "valid": false,
+      "errors": [
+        {
+          "path": "mode",
+          "line": 2
+        },
+        {
+          "path": "defaults.verifed",
+          "line": 4
+        },
+        {
+          "path": "defaults.human",
+          "line": 5
+        },
+        {
+          "path": "purposes.training",
+          "line": 7
+        },
+        {
+          "path": "purposes.search.rate",
+          "line": 8
+        },
+        {
+          "path": "purposes.ads.rate",
+          "line": 9
+        },
+        {
+          "path": "operators.OpenAI",
+          "line": 11
+        },
+        {
+          "path": "paths.api/*",
+          "line": 14
+        },
+        {
+          "path": "paths./docs/*.monitor",
+          "line": 17
+        },
+        {
+          "path": "signup./signup.verified",
+          "line": 20
+        },
+        {
+          "path": "emit.0",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "policy": "mode: monitor\n",
+      "valid": false,
+      "errors": [
+        {
+          "path": "",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "policy": "version: 2\n",
+      "valid": false,
+      "errors": [
+        {
+          "path": "version",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "policy": "version: 1\ncolour: blue\n",
+      "valid": false,
+      "errors": [
+        {
+          "path": "colour",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "policy": "",
+      "valid": false
+    },
+    {
+      "policy": "version: 1\nmode: monitor\nmode: enforce\n",
+      "valid": false
+    },
+    {
+      "policy": "version: 1\npaths:\n  bad: [\n    unclosed\n",
+      "valid": false
+    },
+    {
+      "policy": "version: 1\ndefaults:\npaths:\nsignup:\noperators:\n",
+      "valid": true,
+      "mode": "monitor"
+    }
+  ]
+}

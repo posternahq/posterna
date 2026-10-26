@@ -1,0 +1,203 @@
+{
+  "id": "policy/throttle/timing",
+  "description": "A bucket holds N tokens and refills N per period continuously; Retry-After is the whole seconds until the next token, rounded up.",
+  "spec": [
+    "5.2"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\noperators:\n  example-signer:\n    agent: { action: throttle, rate: 3/min }\n",
+  "steps": [
+    {
+      "at": 0,
+      "repeat": 3,
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "operators.example-signer.agent",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "at": 0,
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "throttle",
+        "enforced": true,
+        "rule": "operators.example-signer.agent",
+        "retry_after": 20,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 429,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "throttle",
+            "Retry-After": "20"
+          },
+          "body": "Rate limited by this site's agent policy. Retry after 20 seconds."
+        }
+      }
+    },
+    {
+      "at": 5,
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "throttle",
+        "enforced": true,
+        "rule": "operators.example-signer.agent",
+        "retry_after": 15,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 429,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "throttle",
+            "Retry-After": "15"
+          },
+          "body": "Rate limited by this site's agent policy. Retry after 15 seconds."
+        }
+      }
+    },
+    {
+      "at": 19.5,
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "throttle",
+        "enforced": true,
+        "rule": "operators.example-signer.agent",
+        "retry_after": 1,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "at": 20,
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "operators.example-signer.agent",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "at": 20,
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "throttle",
+        "enforced": true,
+        "rule": "operators.example-signer.agent",
+        "retry_after": 20,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "at": 200,
+      "repeat": 3,
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "operators.example-signer.agent",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "at": 200,
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "throttle",
+        "enforced": true,
+        "rule": "operators.example-signer.agent",
+        "retry_after": 20,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

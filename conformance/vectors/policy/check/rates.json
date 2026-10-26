@@ -1,0 +1,60 @@
+{
+  "id": "policy/check/rates",
+  "description": "Rates are a whole number from 1 to 1,000,000 per sec, min or hour.",
+  "spec": [
+    "5.2"
+  ],
+  "type": "policy_check",
+  "cases": [
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"60/min\" }\n",
+      "valid": true
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"1/sec\" }\n",
+      "valid": true
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"1/hour\" }\n",
+      "valid": true
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \" 5 / sec \" }\n",
+      "valid": true
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"1000000/hour\" }\n",
+      "valid": true
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"0/min\" }\n",
+      "valid": false,
+      "errors": [
+        {
+          "path": "purposes.agent.rate",
+          "line": 3
+        }
+      ]
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"1000001/min\" }\n",
+      "valid": false
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"1.5/min\" }\n",
+      "valid": false
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"10/day\" }\n",
+      "valid": false
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"10 per min\" }\n",
+      "valid": false
+    },
+    {
+      "policy": "version: 1\npurposes:\n  agent: { action: throttle, rate: \"-1/min\" }\n",
+      "valid": false
+    }
+  ]
+}

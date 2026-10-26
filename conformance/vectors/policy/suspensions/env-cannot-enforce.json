@@ -1,0 +1,39 @@
+{
+  "id": "policy/suspensions/env-cannot-enforce",
+  "description": "POSTERNA_MODE=enforce does not enable enforcement in a monitor policy.",
+  "spec": [
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: monitor\npurposes:\n  training: block\n",
+  "env": {
+    "POSTERNA_MODE": "enforce"
+  },
+  "expected_state": {
+    "mode": "monitor",
+    "suspensions": []
+  },
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

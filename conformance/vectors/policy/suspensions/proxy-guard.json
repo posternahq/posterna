@@ -1,0 +1,42 @@
+{
+  "id": "policy/suspensions/proxy-guard",
+  "description": "While the proxy guard suspects a misconfigured proxy, nothing is enforced.",
+  "spec": [
+    "5.4",
+    "4.2"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npurposes:\n  training: block\n",
+  "proxy_suspect": true,
+  "expected_state": {
+    "mode": "enforce",
+    "proxy_suspect": true,
+    "suspensions": [
+      "proxy"
+    ]
+  },
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    }
+  ]
+}

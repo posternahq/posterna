@@ -1,0 +1,99 @@
+{
+  "id": "policy/order/purposes-beats-defaults",
+  "description": "The purposes rule comes before defaults; a claim with no purpose falls through to defaults.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  verified: allow\n  declared_unverifiable: block\npurposes:\n  other: allow\n  training: block\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "rdns-crawler",
+        "agent": "ExampleRdnsBot",
+        "purpose": "training",
+        "method": "rdns"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "defaults.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "declared_unverifiable",
+        "operator": "quiet-operator",
+        "agent": "QuietBot",
+        "purpose": "other",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "purposes.other",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "declared_unverifiable",
+        "operator": "example-signer",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "defaults.declared_unverifiable",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 403,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "block"
+          },
+          "body": "This site's policy does not allow this agent (example-signer, unknown). Operators can get verified at https://posterna.com/operators"
+        }
+      }
+    }
+  ]
+}

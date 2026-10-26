@@ -1,0 +1,206 @@
+{
+  "id": "policy/signup/recommendations",
+  "description": "Sign-up scopes return lift, cap or challenge by verdict class for the application to act on; the middleware never sends a response for them.",
+  "spec": [
+    "5.2"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npurposes:\n  training: block\nsignup:\n  \"/signup\":\n    verified: lift\n    claimed_failed: challenge\n    unknown_automation: challenge\n  \"/invite/*\":\n    declared_unverifiable: cap\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "lift",
+        "enforced": true,
+        "rule": "signup./signup.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "challenge",
+        "enforced": true,
+        "rule": "signup./signup.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "challenge",
+        "enforced": true,
+        "rule": "signup./signup.unknown_automation",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "declared_unverifiable",
+        "operator": "quiet-operator",
+        "agent": "QuietBot",
+        "purpose": "other",
+        "method": "none"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "human",
+        "method": "none"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "human",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "declared_unverifiable",
+        "operator": "quiet-operator",
+        "agent": "QuietBot",
+        "purpose": "other",
+        "method": "none"
+      },
+      "context": {
+        "path": "/invite/abc",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "cap",
+        "enforced": true,
+        "rule": "signup./invite/*.declared_unverifiable",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/pricing",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "lift",
+        "enforced": true,
+        "rule": "signup./signup.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/signup"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 403,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "block"
+          },
+          "body": "This site's policy does not allow this agent (anthropic, training). Operators can get verified at https://posterna.com/operators"
+        }
+      }
+    }
+  ]
+}

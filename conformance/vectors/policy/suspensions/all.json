@@ -1,0 +1,50 @@
+{
+  "id": "policy/suspensions/all",
+  "description": "Every suspension at once still yields a recorded, unenforced decision.",
+  "spec": [
+    "5.3",
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npurposes:\n  training: block\n",
+  "env": {
+    "POSTERNA_MODE": "monitor"
+  },
+  "proxy_suspect": true,
+  "expected_state": {
+    "mode": "monitor",
+    "remote_override": "monitor",
+    "suspensions": [
+      "env",
+      "remote",
+      "proxy"
+    ]
+  },
+  "steps": [
+    {
+      "set_remote_override": "monitor",
+      "expected_accepted": true
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

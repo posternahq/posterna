@@ -1,0 +1,22 @@
+# Posterna policy: the monitor template.
+#
+# Every request is allowed and labeled; nothing is blocked. Watch what
+# arrives for a while, then move to the allow-list template or write your
+# own rules. The reference for every key is docs/policy.md in the
+# posternahq/posterna repository.
+
+version: 1
+mode: monitor
+
+# By verdict class. People are always allowed and are not configured here.
+defaults:
+  verified: allow
+  declared_unverifiable: allow
+  claimed_failed: allow
+  unknown_automation: allow
+
+# Verified search engines are never blocked or throttled.
+guards:
+  search_engines: protect
+
+emit: [robots.txt, content-signals]

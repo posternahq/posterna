@@ -1,0 +1,92 @@
+{
+  "id": "policy/order/path-class-beats-path-purpose",
+  "description": "Within one path rule the verdict class key beats the purpose key, so a failed claim cannot borrow its claimed purpose's allow.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npurposes:\n  training: block\npaths:\n  \"/api/*\":\n    claimed_failed: block\n    training: allow\n  \"/feed/*\":\n    verified: allow\n    training: block\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/api/x"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./api/*.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/api/x"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "paths./api/*.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/feed/rss"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "paths./feed/*.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

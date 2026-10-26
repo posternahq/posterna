@@ -1,0 +1,57 @@
+{
+  "id": "policy/breaker/signup-not-counted",
+  "description": "Sign-up decisions are not counted, so a request decided as a page and as a sign-up counts once.",
+  "spec": [
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  claimed_failed: block\nsignup:\n  \"/signup\":\n    claimed_failed: challenge\n",
+  "expected_state": {
+    "breaker_tripped": []
+  },
+  "steps": [
+    {
+      "repeat": 25,
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "challenge",
+        "enforced": true,
+        "rule": "signup./signup.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "defaults.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

@@ -11,14 +11,21 @@ import { describe, expect, it } from "vitest";
 import { jwkToKeyID, verify as webBotAuthVerify } from "web-bot-auth";
 import { verifierFromJWK } from "web-bot-auth/crypto";
 import { buildIndex } from "../src/directory/index-builder";
-import type { DirectoryFile, KeysFile } from "../src/directory/types";
+import type { DirectoryFile, KeysFile, OperatorRecord } from "../src/directory/types";
+import { emitRobots } from "../src/policy/emit";
+import { createPolicyEngine } from "../src/policy/engine";
+import { checkPolicy, parsePolicy } from "../src/policy/parse";
+import { enforcementResponse } from "../src/policy/respond";
+import type { DecideContext } from "../src/policy/types";
 import { stripInboundHeaders, verdictHeaders } from "../src/verifier/headers";
 import type { DnsResolver } from "../src/verifier/rdns";
 import { normalizeRequest } from "../src/verifier/request";
 import type { SignatureLibrary } from "../src/verifier/signature-path";
+import type { VerdictResult } from "../src/verifier/types";
 import { createVerifier } from "../src/verifier/verifier";
 
 const CONFORMANCE = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "conformance");
+const TEMPLATES = join(dirname(fileURLToPath(import.meta.url)), "..", "templates");
 const BASE_URL = "https://directory.fixtures.example/v1/";
 const read = (path: string) => JSON.parse(readFileSync(join(CONFORMANCE, path), "utf8"));
 
@@ -93,7 +100,77 @@ interface KeyDirectoryVector {
     keys: { kid: string | null; thumbprint: string }[];
   };
 }
-type Vector = VerifyVector | Rfc9421Vector | KeyDirectoryVector;
+interface HttpResponse {
+  status: number;
+  headers: Record<string, string>;
+  body: string;
+}
+interface DecideStep {
+  at?: number;
+  repeat?: number;
+  result?: Record<string, unknown> | null;
+  context?: DecideContext;
+  expected?: {
+    action: string;
+    enforced: boolean;
+    rule: string | null;
+    retry_after: number | null;
+    guarded: boolean;
+    error: boolean;
+    response?: HttpResponse | null;
+  };
+  set_remote_override?: unknown;
+  expected_accepted?: boolean;
+}
+interface DecideVector {
+  id: string;
+  description: string;
+  type: "decide";
+  now: string;
+  policy: string;
+  template?: string;
+  env?: Record<string, string>;
+  proxy_suspect?: boolean;
+  steps: DecideStep[];
+  expected_state?: {
+    mode?: string;
+    configured_mode?: string;
+    suspensions?: string[];
+    remote_override?: string | null;
+    proxy_suspect?: boolean;
+    breaker_tripped?: string[];
+    guarded?: number;
+    errors_at_least?: number;
+  };
+}
+interface PolicyCheckVector {
+  id: string;
+  description: string;
+  type: "policy_check";
+  cases: {
+    policy: string;
+    template?: string;
+    valid: boolean;
+    mode?: string;
+    errors?: { path: string; line: number }[];
+  }[];
+}
+interface RobotsVector {
+  id: string;
+  description: string;
+  type: "robots";
+  directory: string;
+  policy: string;
+  template?: string;
+  expected: string;
+}
+type Vector =
+  | VerifyVector
+  | Rfc9421Vector
+  | KeyDirectoryVector
+  | DecideVector
+  | PolicyCheckVector
+  | RobotsVector;
 
 function listJson(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -353,6 +430,101 @@ async function runKeyDirectory(vector: KeyDirectoryVector): Promise<void> {
   ).toEqual(computed.map((key) => key.thumbprint).sort());
 }
 
+const lowerKeys = (headers: Record<string, string>) =>
+  Object.fromEntries(Object.entries(headers).map(([name, value]) => [name.toLowerCase(), value]));
+
+/** A shipped template must be byte for byte what the vector holds. */
+function checkTemplate(name: string | undefined, policy: string): void {
+  if (name) expect(readFileSync(join(TEMPLATES, `${name}.yaml`), "utf8")).toBe(policy);
+}
+
+function runDecide(vector: DecideVector): void {
+  checkTemplate(vector.template, vector.policy);
+  const start = Date.parse(vector.now);
+  let now = start;
+  const operators = new Map<string, OperatorRecord>(
+    fixtures.directory.operators.map((operator) => [operator.slug, operator]),
+  );
+  const engine = createPolicyEngine(vector.policy, {
+    verifier: {
+      state: () => ({ proxySuspect: vector.proxy_suspect ?? false }),
+      operator: (slug) => operators.get(slug),
+    },
+    env: vector.env ?? {},
+    now: () => now,
+  });
+  for (const [index, step] of vector.steps.entries()) {
+    const where = `${vector.id} step ${index + 1}`;
+    if (step.at !== undefined) now = start + Math.round(step.at * 1000);
+    if ("set_remote_override" in step) {
+      expect(engine.setRemoteOverride(step.set_remote_override), where).toBe(
+        step.expected_accepted,
+      );
+      continue;
+    }
+    const expected = step.expected;
+    if (!expected || !step.context) continue;
+    for (let round = 0; round < (step.repeat ?? 1); round++) {
+      const result = step.result as unknown as VerdictResult;
+      const decision = engine.decide(result, step.context);
+      const at = `${where} round ${round + 1}: ${decision.reason}`;
+      expect(decision.action, at).toBe(expected.action);
+      expect(decision.enforced, at).toBe(expected.enforced);
+      expect(decision.rule ?? null, at).toBe(expected.rule);
+      expect(decision.retryAfter ?? null, at).toBe(expected.retry_after);
+      expect(Boolean(decision.guarded), at).toBe(expected.guarded);
+      expect(Boolean(decision.error), at).toBe(expected.error);
+      if (expected.response !== undefined) {
+        const response = enforcementResponse(decision, result ?? { verdict: "human" });
+        const normalized = response && { ...response, headers: lowerKeys(response.headers) };
+        const want = expected.response && {
+          ...expected.response,
+          headers: lowerKeys(expected.response.headers),
+        };
+        expect(normalized, at).toEqual(want);
+      }
+    }
+  }
+  const want = vector.expected_state;
+  if (!want) return;
+  const state = engine.state();
+  if (want.mode !== undefined) expect(state.mode).toBe(want.mode);
+  if (want.configured_mode !== undefined) expect(state.configuredMode).toBe(want.configured_mode);
+  if (want.suspensions !== undefined) expect(state.suspensions).toEqual(want.suspensions);
+  if (want.remote_override !== undefined) expect(state.remoteOverride).toBe(want.remote_override);
+  if (want.proxy_suspect !== undefined) expect(state.proxySuspect).toBe(want.proxy_suspect);
+  if (want.breaker_tripped !== undefined)
+    expect(state.breakerTripped).toEqual(want.breaker_tripped);
+  if (want.guarded !== undefined) expect(state.guarded).toBe(want.guarded);
+  if (want.errors_at_least !== undefined)
+    expect(state.errors).toBeGreaterThanOrEqual(want.errors_at_least);
+}
+
+function runPolicyCheck(vector: PolicyCheckVector): void {
+  for (const [index, test] of vector.cases.entries()) {
+    const where = `${vector.id} case ${index + 1}`;
+    checkTemplate(test.template, test.policy);
+    const result = checkPolicy(test.policy);
+    expect(result.policy !== null, `${where}: ${JSON.stringify(result.errors)}`).toBe(test.valid);
+    if (test.mode !== undefined) expect(result.policy?.mode, where).toBe(test.mode);
+    if (test.errors) {
+      type Located = { path: string; line: number | null };
+      const order = (a: Located, b: Located) =>
+        (a.line ?? 0) - (b.line ?? 0) || a.path.localeCompare(b.path);
+      expect(
+        result.errors.map((error) => ({ path: error.path, line: error.line })).sort(order),
+        where,
+      ).toEqual([...test.errors].sort(order));
+    }
+  }
+}
+
+function runRobots(vector: RobotsVector): void {
+  checkTemplate(vector.template, vector.policy);
+  const directory = read(vector.directory) as DirectoryFile;
+  expect(emitRobots(parsePolicy(vector.policy), directory.operators)).toBe(vector.expected);
+}
+
 describe("conformance vectors", () => {
   it("has vectors to run", () => {
     expect(vectors.length).toBeGreaterThan(50);
@@ -367,8 +539,14 @@ describe("conformance vectors", () => {
       it(vector.id, async () => {
         expect(await runRfc9421(vector)).toBe(vector.expected.valid);
       });
-    } else {
+    } else if (vector.type === "key_directory") {
       it(vector.id, () => runKeyDirectory(vector));
+    } else if (vector.type === "decide") {
+      it(vector.id, () => runDecide(vector));
+    } else if (vector.type === "policy_check") {
+      it(vector.id, () => runPolicyCheck(vector));
+    } else {
+      it(vector.id, () => runRobots(vector));
     }
   }
 });

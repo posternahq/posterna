@@ -1,0 +1,70 @@
+{
+  "id": "policy/order/no-rule",
+  "description": "With no rule for the request, the decision is allow with no rule.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

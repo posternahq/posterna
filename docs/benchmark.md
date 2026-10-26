@@ -10,17 +10,19 @@
   - `ip (verified_by_ip)`: a Googlebot claim from an address in Google's published common-crawlers list.
   - `ip (claimed_failed)`: a ClaudeBot claim from an AWS address outside Anthropic's list.
   - `no claim (human)`: an ordinary browser request.
-- **Timing:** 500 warm-up requests, then 5,000 timed requests per scenario, one at a time, with `performance.now()` around each `verify()` call. That includes request normalization, client address resolution, claim identification and the signature or IP check. Building the `Request` objects and signing the test requests happen beforehand and are not timed.
+- **Policy:** an enforcing policy with a rule at every evaluation step (defaults, purposes, an operator throttle, sign-up scopes) and 40 path rules, so every decision scans the full path list.
+- **Timing:** 500 warm-up requests, then 5,000 timed requests per scenario, one at a time, with `performance.now()` around the work the middleware does per request: `verify()`, then `decide()`, then `enforcementResponse()`. That includes request normalization, client address resolution, claim identification, the signature or IP check, and policy evaluation with its safety rails. Building the `Request` objects and signing the test requests happen beforehand and are not timed.
 - **Excluded:** reverse DNS, which runs in the background and never on the request path (`dns: null` in the benchmark), and directory refreshes.
-- **Reported:** p50, p95, p99 and max per scenario. The run fails on p99 of 5 ms or more, or on an unexpected verdict.
+- **Reported:** p50, p95, p99 and max per scenario, with the verdict and decision. The run fails on p99 of 5 ms or more, or on an unexpected verdict or decision. The `claimed_failed` scenario is a flood of 5,500 failed claims, so the breaker trips after the first 20 and later blocks are recorded as not enforced, as they would be in production.
 
 ## Results
 
 | Machine | Signature p99 | IP p99 | Worst p99 | Headroom |
 |---|---|---|---|---|
-| Apple M3, Node 24.13, macOS (26 October 2026) | 0.170 ms | 0.005 ms | 0.170 ms | about 29x |
-| GitHub Actions `ubuntu-latest`, 2 vCPUs (Intel Xeon Platinum 8573C), Node 22.23 (26 October 2026, commit `b6dbcdd`) | 1.379 ms | 0.026 ms | 1.379 ms | about 3.6x |
+| Apple M3, Node 24.13, macOS (26 October 2026), verify and decide | 0.176 ms | 0.007 ms | 0.176 ms | about 28x |
+| Apple M3, Node 24.13, macOS (26 October 2026), verify only | 0.170 ms | 0.005 ms | 0.170 ms | about 29x |
+| GitHub Actions `ubuntu-latest`, 2 vCPUs (Intel Xeon Platinum 8573C), Node 22.23 (26 October 2026, commit `b6dbcdd`), verify only | 1.379 ms | 0.026 ms | 1.379 ms | about 3.6x |
 
 Every run prints its numbers in the `Bench` job log. GitHub's standard Linux runners have 2 vCPUs for private repositories and 4 for public ones, and are noisy: on the run above the signature path's p50 was 0.263 ms but its single slowest request took 6.6 ms. The budget applies to p99, which stayed at 1.4 ms, so CI has about 3.6x headroom on the signature path and far more on the IP path. If the signature p99 in CI starts creeping toward 5 ms, look at the runner before the code: the same commit runs eight times faster on a laptop.
 
-Almost all of the signature path is the Ed25519 verification itself (Web Crypto, inside Cloudflare's library). The IP path is a binary search over merged prefix ranges compiled when the directory loads.
+Almost all of the signature path is the Ed25519 verification itself (Web Crypto, inside Cloudflare's library). The IP path is a binary search over merged prefix ranges compiled when the directory loads. Policy evaluation adds about a microsecond: path patterns are compiled and sorted once, and each decision is a short scan plus map lookups.

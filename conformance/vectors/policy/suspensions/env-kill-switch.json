@@ -1,0 +1,44 @@
+{
+  "id": "policy/suspensions/env-kill-switch",
+  "description": "POSTERNA_MODE=monitor stops enforcement in an enforce policy.",
+  "spec": [
+    "5.3",
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npurposes:\n  training: block\n",
+  "env": {
+    "POSTERNA_MODE": "monitor"
+  },
+  "expected_state": {
+    "mode": "monitor",
+    "configured_mode": "enforce",
+    "suspensions": [
+      "env"
+    ]
+  },
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    }
+  ]
+}

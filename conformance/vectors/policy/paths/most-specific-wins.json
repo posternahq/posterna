@@ -1,0 +1,232 @@
+{
+  "id": "policy/paths/most-specific-wins",
+  "description": "Exact beats wildcard; then more literal characters; then fewer wildcards; then file order. Matching ignores the query and is case-sensitive.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npaths:\n  \"/api/*\":\n    verified: block\n  \"/api/public/*\":\n    verified: allow\n  \"/api/public/feed\":\n    verified: block\n  \"/a/b*\":\n    verified: allow\n  \"/a/*/c\":\n    verified: block\n  \"/x*\":\n    verified: block\n  \"/*y\":\n    verified: allow\n  \"/ab*\":\n    verified: block\n  \"/ab\":\n    verified: allow\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/api/users"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./api/*.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/api/public/list"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "paths./api/public/*.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/api/public/feed"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./api/public/feed.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/api/public/feed?page=2"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./api/public/feed.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/api/public/feed/extra"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "paths./api/public/*.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/api"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/a/b/c"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./a/*/c.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/xy"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./x*.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/ab"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "paths./ab.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/abc"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./ab*.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/API/users"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

@@ -11,6 +11,37 @@ export {
 } from "./directory/signature";
 export { DEFAULT_BASE_URL, type DirectoryOptions, type DirectorySnapshot } from "./directory/store";
 export type * from "./directory/types";
+export {
+  contentSignalLines,
+  emitRobots,
+  type RobotsOptions,
+  robotsPath,
+} from "./policy/emit";
+export {
+  createPolicyEngine,
+  type PolicyEngine,
+  type PolicyEngineOptions,
+  type PolicyState,
+  type PolicyVerifier,
+  type Suspension,
+} from "./policy/engine";
+export { canonicalJson, policyHash } from "./policy/hash";
+export {
+  type CheckOptions,
+  type CheckResult,
+  checkPolicy,
+  formatIssue,
+  MAX_RATE_COUNT,
+  PolicyError,
+  type PolicyIssue,
+  parsePolicy,
+  parseRate,
+  policyFromObject,
+} from "./policy/parse";
+export { type EnforcementResponse, enforcementResponse, OPERATORS_URL } from "./policy/respond";
+export { TEMPLATE_NAMES, type TemplateName } from "./policy/templates";
+export type * from "./policy/types";
+export { PURPOSES, VERDICT_CLASSES } from "./policy/types";
 export type { ProxyOptions, ResolvedClient } from "./verifier/client";
 export {
   DEFAULT_VERDICT_HEADERS,

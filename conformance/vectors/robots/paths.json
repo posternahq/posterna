@@ -1,0 +1,11 @@
+{
+  "id": "robots/paths",
+  "description": "Path rules become Allow and Disallow lines under robots.txt longest-match rules; exact patterns end in $; the guard keeps search engines out.",
+  "spec": [
+    "5.6"
+  ],
+  "type": "robots",
+  "directory": "fixtures/directory.json",
+  "policy": "version: 1\nmode: enforce\npurposes:\n  training: block\n  user_fetch: allow\npaths:\n  \"/blog/*\":\n    training: allow\n  \"/blog/drafts/*\":\n    verified: block\n  \"/private\":\n    user_fetch: block\nemit: [robots.txt]\n",
+  "expected": "# robots.txt written by Posterna from agents.yaml.\n# Crawlers that honor robots.txt are asked to stay out of what the policy blocks.\n# The site's policy engine enforces against agents that do not.\n\nUser-agent: *\nAllow: /\n\n# Training\nUser-agent: ClaudeBot\nUser-agent: Google-Extended\nDisallow: /\nAllow: /blog/\nDisallow: /blog/drafts/\n\n# Search\nUser-agent: Claude-SearchBot\nUser-agent: Googlebot-News\nUser-agent: Storebot-Google\nDisallow: /blog/drafts/\n\n# User-initiated fetches\nUser-agent: Claude-User\nDisallow: /blog/drafts/\nDisallow: /private$\n\n# Other\nUser-agent: Google-CloudVertexBot\nUser-agent: Google-InspectionTool\nUser-agent: GoogleOther\nUser-agent: GoogleOther-Image\nUser-agent: GoogleOther-Video\nDisallow: /blog/drafts/\n"
+}

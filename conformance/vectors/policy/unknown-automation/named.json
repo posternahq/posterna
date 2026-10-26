@@ -1,0 +1,101 @@
+{
+  "id": "policy/unknown-automation/named",
+  "description": "Rules that name unknown_automation act on it. Claims without an operator share one throttle bucket per rule.",
+  "spec": [
+    "5.2",
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  unknown_automation: allow\npaths:\n  \"/admin/*\":\n    unknown_automation: block\n  \"/search\":\n    unknown_automation: { action: throttle, rate: 2/sec }\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none"
+      },
+      "context": {
+        "path": "/admin/x"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./admin/*.unknown_automation",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 403,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "block"
+          },
+          "body": "This site's policy does not allow this agent (unknown, unknown). Operators can get verified at https://posterna.com/operators"
+        }
+      }
+    },
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "defaults.unknown_automation",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none"
+      },
+      "context": {
+        "path": "/search"
+      },
+      "repeat": 2,
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "paths./search.unknown_automation",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none"
+      },
+      "context": {
+        "path": "/search"
+      },
+      "expected": {
+        "action": "throttle",
+        "enforced": true,
+        "rule": "paths./search.unknown_automation",
+        "retry_after": 1,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 429,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "throttle",
+            "Retry-After": "1"
+          },
+          "body": "Rate limited by this site's agent policy. Retry after 1 seconds."
+        }
+      }
+    }
+  ]
+}

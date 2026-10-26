@@ -1,0 +1,52 @@
+{
+  "id": "policy/paths/cascade",
+  "description": "When the most specific matching rule has no key for the request, the next most specific one is checked.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npaths:\n  \"/api/*\":\n    claimed_failed: block\n  \"/api/public/*\":\n    verified: allow\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/api/public/x"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./api/*.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/api/public/x"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "paths./api/public/*.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

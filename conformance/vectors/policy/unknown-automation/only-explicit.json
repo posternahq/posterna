@@ -1,0 +1,48 @@
+{
+  "id": "policy/unknown-automation/only-explicit",
+  "description": "unknown_automation is not touched by purpose, operator or other class rules.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  verified: block\n  declared_unverifiable: block\n  claimed_failed: block\npurposes:\n  training: block\n  search: block\n  user_fetch: block\n  agent: block\n  preview: block\n  ads: block\n  other: block\npaths:\n  \"/*\":\n    verified: block\n    training: block\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none",
+        "purpose": "training"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": null,
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

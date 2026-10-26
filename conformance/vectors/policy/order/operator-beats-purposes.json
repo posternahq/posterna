@@ -1,0 +1,61 @@
+{
+  "id": "policy/order/operator-beats-purposes",
+  "description": "The operator rule for the purpose comes before the purposes rule.",
+  "spec": [
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npurposes:\n  training: block\noperators:\n  anthropic:\n    training: allow\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "operators.anthropic.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "rdns-crawler",
+        "agent": "ExampleRdnsBot",
+        "purpose": "training",
+        "method": "rdns"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": {
+          "status": 403,
+          "headers": {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+            "X-Posterna-Action": "block"
+          },
+          "body": "This site's policy does not allow this agent (rdns-crawler, training). Operators can get verified at https://posterna.com/operators"
+        }
+      }
+    }
+  ]
+}

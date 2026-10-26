@@ -1,0 +1,93 @@
+{
+  "id": "policy/guards/declared-unverifiable",
+  "description": "An unverifiable search-engine claim gets the same protection as a failed one.",
+  "spec": [
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  declared_unverifiable: block\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "declared_unverifiable",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "guards.search_engines",
+        "retry_after": null,
+        "guarded": true,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "rdns"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "guards.search_engines",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "declared_unverifiable",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "defaults.declared_unverifiable",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "declared_unverifiable",
+        "operator": "quiet-operator",
+        "agent": "QuietBot",
+        "purpose": "other",
+        "method": "none"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "defaults.declared_unverifiable",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

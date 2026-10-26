@@ -1,0 +1,40 @@
+{
+  "id": "policy/suspensions/remote-cannot-enforce",
+  "description": "The remote override can never move an install to enforce.",
+  "spec": [
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: monitor\npurposes:\n  training: block\n",
+  "expected_state": {
+    "mode": "monitor",
+    "remote_override": null
+  },
+  "steps": [
+    {
+      "set_remote_override": "enforce",
+      "expected_accepted": false
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

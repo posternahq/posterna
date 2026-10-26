@@ -1,0 +1,12 @@
+{
+  "id": "robots/templates/monitor",
+  "description": "The monitor template blocks nothing and sets no signals.",
+  "spec": [
+    "5.6"
+  ],
+  "type": "robots",
+  "directory": "fixtures/directory.json",
+  "policy": "# Posterna policy: the monitor template.\n#\n# Every request is allowed and labeled; nothing is blocked. Watch what\n# arrives for a while, then move to the allow-list template or write your\n# own rules. The reference for every key is docs/policy.md in the\n# posternahq/posterna repository.\n\nversion: 1\nmode: monitor\n\n# By verdict class. People are always allowed and are not configured here.\ndefaults:\n  verified: allow\n  declared_unverifiable: allow\n  claimed_failed: allow\n  unknown_automation: allow\n\n# Verified search engines are never blocked or throttled.\nguards:\n  search_engines: protect\n\nemit: [robots.txt, content-signals]\n",
+  "template": "monitor",
+  "expected": "# robots.txt written by Posterna from agents.yaml.\n# Crawlers that honor robots.txt are asked to stay out of what the policy blocks.\n# The site's policy engine enforces against agents that do not.\n\nUser-agent: *\nAllow: /\n"
+}

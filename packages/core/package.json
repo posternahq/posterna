@@ -39,10 +39,12 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./templates/*": "./templates/*",
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
+    "templates",
     "README.md",
     "LICENSE"
   ],
@@ -61,6 +63,11 @@
     "http-message-sig": "0.3.0",
     "ipaddr.js": "2.5.0",
     "structured-headers": "2.0.3",
-    "web-bot-auth": "0.2.0"
+    "web-bot-auth": "0.2.0",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
   }
 }

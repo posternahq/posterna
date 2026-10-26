@@ -1,0 +1,54 @@
+{
+  "id": "policy/throttle/monitor-consumes",
+  "description": "In monitor mode the bucket still counts, so the record shows what enforcement would do.",
+  "spec": [
+    "5.2",
+    "5.3"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: monitor\npurposes:\n  agent: { action: throttle, rate: 1/min }\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "purposes.agent",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "throttle",
+        "enforced": false,
+        "rule": "purposes.agent",
+        "retry_after": 60,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    }
+  ]
+}

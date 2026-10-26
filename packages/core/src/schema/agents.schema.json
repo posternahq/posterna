@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://posterna.com/schema/v1/agents.schema.json",
+  "title": "Posterna site policy (agents.yaml)",
+  "description": "See docs/SPEC.md section 5 and docs/policy.md. The parser in @posterna/core applies the same rules and adds line numbers and suggestions to its errors.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version"],
+  "properties": {
+    "version": { "const": 1 },
+    "mode": { "enum": ["monitor", "enforce"], "default": "monitor" },
+    "defaults": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "verified": { "$ref": "#/$defs/pageAction" },
+        "declared_unverifiable": { "$ref": "#/$defs/pageAction" },
+        "claimed_failed": { "$ref": "#/$defs/pageAction" },
+        "unknown_automation": { "$ref": "#/$defs/pageAction" }
+      }
+    },
+    "guards": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "search_engines": { "enum": ["protect", "off"], "default": "protect" }
+      }
+    },
+    "purposes": { "$ref": "#/$defs/purposeRules" },
+    "operators": {
+      "type": ["object", "null"],
+      "propertyNames": { "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "additionalProperties": { "$ref": "#/$defs/purposeRules" }
+    },
+    "paths": {
+      "type": ["object", "null"],
+      "propertyNames": { "$ref": "#/$defs/pathPattern" },
+      "additionalProperties": {
+        "type": ["object", "null"],
+        "additionalProperties": false,
+        "properties": {
+          "verified": { "$ref": "#/$defs/pageAction" },
+          "declared_unverifiable": { "$ref": "#/$defs/pageAction" },
+          "claimed_failed": { "$ref": "#/$defs/pageAction" },
+          "unknown_automation": { "$ref": "#/$defs/pageAction" },
+          "training": { "$ref": "#/$defs/pageAction" },
+          "search": { "$ref": "#/$defs/pageAction" },
+          "user_fetch": { "$ref": "#/$defs/pageAction" },
+          "agent": { "$ref": "#/$defs/pageAction" },
+          "preview": { "$ref": "#/$defs/pageAction" },
+          "ads": { "$ref": "#/$defs/pageAction" },
+          "other": { "$ref": "#/$defs/pageAction" },
+          "monitor": { "type": "boolean" }
+        }
+      }
+    },
+    "signup": {
+      "type": ["object", "null"],
+      "propertyNames": { "$ref": "#/$defs/pathPattern" },
+      "additionalProperties": {
+        "type": ["object", "null"],
+        "additionalProperties": false,
+        "properties": {
+          "verified": { "$ref": "#/$defs/signupAction" },
+          "declared_unverifiable": { "$ref": "#/$defs/signupAction" },
+          "claimed_failed": { "$ref": "#/$defs/signupAction" },
+          "unknown_automation": { "$ref": "#/$defs/signupAction" }
+        }
+      }
+    },
+    "emit": {
+      "type": "array",
+      "items": { "enum": ["robots.txt", "content-signals"] }
+    }
+  },
+  "$defs": {
+    "rate": {
+      "type": "string",
+      "pattern": "^\\s*0*([1-9][0-9]{0,5}|1000000)\\s*/\\s*(sec|min|hour)\\s*$"
+    },
+    "pathPattern": { "type": "string", "pattern": "^/[^?#\\s]*$" },
+    "pageAction": {
+      "oneOf": [
+        { "enum": ["allow", "block"] },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["action"],
+          "properties": { "action": { "enum": ["allow", "block"] } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["action", "rate"],
+          "properties": {
+            "action": { "const": "throttle" },
+            "rate": { "$ref": "#/$defs/rate" }
+          }
+        }
+      ]
+    },
+    "signupAction": { "enum": ["allow", "lift", "cap", "challenge"] },
+    "purposeRules": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "training": { "$ref": "#/$defs/pageAction" },
+        "search": { "$ref": "#/$defs/pageAction" },
+        "user_fetch": { "$ref": "#/$defs/pageAction" },
+        "agent": { "$ref": "#/$defs/pageAction" },
+        "preview": { "$ref": "#/$defs/pageAction" },
+        "ads": { "$ref": "#/$defs/pageAction" },
+        "other": { "$ref": "#/$defs/pageAction" }
+      }
+    }
+  }
+}

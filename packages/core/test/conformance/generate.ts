@@ -24,6 +24,7 @@ import { signerFromJWK } from "web-bot-auth/crypto";
 import type { DirectoryFile, KeysFile, OperatorRecord } from "../../src/directory/types";
 import { parseAddress } from "../../src/ip/address";
 import { PrefixMatcher } from "../../src/ip/prefix-matcher";
+import { policyVectors } from "./policy-vectors";
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
 const CONFORMANCE = join(REPO, "conformance");
@@ -31,6 +32,7 @@ const FIXTURES = join(CONFORMANCE, "fixtures");
 const VECTORS = join(CONFORMANCE, "vectors");
 const DIRECTORY_DATA = join(REPO, "packages", "directory", "data");
 const DIRECTORY_RAW = join(REPO, "packages", "directory", "raw");
+const TEMPLATES = join(REPO, "packages", "core", "templates");
 
 const NOW_ISO = "2026-10-26T12:00:00Z";
 const NOW = Date.parse(NOW_ISO) / 1000;
@@ -457,7 +459,7 @@ interface Vector {
   id: string;
   description: string;
   spec: string[];
-  type: "verify" | "rfc9421" | "key_directory";
+  type: "verify" | "rfc9421" | "key_directory" | "decide" | "policy_check" | "robots";
   [key: string]: unknown;
 }
 
@@ -1817,6 +1819,13 @@ async function main(): Promise<void> {
   await proxyVectors();
   headerVectors();
   await failureVectors();
+  const templates = Object.fromEntries(
+    ["monitor", "allow-list", "saas-signup"].map((name) => [
+      name,
+      readFileSync(join(TEMPLATES, `${name}.yaml`), "utf8"),
+    ]),
+  );
+  vectors.push(...policyVectors(templates));
   for (const vector of vectors) write(join(VECTORS, `${vector.id}.json`), vector);
   console.log(`Wrote ${vectors.length} vectors and fixtures to ${CONFORMANCE}`);
 }

@@ -1,5 +1,7 @@
 // `pnpm bench`: the hot path budget (docs/SPEC.md section 10). Fails when p99
-// for the signature or IP path is 5 ms or more. Method: docs/benchmark.md.
+// for the signature or IP path is 5 ms or more. Each timed request runs
+// verify(), decide() and enforcementResponse(), as the middleware does.
+// Method: docs/benchmark.md.
 
 import type { webcrypto } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -9,6 +11,8 @@ import { fileURLToPath } from "node:url";
 import { sign } from "web-bot-auth";
 import { signerFromJWK } from "web-bot-auth/crypto";
 import type { DirectoryFile, KeysFile } from "../src/directory/types";
+import { createPolicyEngine, type PolicyEngine } from "../src/policy/engine";
+import { enforcementResponse } from "../src/policy/respond";
 import { createVerifier } from "../src/verifier/verifier";
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
@@ -43,6 +47,33 @@ if (!crawlerPrefix) throw new Error("the snapshot has no Google common-crawlers 
 const crawlerAddress = crawlerPrefix.replace(/\.0\/\d+$/, ".1").replace(/\/\d+$/, "");
 
 const SITE = "www.site.example";
+
+// An enforcing policy with a rule at every evaluation step and 40 path rules to scan.
+const POLICY = `version: 1
+mode: enforce
+defaults:
+  claimed_failed: block
+purposes:
+  training: block
+operators:
+  example-signer:
+    agent: { action: throttle, rate: 1000000/sec }
+paths:
+${Array.from({ length: 36 }, (_, i) => `  "/section-${i}/*":\n    claimed_failed: block\n    training: allow`).join("\n")}
+  "/api/*":
+    claimed_failed: block
+    monitor: true
+  "/api/public/*":
+    verified: allow
+  "/docs/*":
+    verified: allow
+  "/admin/*":
+    unknown_automation: block
+signup:
+  "/signup":
+    verified: lift
+    claimed_failed: challenge
+`;
 const BROWSER = {
   "user-agent":
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
@@ -91,6 +122,7 @@ async function signedRequests(count: number, now: number): Promise<Request[]> {
 interface Result {
   scenario: string;
   verdict: string;
+  action: string;
   p50: number;
   p95: number;
   p99: number;
@@ -100,10 +132,12 @@ interface Result {
 async function measure(
   scenario: string,
   verifier: ReturnType<typeof createVerifier>,
+  engine: PolicyEngine,
   requests: { request: Request; remoteAddress: string }[],
 ): Promise<Result> {
   const durations: number[] = [];
   let verdict = "";
+  let action = "";
   for (let i = 0; i < WARMUP + SAMPLES; i++) {
     const { request, remoteAddress } = requests[i % requests.length] as {
       request: Request;
@@ -111,9 +145,12 @@ async function measure(
     };
     const start = performance.now();
     const result = await verifier.verify(request, { remoteAddress });
+    const decision = engine.decide(result, { path: new URL(request.url).pathname });
+    enforcementResponse(decision, result);
     const elapsed = performance.now() - start;
     if (i >= WARMUP) durations.push(elapsed);
     verdict = result.verdict;
+    action = `${decision.action}${decision.enforced ? " (enforced)" : ""}`;
   }
   durations.sort((a, b) => a - b);
   const at = (q: number) =>
@@ -121,6 +158,7 @@ async function measure(
   return {
     scenario,
     verdict,
+    action,
     p50: at(0.5),
     p95: at(0.95),
     p99: at(0.99),
@@ -135,6 +173,7 @@ async function main(): Promise<void> {
     directory: { snapshot: () => ({ directory, keys }), refresh: false },
   });
   await verifier.settled();
+  const engine = createPolicyEngine(POLICY, { verifier, env: {} });
 
   const signed = await signedRequests(WARMUP + SAMPLES, nowSeconds);
   const ipRequest = () =>
@@ -148,12 +187,13 @@ async function main(): Promise<void> {
     await measure(
       "signature (verified_by_signature)",
       verifier,
+      engine,
       signed.map((request) => ({ request, remoteAddress: "203.0.113.20" })),
     ),
-    await measure("ip (verified_by_ip)", verifier, [
+    await measure("ip (verified_by_ip)", verifier, engine, [
       { request: ipRequest(), remoteAddress: crawlerAddress },
     ]),
-    await measure("ip (claimed_failed)", verifier, [
+    await measure("ip (claimed_failed)", verifier, engine, [
       {
         request: new Request(`https://${SITE}/docs`, {
           headers: { host: SITE, "user-agent": "Mozilla/5.0 (compatible; ClaudeBot/1.0)" },
@@ -161,7 +201,7 @@ async function main(): Promise<void> {
         remoteAddress: "216.244.7.10",
       },
     ]),
-    await measure("no claim (human)", verifier, [
+    await measure("no claim (human)", verifier, engine, [
       {
         request: new Request(`https://${SITE}/`, { headers: { host: SITE, ...BROWSER } }),
         remoteAddress: "203.0.113.30",
@@ -175,21 +215,30 @@ async function main(): Promise<void> {
     `Node ${process.version} on ${platform()} ${release()}, ${availableParallelism()} CPUs (${cpu})`,
   );
   console.log(
-    `Directory: ${directory.operators.length} operators, ${keys.operators ? Object.keys(keys.operators).length : 0} key sets. ${SAMPLES} samples after ${WARMUP} warm-up requests.\n`,
+    `Directory: ${directory.operators.length} operators, ${keys.operators ? Object.keys(keys.operators).length : 0} key sets. Policy: ${engine.policy.paths.length} path rules, enforce mode. ${SAMPLES} samples after ${WARMUP} warm-up requests.\n`,
   );
-  console.log("| Scenario | Verdict | p50 ms | p95 ms | p99 ms | max ms |");
-  console.log("|---|---|---|---|---|---|");
+  console.log("| Scenario | Verdict | Decision | p50 ms | p95 ms | p99 ms | max ms |");
+  console.log("|---|---|---|---|---|---|---|");
   for (const r of results) {
     console.log(
-      `| ${r.scenario} | ${r.verdict} | ${r.p50.toFixed(3)} | ${r.p95.toFixed(3)} | ${r.p99.toFixed(3)} | ${r.max.toFixed(3)} |`,
+      `| ${r.scenario} | ${r.verdict} | ${r.action} | ${r.p50.toFixed(3)} | ${r.p95.toFixed(3)} | ${r.p99.toFixed(3)} | ${r.max.toFixed(3)} |`,
     );
   }
-  const expected = ["verified_by_signature", "verified_by_ip", "claimed_failed", "human"];
-  const wrong = results.filter((r, i) => r.verdict !== expected[i]);
+  const expected = [
+    ["verified_by_signature", "allow"],
+    ["verified_by_ip", "allow"],
+    // 5,500 failed claims in a row trip the breaker after the first 20, as a real
+    // spoofing flood would, so the block is recorded and not enforced.
+    ["claimed_failed", "block"],
+    ["human", "allow"],
+  ];
+  const wrong = results.filter(
+    (r, i) => r.verdict !== expected[i]?.[0] || r.action !== expected[i]?.[1],
+  );
   const over = results.filter((r) => r.p99 >= BUDGET_MS);
   if (wrong.length > 0) {
     console.error(
-      `\nUnexpected verdicts: ${wrong.map((r) => `${r.scenario} got ${r.verdict}`).join(", ")}`,
+      `\nUnexpected results: ${wrong.map((r) => `${r.scenario} got ${r.verdict}, ${r.action}`).join("; ")}`,
     );
     process.exitCode = 1;
   }

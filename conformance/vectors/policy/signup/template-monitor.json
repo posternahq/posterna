@@ -1,0 +1,74 @@
+{
+  "id": "policy/signup/template-monitor",
+  "description": "The saas-signup template starts in monitor, so its recommendations are recorded but not enforced.",
+  "spec": [
+    "5.2",
+    "5.5"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "# Posterna policy: the saas-signup template.\n#\n# The allow-list template, plus recommendations for the sign-up page:\n# verified agents can skip a friction step, and failed claims and unknown\n# automation get your own challenge. Your application acts on these\n# recommendations; Posterna never shows a challenge itself. It starts in\n# monitor mode, so nothing is blocked or recommended until you change mode\n# to enforce. The reference for every key is docs/policy.md in the\n# posternahq/posterna repository.\n\nversion: 1\nmode: monitor\n\n# By verdict class. People are always allowed and are not configured here.\ndefaults:\n  verified: allow\n  declared_unverifiable: allow\n  claimed_failed: allow\n  unknown_automation: allow\n\n# Verified search engines are never blocked or throttled.\nguards:\n  search_engines: protect\n\n# Applies to every operator.\npurposes:\n  training: block\n\n# Returned by decide(result, { path, kind: \"signup\" }) for your application to act on.\nsignup:\n  \"/signup\":\n    verified: lift\n    claimed_failed: challenge\n    unknown_automation: challenge\n\nemit: [robots.txt, content-signals]\n",
+  "template": "saas-signup",
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "lift",
+        "enforced": false,
+        "rule": "signup./signup.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "unknown_automation",
+        "method": "none"
+      },
+      "context": {
+        "path": "/signup",
+        "kind": "signup"
+      },
+      "expected": {
+        "action": "challenge",
+        "enforced": false,
+        "rule": "signup./signup.unknown_automation",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "purposes.training",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    }
+  ]
+}

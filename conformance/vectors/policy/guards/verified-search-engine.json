@@ -1,0 +1,91 @@
+{
+  "id": "policy/guards/verified-search-engine",
+  "description": "Verified search engines are never blocked or throttled; agents not flagged search_engine are.",
+  "spec": [
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\npurposes:\n  search: block\npaths:\n  \"/*\":\n    verified: block\n",
+  "steps": [
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "rdns"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "guards.search_engines",
+        "retry_after": null,
+        "guarded": false,
+        "error": false,
+        "response": null
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_signature",
+        "operator": "google",
+        "method": "signature"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "allow",
+        "enforced": false,
+        "rule": "guards.search_engines",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "google",
+        "agent": "Googlebot News",
+        "purpose": "search",
+        "method": "rdns"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./*.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "result": {
+        "verdict": "verified_by_ip",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "paths./*.verified",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}

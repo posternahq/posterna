@@ -1,0 +1,103 @@
+{
+  "id": "policy/breaker/retrips",
+  "description": "If failures are still at or above half when the hour ends, the breaker trips again at once.",
+  "spec": [
+    "5.4"
+  ],
+  "type": "decide",
+  "now": "2026-10-26T12:00:00Z",
+  "policy": "version: 1\nmode: enforce\ndefaults:\n  declared_unverifiable: block\n  claimed_failed: block\n",
+  "expected_state": {
+    "breaker_tripped": [
+      "ip-crawler"
+    ]
+  },
+  "steps": [
+    {
+      "at": 0,
+      "repeat": 19,
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": true,
+        "rule": "defaults.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "at": 0,
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "defaults.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "at": 3060,
+      "repeat": 20,
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "defaults.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    },
+    {
+      "at": 3600,
+      "result": {
+        "verdict": "claimed_failed",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip"
+      },
+      "context": {
+        "path": "/"
+      },
+      "expected": {
+        "action": "block",
+        "enforced": false,
+        "rule": "defaults.claimed_failed",
+        "retry_after": null,
+        "guarded": false,
+        "error": false
+      }
+    }
+  ]
+}
