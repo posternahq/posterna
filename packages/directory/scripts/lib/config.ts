@@ -8,6 +8,8 @@ export const SOURCES_DIR = join(PACKAGE_DIR, "sources");
 export const COMMUNITY_OPERATORS_PATH = join(SOURCES_DIR, "community-operators.yaml");
 export const RAW_DIR = join(PACKAGE_DIR, "raw");
 export const MANIFEST_PATH = join(RAW_DIR, "manifest.json");
+/** Things on operators' pages the directory does not know yet. Committed, no timestamps. */
+export const FINDINGS_PATH = join(RAW_DIR, "findings.json");
 export const DATA_DIR = join(PACKAGE_DIR, "data");
 export const SCHEMA_DIR = join(REPO_DIR, "packages", "core", "src", "schema");
 export const REPORT_PATH = join(REPO_DIR, "docs", "directory-build-report.md");

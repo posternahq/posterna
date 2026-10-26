@@ -65,7 +65,21 @@ signing:                      # Web Bot Auth key directory
   covers: [ExampleBot]        # agent names the signatures cover
   note: null
   sources: [bots]
+
+ignore_findings:              # optional: findings reviewed and deliberately left out
+  - value: https://example.com/all-ranges.json   # exactly as the finding shows it
+    reason: Company-wide ranges, not a crawler list.
 ```
+
+## Findings
+
+Every build scans the operator's own pages (not pages cited only as a third-party report) for things the directory does not know yet:
+
+- links that look like IP lists, and links to key directories, that are not in this file
+- user-agent tokens (`ExampleBot/1.2`, `User-agent: ExampleBot`) that are not in the directory
+- quotes, tokens and URLs that no longer appear on the page they cite
+
+They are listed in `raw/findings.json` and in the "Needs review" section of `docs/directory-build-report.md`, and a change in them opens the daily pull request. The build never adds them to the data. A person either adds the fact to this file, with its source, or lists it under `ignore_findings` with the reason it was left out.
 
 ## Community records
 

@@ -149,3 +149,31 @@ describe("parseOperatorSource", () => {
     );
   });
 });
+
+describe("ignore_findings", () => {
+  const base = `
+slug: example
+name: Example AI
+checked_on: "2026-10-26"
+sources:
+  - id: bots
+    url: https://example.com/bots
+    title: Example bots
+agents: []
+signing:
+  basis: none
+`;
+
+  it("defaults to an empty list and accepts entries with a reason", () => {
+    expect(parseOperatorSource(base, "example.yaml").ignore_findings).toEqual([]);
+    const withEntry = `${base}ignore_findings:\n  - value: SomeToken\n    reason: Reviewed; a retired crawler.\n`;
+    expect(parseOperatorSource(withEntry, "example.yaml").ignore_findings).toEqual([
+      { value: "SomeToken", reason: "Reviewed; a retired crawler." },
+    ]);
+  });
+
+  it("requires a reason", () => {
+    const noReason = `${base}ignore_findings:\n  - value: SomeToken\n`;
+    expect(() => parseOperatorSource(noReason, "example.yaml")).toThrow(/reason/);
+  });
+});

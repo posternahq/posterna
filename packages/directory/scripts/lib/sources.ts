@@ -74,6 +74,8 @@ export interface OperatorSource {
   reverse_dns: SourceReverseDns | null;
   asn: SourceAsn[];
   signing: SourceSigning;
+  /** Findings a person reviewed and decided not to act on, with the reason. */
+  ignore_findings: { value: string; reason: string }[];
 }
 
 const nullableText = { type: ["string", "null"], minLength: 1 };
@@ -96,6 +98,19 @@ const operatorSchema = {
       items: { type: "string", minLength: 1 },
       uniqueItems: true,
       default: [],
+    },
+    ignore_findings: {
+      type: "array",
+      default: [],
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["value", "reason"],
+        properties: {
+          value: { type: "string", minLength: 1 },
+          reason: { type: "string", minLength: 10 },
+        },
+      },
     },
     sources: {
       type: "array",

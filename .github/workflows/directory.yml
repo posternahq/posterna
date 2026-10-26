@@ -49,9 +49,11 @@ jobs:
       - name: Build directory
         run: pnpm directory:build
 
+      # Decides whether facts or findings changed, and writes the summary that
+      # becomes the pull request description. Must run before switching branch.
       - name: Compare with main
         id: diff
-        run: pnpm --filter @posterna/directory data:changed
+        run: pnpm --filter @posterna/directory data:changed --summary "$RUNNER_TEMP/summary.md"
 
       # Pushes made with the workflow token do not start CI, so test here.
       - name: Test the rebuilt data
@@ -66,7 +68,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -C "$BRANCH"
-          git add packages/directory/data packages/directory/raw/manifest.json docs/directory-build-report.md
+          git add packages/directory/data packages/directory/raw/manifest.json packages/directory/raw/findings.json docs/directory-build-report.md
           git commit --signoff -m "Directory: daily rebuild $(date -u +%F)"
           git push --force origin "$BRANCH"
 
@@ -74,13 +76,16 @@ jobs:
           {
             echo "Automated rebuild of the operator directory from public sources."
             echo
-            echo "A person must review this before merging: check the diff of \`packages/directory/data/\` and the updated \`docs/directory-build-report.md\` (signing status, IP lists, evidence checks, fetch failures)."
+            echo "A person must review this before merging. The summary below covers what changed compared with \`main\`; the full detail is in \`docs/directory-build-report.md\`. Findings under \"Needs review\" are never added to the data automatically: add the fact to the operator's file in \`packages/directory/sources/\` with its source, or list it under \`ignore_findings\` with a reason."
             echo
             echo "The workflow ran \`pnpm test\` on this data before opening the pull request. Pushes made by the workflow do not start CI on their own; close and reopen the pull request to run it."
+            echo
+            cat "$RUNNER_TEMP/summary.md"
           } > "$body"
 
           if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
             gh pr create --base main --head "$BRANCH" --title "Directory: daily rebuild" --body-file "$body"
           else
+            gh pr edit "$BRANCH" --body-file "$body"
             echo "Updated the open pull request for $BRANCH."
           fi

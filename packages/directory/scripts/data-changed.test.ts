@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { stripVolatile, substantiveEqual } from "./data-changed";
+import { hasChanges, stripVolatile, substantiveEqual } from "./data-changed";
 
 const base = {
   version: "2026-10-26",
@@ -47,5 +47,47 @@ describe("data-changed", () => {
     expect(stripVolatile({ a: { fetched_at: 1, b: [{ last_seen: 2, c: 3 }] } })).toEqual({
       a: { b: [{ c: 3 }] },
     });
+  });
+});
+
+describe("hasChanges", () => {
+  const findings = (values: string[]) =>
+    JSON.stringify({
+      findings: values.map((value) => ({
+        operator: "a",
+        kind: "user_agent_token",
+        value,
+        source: "s",
+        detail: null,
+      })),
+    });
+  const facts = JSON.stringify(base);
+
+  it("is false when only timestamps moved and findings are the same", () => {
+    const rerun = JSON.stringify({ ...base, generated_at: "2026-10-27T06:00:00Z" });
+    expect(
+      hasChanges(
+        { directory: facts, findings: findings(["A"]) },
+        { directory: rerun, findings: findings(["A"]) },
+      ),
+    ).toBe(false);
+  });
+
+  it("is true when findings change even if no facts did", () => {
+    expect(
+      hasChanges(
+        { directory: facts, findings: findings(["A"]) },
+        { directory: facts, findings: findings(["A", "B"]) },
+      ),
+    ).toBe(true);
+  });
+
+  it("is true when a file appears for the first time", () => {
+    expect(
+      hasChanges(
+        { directory: facts, findings: null },
+        { directory: facts, findings: findings([]) },
+      ),
+    ).toBe(true);
   });
 });

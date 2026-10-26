@@ -28,6 +28,15 @@ community_agents:
   - GoogleOther-Video
   - NotebookLM
 
+# Things the build found on Google's pages that were reviewed and left out.
+ignore_findings:
+  - value: https://www.gstatic.com/ipranges/goog.json
+    reason: General Google IP ranges linked from the verify page, not a list of crawler or fetcher addresses.
+  - value: https://developers.google.com/static/crawling/ipranges/user-triggered-fetchers.json
+    reason: Fetchers run by Google Cloud customers. Left out on purpose; accepting it would let anyone on Google Cloud pass as a Google crawler.
+  - value: DuplexWeb-Google
+    reason: Google lists this crawler as retired.
+
 sources:
   - id: overview
     url: https://developers.google.com/crawling/docs/crawlers-fetchers/overview-google-crawlers

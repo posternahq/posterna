@@ -17,6 +17,11 @@ community_agents:
   - bedrockbot
   - NovaAct
 
+# Things the build found on Amazon's pages that were reviewed and left out.
+ignore_findings:
+  - value: bedrockbot-UUID
+    reason: AWS's placeholder for per-knowledge-base robots.txt rules (bedrockbot followed by the data source ID); covered by the Amazon Bedrock Web Crawler entry.
+
 sources:
   - id: bots
     url: https://developer.amazon.com/docs/amazonbot/amazonbot.html

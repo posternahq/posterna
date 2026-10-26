@@ -9,8 +9,15 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { DirectoryFile, KeysFile } from "../../core/src/directory/types";
 import { parseCommunityList } from "./lib/community";
-import { DATA_DIR, REPORT_PATH, ROBOTS_JSON_TITLE, ROBOTS_JSON_URL } from "./lib/config";
+import {
+  DATA_DIR,
+  FINDINGS_PATH,
+  REPORT_PATH,
+  ROBOTS_JSON_TITLE,
+  ROBOTS_JSON_URL,
+} from "./lib/config";
 import { checkEvidence } from "./lib/evidence";
+import { findNewThings } from "./lib/findings";
 import { loadFetched, readManifest } from "./lib/manifest";
 import { buildDirectory } from "./lib/merge";
 import { agentsCsv, schemaValidators, summary } from "./lib/outputs";
@@ -68,13 +75,18 @@ async function main(): Promise<void> {
   }
 
   const evidence = checkEvidence(researched, fetched);
+  const { findings, ignored } = findNewThings(researched, fetched, directory, evidence);
+  writeFileSync(FINDINGS_PATH, json({ findings }));
   mkdirSync(DATA_DIR, { recursive: true });
   writeFileSync(join(DATA_DIR, "directory.json"), json(directory));
   writeFileSync(join(DATA_DIR, "keys.json"), json(keys));
   writeFileSync(join(DATA_DIR, "agents.csv"), agentsCsv(directory));
   const counts = summary(directory, keys);
   writeFileSync(join(DATA_DIR, "summary.json"), json(counts));
-  writeFileSync(REPORT_PATH, buildReport({ directory, keys, log, evidence, manifest, researched }));
+  writeFileSync(
+    REPORT_PATH,
+    buildReport({ directory, keys, log, evidence, findings, ignored, manifest, researched }),
+  );
 
   const notVerbatim = evidence.filter((check) => check.result !== "verbatim");
   console.log(
@@ -87,6 +99,9 @@ async function main(): Promise<void> {
       `${notVerbatim.length} of ${evidence.length} evidence checks were not verbatim; see ${REPORT_PATH}.`,
     );
   }
+  console.log(
+    `${findings.length} findings need review (${ignored} reviewed and ignored); see ${FINDINGS_PATH}.`,
+  );
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) await main();
