@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "version": "2026-10-26",
-  "generated_at": "2026-10-26T21:43:31Z",
+  "generated_at": "2026-10-26T22:08:45Z",
   "license": "CC-BY-4.0",
   "attribution": "Posterna operator directory (https://github.com/posternahq/posterna), CC BY 4.0. Community records derived from ai.robots.txt (https://github.com/ai-robots-txt/ai.robots.txt), MIT.",
   "operators": [
@@ -43,6 +43,126 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"This bot crawls the web to gather data and content for indexation and AI model training.\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
+      "slug": "addsearch",
+      "name": "AddSearch",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "AddSearchBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "AddSearchBot"
+          ],
+          "aliases": [],
+          "purpose": "search",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "AddSearchBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Search Crawlers\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
+      "slug": "agentdata",
+      "name": "AgentData",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "AgentDataBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "AgentDataBot"
+          ],
+          "aliases": [],
+          "purpose": "other",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "AgentDataBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -4144,6 +4264,90 @@
       ]
     },
     {
+      "slug": "apify",
+      "name": "Apify",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "ApifyBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "ApifyBot"
+          ],
+          "aliases": [],
+          "purpose": "other",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "ApifyBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
+        {
+          "name": "ApifyWebsiteContentCrawler",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "ApifyWebsiteContentCrawler"
+          ],
+          "aliases": [],
+          "purpose": "other",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "ApifyWebsiteContentCrawler",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
       "slug": "apple",
       "name": "Apple",
       "website": "https://www.apple.com/",
@@ -4553,6 +4757,66 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
+      "slug": "bixel",
+      "name": "Bixel",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "BixelBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "BixelBot"
+          ],
+          "aliases": [],
+          "purpose": "other",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "BixelBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -5016,6 +5280,30 @@
               "fetched_at": "2026-10-26T21:37:08.411Z"
             }
           ]
+        },
+        {
+          "name": "Trae",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "Trae"
+          ],
+          "aliases": [],
+          "purpose": "agent",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "Trae",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Coding Agents\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
         }
       ],
       "observed": {},
@@ -5094,10 +5382,10 @@
     {
       "slug": "ceramic-ai",
       "name": "Ceramic AI",
-      "website": "https://ceramic.ai/",
+      "website": null,
       "docs_url": null,
       "coverage": "community",
-      "note": null,
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
       "verification": {
         "signing": {
           "status": "not_probed",
@@ -5113,6 +5401,30 @@
         "asn": []
       },
       "agents": [
+        {
+          "name": "Terra Cotta",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "Terra Cotta"
+          ],
+          "aliases": [],
+          "purpose": "other",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "Terra Cotta",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
         {
           "name": "TerraCotta",
           "coverage": "community",
@@ -7144,12 +7456,12 @@
       ]
     },
     {
-      "slug": "exa",
-      "name": "Exa",
-      "website": "https://exa.ai",
+      "slug": "elevenlabs",
+      "name": "ElevenLabs",
+      "website": null,
       "docs_url": null,
       "coverage": "community",
-      "note": null,
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
       "verification": {
         "signing": {
           "status": "not_probed",
@@ -7166,6 +7478,90 @@
       },
       "agents": [
         {
+          "name": "ElevenlabsBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "ElevenlabsBot"
+          ],
+          "aliases": [],
+          "purpose": "user_fetch",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "ElevenlabsBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
+      "slug": "exa",
+      "name": "Exa",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "ExaBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "ExaBot"
+          ],
+          "aliases": [],
+          "purpose": "other",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "ExaBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
+        {
           "name": "ExaSearchBot",
           "coverage": "community",
           "user_agent_tokens": [
@@ -7181,6 +7577,30 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"AI Search Crawlers\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
+        {
+          "name": "ExaUser",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "ExaUser"
+          ],
+          "aliases": [],
+          "purpose": "user_fetch",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "ExaUser",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -9464,6 +9884,66 @@
       ]
     },
     {
+      "slug": "hark",
+      "name": "Hark",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "HarkBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "HarkBot"
+          ],
+          "aliases": [],
+          "purpose": "agent",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "HarkBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Agents\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
       "slug": "huawei",
       "name": "Huawei",
       "website": null,
@@ -9850,6 +10330,66 @@
       ]
     },
     {
+      "slug": "kangaroo-llm",
+      "name": "Kangaroo LLM",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "Kangaroo Bot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "Kangaroo Bot"
+          ],
+          "aliases": [],
+          "purpose": "training",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "Kangaroo Bot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Scrapers\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
       "slug": "keenable",
       "name": "Keenable",
       "website": "https://keenable.ai/",
@@ -10127,6 +10667,66 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"AI Data Scrapers\". Respects robots.txt: \"At the discretion of Lightpanda users.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
+      "slug": "liner",
+      "name": "Liner",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "LinerBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "LinerBot"
+          ],
+          "aliases": [],
+          "purpose": "user_fetch",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "LinerBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -10503,6 +11103,30 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"Training language models\". Respects robots.txt: \"Yes\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
+        {
+          "name": "Muse",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "Muse"
+          ],
+          "aliases": [],
+          "purpose": "agent",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "Muse",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Agents\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -11887,6 +12511,54 @@
           ]
         },
         {
+          "name": "Codex",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "Codex"
+          ],
+          "aliases": [],
+          "purpose": "agent",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "Codex",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Coding Agents\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
+        {
+          "name": "Dot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "Dot"
+          ],
+          "aliases": [],
+          "purpose": "agent",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "Dot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Agents\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
+        {
           "name": "OpenAI",
           "coverage": "community",
           "user_agent_tokens": [
@@ -11902,6 +12574,30 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"Unclear at this time.\". Respects robots.txt: \"Yes\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
+        {
+          "name": "Operator",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "Operator"
+          ],
+          "aliases": [],
+          "purpose": "agent",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "Operator",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Agents\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -12016,10 +12712,10 @@
     {
       "slug": "parallel",
       "name": "Parallel",
-      "website": "https://parallel.ai",
+      "website": null,
       "docs_url": null,
       "coverage": "community",
-      "note": null,
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
       "verification": {
         "signing": {
           "status": "not_probed",
@@ -12035,6 +12731,30 @@
         "asn": []
       },
       "agents": [
+        {
+          "name": "Shap-User",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "Shap-User"
+          ],
+          "aliases": [],
+          "purpose": "user_fetch",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "Shap-User",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
         {
           "name": "ShapBot",
           "coverage": "community",
@@ -13187,6 +13907,66 @@
       ]
     },
     {
+      "slug": "tavily",
+      "name": "Tavily",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "TavilyBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "TavilyBot"
+          ],
+          "aliases": [],
+          "purpose": "other",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "TavilyBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
       "slug": "tencent",
       "name": "Tencent",
       "website": "https://hunyuan.tencent.com",
@@ -13487,246 +14267,6 @@
       ]
     },
     {
-      "slug": "unknown-addsearchbot",
-      "name": "Unknown operator (AddSearchBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "AddSearchBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "AddSearchBot"
-          ],
-          "aliases": [],
-          "purpose": "search",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "AddSearchBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Search Crawlers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-agentdatabot",
-      "name": "Unknown operator (AgentDataBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "AgentDataBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "AgentDataBot"
-          ],
-          "aliases": [],
-          "purpose": "other",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "AgentDataBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-apifybot",
-      "name": "Unknown operator (ApifyBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "ApifyBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "ApifyBot"
-          ],
-          "aliases": [],
-          "purpose": "other",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "ApifyBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-apifywebsitecontentcrawler",
-      "name": "Unknown operator (ApifyWebsiteContentCrawler)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "ApifyWebsiteContentCrawler",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "ApifyWebsiteContentCrawler"
-          ],
-          "aliases": [],
-          "purpose": "other",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "ApifyWebsiteContentCrawler",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
       "slug": "unknown-aranet-searchbot",
       "name": "Unknown operator (Aranet-SearchBot)",
       "website": null,
@@ -13824,66 +14364,6 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"AI Search Crawlers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-bixelbot",
-      "name": "Unknown operator (BixelBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "BixelBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "BixelBot"
-          ],
-          "aliases": [],
-          "purpose": "other",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "BixelBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -14087,66 +14567,6 @@
       ]
     },
     {
-      "slug": "unknown-codex",
-      "name": "Unknown operator (Codex)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "Codex",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "Codex"
-          ],
-          "aliases": [],
-          "purpose": "agent",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "Codex",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Coding Agents\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
       "slug": "unknown-crawl4ai",
       "name": "Unknown operator (Crawl4AI)",
       "website": null,
@@ -14267,246 +14687,6 @@
       ]
     },
     {
-      "slug": "unknown-dot",
-      "name": "Unknown operator (Dot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "Dot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "Dot"
-          ],
-          "aliases": [],
-          "purpose": "agent",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "Dot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Agents\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-elevenlabsbot",
-      "name": "Unknown operator (ElevenlabsBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "ElevenlabsBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "ElevenlabsBot"
-          ],
-          "aliases": [],
-          "purpose": "user_fetch",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "ElevenlabsBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-exabot",
-      "name": "Unknown operator (ExaBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "ExaBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "ExaBot"
-          ],
-          "aliases": [],
-          "purpose": "other",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "ExaBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-exauser",
-      "name": "Unknown operator (ExaUser)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "ExaUser",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "ExaUser"
-          ],
-          "aliases": [],
-          "purpose": "user_fetch",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "ExaUser",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
       "slug": "unknown-friendlycrawler",
       "name": "Unknown operator (FriendlyCrawler)",
       "website": null,
@@ -14544,126 +14724,6 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"We are using the data from the crawler to build datasets for machine learning experiments.\". Respects robots.txt: \"Yes\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-harkbot",
-      "name": "Unknown operator (HarkBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "HarkBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "HarkBot"
-          ],
-          "aliases": [],
-          "purpose": "agent",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "HarkBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Agents\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-henkbot",
-      "name": "Unknown operator (HenkBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "HenkBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "HenkBot"
-          ],
-          "aliases": [],
-          "purpose": "other",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "HenkBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -14867,66 +14927,6 @@
       ]
     },
     {
-      "slug": "unknown-kangaroo-bot",
-      "name": "Unknown operator (Kangaroo Bot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "Kangaroo Bot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "Kangaroo Bot"
-          ],
-          "aliases": [],
-          "purpose": "training",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "Kangaroo Bot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Scrapers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
       "slug": "unknown-kunatocrawler",
       "name": "Unknown operator (KunatoCrawler)",
       "website": null,
@@ -15107,66 +15107,6 @@
       ]
     },
     {
-      "slug": "unknown-linerbot",
-      "name": "Unknown operator (LinerBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "LinerBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "LinerBot"
-          ],
-          "aliases": [],
-          "purpose": "user_fetch",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "LinerBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
       "slug": "unknown-linkupbot",
       "name": "Unknown operator (LinkupBot)",
       "website": null,
@@ -15204,66 +15144,6 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"AI Search Crawlers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-muse",
-      "name": "Unknown operator (Muse)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "Muse",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "Muse"
-          ],
-          "aliases": [],
-          "purpose": "agent",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "Muse",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Agents\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -15467,126 +15347,6 @@
       ]
     },
     {
-      "slug": "unknown-operator",
-      "name": "Unknown operator (Operator)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "Operator",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "Operator"
-          ],
-          "aliases": [],
-          "purpose": "agent",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "Operator",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Agents\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-shap-user",
-      "name": "Unknown operator (Shap-User)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "Shap-User",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "Shap-User"
-          ],
-          "aliases": [],
-          "purpose": "user_fetch",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "Shap-User",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
       "slug": "unknown-spider",
       "name": "Unknown operator (Spider)",
       "website": null,
@@ -15647,186 +15407,6 @@
       ]
     },
     {
-      "slug": "unknown-tavilybot",
-      "name": "Unknown operator (TavilyBot)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "TavilyBot",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "TavilyBot"
-          ],
-          "aliases": [],
-          "purpose": "other",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "TavilyBot",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-terra-cotta",
-      "name": "Unknown operator (Terra Cotta)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "Terra Cotta",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "Terra Cotta"
-          ],
-          "aliases": [],
-          "purpose": "other",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "Terra Cotta",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-trae",
-      "name": "Unknown operator (Trae)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "Trae",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "Trae"
-          ],
-          "aliases": [],
-          "purpose": "agent",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "Trae",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Coding Agents\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
       "slug": "unknown-useai",
       "name": "Unknown operator (UseAI)",
       "website": null,
@@ -15864,68 +15444,6 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"AI Assistants\". Respects robots.txt: \"Unclear at this time.\".",
-          "sources": [
-            {
-              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-              "title": "ai.robots.txt robots.json",
-              "fetched_at": "2026-10-26T21:37:08.411Z"
-            }
-          ]
-        }
-      ],
-      "observed": {},
-      "enrollment": {
-        "status": "none"
-      },
-      "identity_anchors": [],
-      "sources": [
-        {
-          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
-          "title": "ai.robots.txt robots.json",
-          "fetched_at": "2026-10-26T21:37:08.411Z"
-        }
-      ]
-    },
-    {
-      "slug": "unknown-webzio-extended",
-      "name": "Unknown operator (webzio-extended)",
-      "website": null,
-      "docs_url": null,
-      "coverage": "community",
-      "note": "ai.robots.txt does not name the operator of this agent.",
-      "verification": {
-        "signing": {
-          "status": "not_probed",
-          "directory_url": null,
-          "kid_convention": null,
-          "purpose_field": null,
-          "covers": [],
-          "note": null,
-          "sources": []
-        },
-        "ip_lists": [],
-        "reverse_dns": null,
-        "asn": []
-      },
-      "agents": [
-        {
-          "name": "webzio-extended",
-          "coverage": "community",
-          "user_agent_tokens": [
-            "webzio-extended"
-          ],
-          "aliases": [
-            "Webzio-Extended"
-          ],
-          "purpose": "training",
-          "purpose_quote": null,
-          "search_engine": false,
-          "robots_token": "webzio-extended",
-          "robots_policy": "unstated",
-          "robots_quote": null,
-          "ip_list_agent": null,
-          "signs": false,
-          "note": "Community record from ai.robots.txt. Function: \"AI Data Scrapers\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -16046,6 +15564,66 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"AI Search Crawlers\". Respects robots.txt: \"Unclear at this time.\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        }
+      ],
+      "observed": {},
+      "enrollment": {
+        "status": "none"
+      },
+      "identity_anchors": [],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+          "title": "ai.robots.txt robots.json",
+          "fetched_at": "2026-10-26T21:37:08.411Z"
+        }
+      ]
+    },
+    {
+      "slug": "valyu",
+      "name": "Valyu",
+      "website": null,
+      "docs_url": null,
+      "coverage": "community",
+      "note": "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there.",
+      "verification": {
+        "signing": {
+          "status": "not_probed",
+          "directory_url": null,
+          "kid_convention": null,
+          "purpose_field": null,
+          "covers": [],
+          "note": null,
+          "sources": []
+        },
+        "ip_lists": [],
+        "reverse_dns": null,
+        "asn": []
+      },
+      "agents": [
+        {
+          "name": "HenkBot",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "HenkBot"
+          ],
+          "aliases": [],
+          "purpose": "other",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "HenkBot",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Providers\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
@@ -16250,6 +15828,32 @@
           "ip_list_agent": null,
           "signs": false,
           "note": "Community record from ai.robots.txt. Function: \"Data is sold.\". Respects robots.txt: \"Yes\".",
+          "sources": [
+            {
+              "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",
+              "title": "ai.robots.txt robots.json",
+              "fetched_at": "2026-10-26T21:37:08.411Z"
+            }
+          ]
+        },
+        {
+          "name": "Webzio-Extended",
+          "coverage": "community",
+          "user_agent_tokens": [
+            "Webzio-Extended"
+          ],
+          "aliases": [
+            "webzio-extended"
+          ],
+          "purpose": "training",
+          "purpose_quote": null,
+          "search_engine": false,
+          "robots_token": "Webzio-Extended",
+          "robots_policy": "unstated",
+          "robots_quote": null,
+          "ip_list_agent": null,
+          "signs": false,
+          "note": "Community record from ai.robots.txt. Its operator is named in its ai.robots.txt description. Function: \"AI Data Scrapers\". Respects robots.txt: \"Unclear at this time.\".",
           "sources": [
             {
               "url": "https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json",

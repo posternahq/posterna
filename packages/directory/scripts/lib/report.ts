@@ -272,6 +272,14 @@ export function buildReport(input: ReportInput): string {
       `- Attached by operator name only, worth adding to the operator's \`community_agents\`: ${byName.map((entry) => `\`${entry.community}\` (${entry.operator})`).join(", ")}.`,
     );
   }
+  add(
+    `- ${log.described.length} entries list their operator as unclear but name it in their own description; they are attributed from \`sources/community-operators.yaml\`, which quotes the description: ${log.described.map((entry) => `\`${entry.community}\` (${entry.operator})`).join(", ") || "none"}.`,
+  );
+  if (log.staleDescriptions.length > 0) {
+    add(
+      `- Attributions in \`sources/community-operators.yaml\` that no longer apply: ${log.staleDescriptions.map((entry) => `\`${entry.community}\` (${entry.reason})`).join(", ")}.`,
+    );
+  }
   add();
   add(
     table(

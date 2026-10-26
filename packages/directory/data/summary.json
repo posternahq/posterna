@@ -1,10 +1,10 @@
 {
   "version": "2026-10-26",
-  "generated_at": "2026-10-26T21:43:31Z",
+  "generated_at": "2026-10-26T22:08:45Z",
   "operators": {
-    "total": 136,
+    "total": 125,
     "by_coverage": {
-      "community": 122,
+      "community": 111,
       "researched": 14
     }
   },
@@ -34,7 +34,7 @@
   "signing": {
     "live": 4,
     "none_found": 8,
-    "not_probed": 122,
+    "not_probed": 111,
     "pending": 1,
     "reported": 1
   },

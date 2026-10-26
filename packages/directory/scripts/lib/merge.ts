@@ -27,6 +27,12 @@ import { kidConvention, type ParsedKey, parseKeyDirectory } from "./keys";
 import { normalizePrefixes, parseIpList } from "./prefixes";
 import type { OperatorSource, SourceAgent } from "./sources";
 
+export interface DescribedOperator {
+  operator: string;
+  /** Verbatim phrase from the entry's ai.robots.txt description that names the operator. */
+  evidence: string;
+}
+
 export interface FetchedFile {
   entry: ManifestEntry;
   body: Uint8Array | null;
@@ -36,6 +42,11 @@ export interface BuildInput {
   generatedAt: Date;
   researched: OperatorSource[];
   communityOperatorNames: ReadonlyMap<string, string>;
+  /**
+   * Operators for ai.robots.txt entries whose operator field is unclear but
+   * whose own description names the operator, with the phrase that does.
+   */
+  describedOperators: ReadonlyMap<string, DescribedOperator>;
   /** Null when robots.json could not be fetched. */
   community: { list: CommunityList; source: DirectorySource } | null;
   /** Fetch results by requested URL. */
@@ -72,7 +83,15 @@ export interface BuildLog {
   /** Community entries folded into a researched agent. */
   merged: { community: string; operator: string; agent: string }[];
   /** Community entries kept as community agents of a researched operator. */
-  claimed: { community: string; operator: string; how: "listed" | "operator name" }[];
+  claimed: {
+    community: string;
+    operator: string;
+    how: "listed" | "operator name" | "description";
+  }[];
+  /** Community entries whose operator comes from their own ai.robots.txt description. */
+  described: { community: string; operator: string }[];
+  /** Attributions in community-operators.yaml that no longer apply, with the reason. */
+  staleDescriptions: { community: string; reason: string }[];
   /** Spellings of one community agent collapsed into one record (case or version differences). */
   collapsed: { kept: string; dropped: string }[];
   /** Names listed in community_agents that robots.json no longer has. */
@@ -395,7 +414,11 @@ interface CommunityAgentDraft {
   entry: CommunityEntry;
 }
 
-function communityAgent(draft: CommunityAgentDraft, source: DirectorySource): AgentRecord {
+function communityAgent(
+  draft: CommunityAgentDraft,
+  source: DirectorySource,
+  described: boolean,
+): AgentRecord {
   const { entry } = draft;
   const fn = plainText(entry.function ?? "");
   const respect = plainText(entry.respect ?? "");
@@ -414,6 +437,7 @@ function communityAgent(draft: CommunityAgentDraft, source: DirectorySource): Ag
     signs: false,
     note: joinNotes(
       "Community record from ai.robots.txt.",
+      described ? "Its operator is named in its ai.robots.txt description." : null,
       fn ? `Function: "${fn}".` : null,
       respect ? `Respects robots.txt: "${respect}".` : null,
     ),
@@ -433,6 +457,8 @@ export async function buildDirectory(input: BuildInput): Promise<BuildOutput> {
   const log: BuildLog = {
     merged: [],
     claimed: [],
+    described: [],
+    staleDescriptions: [],
     collapsed: [],
     missingClaims: [],
     ipLists: [],
@@ -484,6 +510,33 @@ export async function buildDirectory(input: BuildInput): Promise<BuildOutput> {
       if (!(name in list)) log.missingClaims.push({ operator, community: name });
     }
 
+    // Description-based attributions must quote the description they rely on.
+    const described = new Map<string, DescribedOperator>();
+    for (const [name, attribution] of input.describedOperators) {
+      const entry = list[name];
+      if (!entry) {
+        log.staleDescriptions.push({ community: name, reason: "no longer in robots.json" });
+      } else if (!(entry.description ?? "").includes(attribution.evidence)) {
+        log.problems.push(
+          `community-operators.yaml: the ai.robots.txt description of "${name}" does not contain "${attribution.evidence}"`,
+        );
+      } else if (parseOperatorField(entry.operator, input.communityOperatorNames).name) {
+        log.staleDescriptions.push({
+          community: name,
+          reason: "ai.robots.txt now names its operator",
+        });
+      } else {
+        described.set(name, attribution);
+      }
+    }
+    /** The operator of one spelling: from its operator field, else from its description. */
+    const operatorOf = (name: string) => {
+      const parsed = parseOperatorField(list[name]?.operator, input.communityOperatorNames);
+      const attribution = described.get(name);
+      if (parsed.name || !attribution) return { ...parsed, described: false };
+      return { name: attribution.operator, url: null, described: true };
+    };
+
     // Group spellings of the same agent ("MistralAI-User", "MistralAI-User/1.0").
     const groups = new Map<string, string[]>();
     for (const name of Object.keys(list).sort()) {
@@ -515,21 +568,21 @@ export async function buildDirectory(input: BuildInput): Promise<BuildOutput> {
         const score = (name: string) =>
           (baseAgentName(name) === name ? 0 : 4) +
           (claimedBy.has(name) ? 0 : 2) +
-          (parseOperatorField(list[name]?.operator, input.communityOperatorNames).name ? 0 : 1);
+          (operatorOf(name).name ? 0 : 1);
         return score(a) - score(b) || a.localeCompare(b);
       });
       const primary = ranked[0] as string;
       // Facts come from the spelling that names its operator, if any does.
-      const informed =
-        ranked.find(
-          (name) => parseOperatorField(list[name]?.operator, input.communityOperatorNames).name,
-        ) ?? primary;
+      const informed = ranked.find((name) => operatorOf(name).name) ?? primary;
       const entry = list[informed] as CommunityEntry;
       const draft: CommunityAgentDraft = { name: baseAgentName(primary), spellings, entry };
       for (const dropped of ranked.slice(1)) log.collapsed.push({ kept: primary, dropped });
 
       const listedBy = spellings.map((spelling) => claimedBy.get(spelling)).find(Boolean);
-      const parsed = parseOperatorField(entry.operator, input.communityOperatorNames);
+      const parsed = operatorOf(informed);
+      if (parsed.described && parsed.name && !listedBy) {
+        log.described.push({ community: informed, operator: parsed.name });
+      }
       let slug: string;
       if (listedBy) {
         slug = listedBy;
@@ -538,14 +591,18 @@ export async function buildDirectory(input: BuildInput): Promise<BuildOutput> {
       } else if (parsed.name && operators.get(slugify(parsed.name))?.coverage === "researched") {
         slug = slugify(parsed.name);
         for (const spelling of spellings) {
-          log.claimed.push({ community: spelling, operator: slug, how: "operator name" });
+          log.claimed.push({
+            community: spelling,
+            operator: slug,
+            how: parsed.described ? "description" : "operator name",
+          });
         }
       } else {
         slug = parsed.name ? slugify(parsed.name) : `unknown-${slugify(draft.name)}`;
         if (!slug || slug === "unknown-") slug = `unknown-${slugify(primary) || "agent"}`;
       }
 
-      const agent = communityAgent(draft, source);
+      const agent = communityAgent(draft, source, parsed.described && !listedBy);
       const owner = input.researched.find((op) => op.slug === slug);
       if (
         owner &&
@@ -564,7 +621,11 @@ export async function buildDirectory(input: BuildInput): Promise<BuildOutput> {
           website: path === "/" || path === "" ? httpsOrNull(parsed.url) : null,
           docs_url: path && path !== "/" ? httpsOrNull(parsed.url) : null,
           coverage: "community",
-          note: parsed.name ? null : "ai.robots.txt does not name the operator of this agent.",
+          note: !parsed.name
+            ? "ai.robots.txt does not name the operator of this agent."
+            : parsed.described
+              ? "ai.robots.txt lists the operator as unclear; it is named in the agent's own description there."
+              : null,
           verification: {
             signing: emptySigning("not_probed", null),
             ip_lists: [],

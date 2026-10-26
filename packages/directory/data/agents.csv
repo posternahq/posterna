@@ -1,5 +1,7 @@
 operator,operator_name,operator_coverage,agent,agent_coverage,purpose,search_engine,user_agent_tokens,robots_token,robots_policy,signs,signing_status,ip_list,ip_prefixes,reverse_dns,source_urls
 01-ai,01.ai,community,YiBot,community,training,false,YiBot,YiBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+addsearch,AddSearch,community,AddSearchBot,community,search,false,AddSearchBot,AddSearchBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+agentdata,AgentData,community,AgentDataBot,community,other,false,AgentDataBot,AgentDataBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 agi,AGI,community,AGI Agent,community,agent,false,AGI Agent,AGI Agent,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 ai2,Ai2,community,AI2Bot,community,training,false,AI2Bot,AI2Bot,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 ai2,Ai2,community,AI2Bot-DeepResearchEval,community,user_fetch,false,AI2Bot-DeepResearchEval,AI2Bot-DeepResearchEval,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
@@ -23,6 +25,8 @@ anthropic,Anthropic,researched,ClaudeBot,researched,training,false,ClaudeBot,Cla
 anthropic,Anthropic,researched,anthropic-ai,community,training,false,anthropic-ai,anthropic-ai,unstated,false,none_found,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 anthropic,Anthropic,researched,Claude-Code,community,agent,false,Claude-Code,Claude-Code,unstated,false,none_found,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 anthropic,Anthropic,researched,Claude-Web,community,agent,false,Claude-Web,Claude-Web,unstated,false,none_found,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+apify,Apify,community,ApifyBot,community,other,false,ApifyBot,ApifyBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+apify,Apify,community,ApifyWebsiteContentCrawler,community,other,false,ApifyWebsiteContentCrawler,ApifyWebsiteContentCrawler,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 apple,Apple,researched,Applebot,researched,search,true,Applebot,Applebot,honors,false,none_found,https://search.developer.apple.com/applebot.json,24,applebot.apple.com,https://support.apple.com/en-us/119829
 apple,Apple,researched,Applebot-Extended,researched,training,false,,Applebot-Extended,honors,false,none_found,,,applebot.apple.com,https://support.apple.com/en-us/119829
 apple,Apple,researched,iTMS,researched,other,false,iTMS,,may_ignore,false,none_found,,,applebot.apple.com,https://support.apple.com/en-us/119829
@@ -31,6 +35,7 @@ awario,Awario,community,Awario,community,training,false,Awario,Awario,unstated,f
 baidu,Baidu,community,ERNIEBot,community,other,false,ERNIEBot,ERNIEBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 baidu,Baidu,community,YiyanBot,community,user_fetch,false,YiyanBot,YiyanBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 big-sur-ai,Big Sur AI,community,bigsur.ai,community,user_fetch,false,bigsur.ai,bigsur.ai,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+bixel,Bixel,community,BixelBot,community,other,false,BixelBot,BixelBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 brave-search,Brave Search,community,Bravebot,community,other,false,Bravebot,Bravebot,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 brightdata-com,brightdata.com,community,Brightbot,community,training,false,Brightbot,Brightbot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 browserbase,Browserbase,researched,Browserbase,researched,agent,false,,,unstated,true,live,,,,https://docs.browserbase.com/welcome/what-is-browserbase
@@ -39,7 +44,9 @@ butterfly-effect,Butterfly Effect,community,Manus-User,community,agent,false,Man
 bytedance,ByteDance,community,Bytespider,community,training,false,Bytespider,Bytespider,may_ignore,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 bytedance,ByteDance,community,DoubaoBot,community,user_fetch,false,DoubaoBot,DoubaoBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 bytedance,ByteDance,community,TikTokSpider,community,training,false,TikTokSpider,TikTokSpider,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+bytedance,ByteDance,community,Trae,community,agent,false,Trae,Trae,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 cartai,CartAI,community,CartAI Agentic Commerce,community,agent,false,CartAI Agentic Commerce,CartAI Agentic Commerce,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+ceramic-ai,Ceramic AI,community,Terra Cotta,community,other,false,Terra Cotta,Terra Cotta,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 ceramic-ai,Ceramic AI,community,TerraCotta,community,other,false,TerraCotta,TerraCotta,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 cledara,Cledara,community,CledaraBot,community,agent,false,CledaraBot,CledaraBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 cloudflare,Cloudflare,community,Cloudflare-AutoRAG,community,search,false,Cloudflare-AutoRAG,Cloudflare-AutoRAG,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
@@ -59,7 +66,10 @@ duckduckgo,DuckDuckGo,researched,DuckAssistBot,researched,search,false,DuckAssis
 duckduckgo,DuckDuckGo,researched,DuckDuckBot,researched,search,false,DuckDuckBot,DuckDuckBot,honors,false,live,https://duckduckgo.com/duckduckbot.json,486,,https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot
 echobox,Echobox,community,Echobot Bot,community,training,false,Echobot Bot,Echobot Bot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 echobox,Echobox,community,EchoboxBot,community,other,false,EchoboxBot,EchoboxBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+elevenlabs,ElevenLabs,community,ElevenlabsBot,community,user_fetch,false,ElevenlabsBot,ElevenlabsBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+exa,Exa,community,ExaBot,community,other,false,ExaBot,ExaBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 exa,Exa,community,ExaSearchBot,community,search,false,ExaSearchBot,ExaSearchBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+exa,Exa,community,ExaUser,community,user_fetch,false,ExaUser,ExaUser,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 factset,Factset,community,Factset_spyderbot,community,training,false,Factset_spyderbot,Factset_spyderbot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 firecrawl,Firecrawl,community,FirecrawlAgent,community,other,false,FirecrawlAgent,FirecrawlAgent,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 geisthaus,GeistHaus,community,GeistHaus-PageFetcher,community,user_fetch,false,GeistHaus-PageFetcher,GeistHaus-PageFetcher,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
@@ -95,6 +105,7 @@ google,Google,researched,Google-Gemini-CLI,community,agent,false,Google-Gemini-C
 google,Google,researched,GoogleAgent-Mariner,community,agent,false,GoogleAgent-Mariner,GoogleAgent-Mariner,unstated,false,live,,,googlebot.com;google.com,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 google,Google,researched,GoogleAgent-URLContext,community,user_fetch,false,GoogleAgent-URLContext,GoogleAgent-URLContext,unstated,false,live,,,googlebot.com;google.com,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 google,Google,researched,NotebookLM,community,user_fetch,false,NotebookLM,NotebookLM,unstated,false,live,,,googlebot.com;google.com,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+hark,Hark,community,HarkBot,community,agent,false,HarkBot,HarkBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 huawei,Huawei,community,PanguBot,community,training,false,PanguBot,PanguBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 huawei,Huawei,community,PetalBot,community,search,false,PetalBot,PetalBot,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 iask,iAsk,community,iaskspider,community,user_fetch,false,iaskspider,iaskspider,may_ignore,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
@@ -102,11 +113,13 @@ imagesift,ImageSift,community,ImagesiftBot,community,other,false,ImagesiftBot,Im
 img2dataset,img2dataset,community,img2dataset,community,other,false,img2dataset,img2dataset,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 iss-corporate,ISS-Corporate,community,ISSCyberRiskCrawler,community,training,false,ISSCyberRiskCrawler,ISSCyberRiskCrawler,may_ignore,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 kagi,Kagi,community,kagi-fetcher,community,user_fetch,false,kagi-fetcher,kagi-fetcher,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+kangaroo-llm,Kangaroo LLM,community,Kangaroo Bot,community,training,false,Kangaroo Bot,Kangaroo Bot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 keenable,Keenable,community,KeenableBot,community,search,false,KeenableBot,KeenableBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 kimi,Kimi,community,MoonshotBot,community,training,false,MoonshotBot,MoonshotBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 klaviyo,Klaviyo,community,KlaviyoAIBot,community,user_fetch,false,KlaviyoAIBot,KlaviyoAIBot,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 large-scale-artificial-intelligence-open-network,Large-scale Artificial Intelligence Open Network,community,LAIONDownloader,community,search,false,LAIONDownloader,LAIONDownloader,may_ignore,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 lightpanda-client-users,Lightpanda client users,community,Lightpanda,community,training,false,Lightpanda,Lightpanda,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+liner,Liner,community,LinerBot,community,user_fetch,false,LinerBot,LinerBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 linguee,Linguee,community,Linguee Bot,community,other,false,Linguee Bot,Linguee Bot,may_ignore,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 lyrenth,Lyrenth,community,AIWebIndex,community,search,false,AIWebIndex,AIWebIndex,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 meltwater,Meltwater,community,YaK,community,search,false,YaK,YaK,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
@@ -116,6 +129,7 @@ meta,Meta,researched,Meta-ExternalAgent,researched,training,false,meta-externala
 meta,Meta,researched,Meta-ExternalFetcher,researched,user_fetch,false,meta-externalfetcher,meta-externalfetcher,may_ignore,false,live,,,,https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers
 meta,Meta,researched,Meta-WebIndexer,researched,search,false,meta-webindexer,meta-webindexer,honors,false,live,,,,https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers
 meta,Meta,researched,FacebookBot,community,training,false,FacebookBot,FacebookBot,honors,false,live,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+meta,Meta,researched,Muse,community,agent,false,Muse,Muse,unstated,false,live,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 microsoft,Microsoft,researched,AdIdxBot,researched,ads,false,adidxbot,,honors,false,none_found,,,search.msn.com,https://www.bing.com/webmasters/api/help/htmlcontent?ArticleId=8c184ec0
 microsoft,Microsoft,researched,Bingbot,researched,search,true,bingbot,Bingbot,honors,false,none_found,https://www.bing.com/toolbox/bingbot.json,28,search.msn.com,https://www.bing.com/webmasters/api/help/htmlcontent?ArticleId=8c184ec0;https://www.bing.com/webmasters/api/help/htmlcontent?ArticleId=25c19802;https://www.bing.com/webmasters/api/help/htmlcontent?ArticleId=2195837f
 microsoft,Microsoft,researched,BingPreview,researched,preview,false,,,honors,false,none_found,,,search.msn.com,https://www.bing.com/webmasters/api/help/htmlcontent?ArticleId=8c184ec0
@@ -138,9 +152,13 @@ openai,OpenAI,researched,GPTBot,researched,training,false,GPTBot,GPTBot,honors,f
 openai,OpenAI,researched,OAI-AdsBot,researched,ads,false,OAI-AdsBot,,unstated,false,reported,https://openai.com/adsbot.json,2,,https://developers.openai.com/api/docs/bots
 openai,OpenAI,researched,OAI-SearchBot,researched,search,false,OAI-SearchBot,OAI-SearchBot,honors,false,reported,https://openai.com/searchbot.json,39,,https://developers.openai.com/api/docs/bots
 openai,OpenAI,researched,ChatGPT Agent,community,agent,false,ChatGPT Agent,ChatGPT Agent,honors,false,reported,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+openai,OpenAI,researched,Codex,community,agent,false,Codex,Codex,unstated,false,reported,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+openai,OpenAI,researched,Dot,community,agent,false,Dot,Dot,unstated,false,reported,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 openai,OpenAI,researched,OpenAI,community,other,false,OpenAI,OpenAI,honors,false,reported,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+openai,OpenAI,researched,Operator,community,agent,false,Operator,Operator,unstated,false,reported,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 panscient,Panscient,community,Panscient,community,other,false,Panscient,Panscient,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 panscient,Panscient,community,panscient.com,community,other,false,panscient.com,panscient.com,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+parallel,Parallel,community,Shap-User,community,user_fetch,false,Shap-User,Shap-User,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 parallel,Parallel,community,ShapBot,community,other,false,ShapBot,ShapBot,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 payhawk,Payhawk,community,Payhawk Invoice Fetching Agent,community,agent,false,Payhawk Invoice Fetching Agent,Payhawk Invoice Fetching Agent,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 perplexity,Perplexity,researched,Perplexity-User,researched,user_fetch,false,Perplexity-User,Perplexity-User,may_ignore,false,none_found,https://www.perplexity.com/perplexity-user.json,4,,https://docs.perplexity.ai/docs/resources/perplexity-crawlers
@@ -162,58 +180,40 @@ sb-intuitions,SB Intuitions,community,SBIntuitionsBot,community,other,false,SBIn
 semrush,Semrush,community,SemrushBot-OCOB,community,other,false,SemrushBot-OCOB,SemrushBot-OCOB,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 semrush,Semrush,community,SemrushBot-SWA,community,user_fetch,false,SemrushBot-SWA,SemrushBot-SWA,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 sidetrade,Sidetrade,community,Sidetrade indexer bot,community,training,false,Sidetrade indexer bot,Sidetrade indexer bot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+tavily,Tavily,community,TavilyBot,community,other,false,TavilyBot,TavilyBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 tencent,Tencent,community,Hunyuan,community,training,false,Hunyuan,Hunyuan,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 the-agent-times,The Agent Times,community,AgentTimes,community,other,false,AgentTimes,AgentTimes,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 thinkbot,Thinkbot,community,Thinkbot,community,other,false,Thinkbot,Thinkbot,may_ignore,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 timpi,Timpi,community,Timpibot,community,training,false,Timpibot,Timpibot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 twin,Twin,community,TwinAgent,community,agent,false,TwinAgent,TwinAgent,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-addsearchbot,Unknown operator (AddSearchBot),community,AddSearchBot,community,search,false,AddSearchBot,AddSearchBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-agentdatabot,Unknown operator (AgentDataBot),community,AgentDataBot,community,other,false,AgentDataBot,AgentDataBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-apifybot,Unknown operator (ApifyBot),community,ApifyBot,community,other,false,ApifyBot,ApifyBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-apifywebsitecontentcrawler,Unknown operator (ApifyWebsiteContentCrawler),community,ApifyWebsiteContentCrawler,community,other,false,ApifyWebsiteContentCrawler,ApifyWebsiteContentCrawler,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-aranet-searchbot,Unknown operator (Aranet-SearchBot),community,Aranet-SearchBot,community,agent,false,Aranet-SearchBot,Aranet-SearchBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-azureai-searchbot,Unknown operator (AzureAI-SearchBot),community,AzureAI-SearchBot,community,search,false,AzureAI-SearchBot,AzureAI-SearchBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-bixelbot,Unknown operator (BixelBot),community,BixelBot,community,other,false,BixelBot,BixelBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-channel3bot,Unknown operator (Channel3Bot),community,Channel3Bot,community,search,false,Channel3Bot,Channel3Bot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-chatglm-spider,Unknown operator (ChatGLM-Spider),community,ChatGLM-Spider,community,training,false,ChatGLM-Spider,ChatGLM-Spider,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-code,Unknown operator (Code),community,Code,community,agent,false,Code,Code,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-codex,Unknown operator (Codex),community,Codex,community,agent,false,Codex,Codex,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-crawl4ai,Unknown operator (Crawl4AI),community,Crawl4AI,community,agent,false,Crawl4AI,Crawl4AI,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-cursor,Unknown operator (Cursor),community,Cursor,community,agent,false,Cursor,Cursor,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-dot,Unknown operator (Dot),community,Dot,community,agent,false,Dot,Dot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-elevenlabsbot,Unknown operator (ElevenlabsBot),community,ElevenlabsBot,community,user_fetch,false,ElevenlabsBot,ElevenlabsBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-exabot,Unknown operator (ExaBot),community,ExaBot,community,other,false,ExaBot,ExaBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-exauser,Unknown operator (ExaUser),community,ExaUser,community,user_fetch,false,ExaUser,ExaUser,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-friendlycrawler,Unknown operator (FriendlyCrawler),community,FriendlyCrawler,community,other,false,FriendlyCrawler,FriendlyCrawler,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-harkbot,Unknown operator (HarkBot),community,HarkBot,community,agent,false,HarkBot,HarkBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-henkbot,Unknown operator (HenkBot),community,HenkBot,community,other,false,HenkBot,HenkBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-iaskbot,Unknown operator (iAskBot),community,iAskBot,community,agent,false,iAskBot,iAskBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-imagespider,Unknown operator (imageSpider),community,imageSpider,community,training,false,imageSpider,imageSpider,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-instinct,Unknown operator (Instinct),community,Instinct,community,agent,false,Instinct,Instinct,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-kangaroo-bot,Unknown operator (Kangaroo Bot),community,Kangaroo Bot,community,training,false,Kangaroo Bot,Kangaroo Bot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-kunatocrawler,Unknown operator (KunatoCrawler),community,KunatoCrawler,community,agent,false,KunatoCrawler,KunatoCrawler,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-laion-huggingface-processor,Unknown operator (laion-huggingface-processor),community,laion-huggingface-processor,community,training,false,laion-huggingface-processor,laion-huggingface-processor,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-lcc,Unknown operator (LCC),community,LCC,community,training,false,LCC,LCC,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-linerbot,Unknown operator (LinerBot),community,LinerBot,community,user_fetch,false,LinerBot,LinerBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-linkupbot,Unknown operator (LinkupBot),community,LinkupBot,community,search,false,LinkupBot,LinkupBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-muse,Unknown operator (Muse),community,Muse,community,agent,false,Muse,Muse,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-mycentralaiscraperbot,Unknown operator (MyCentralAIScraperBot),community,MyCentralAIScraperBot,community,training,false,MyCentralAIScraperBot,MyCentralAIScraperBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-newsai,Unknown operator (newsai),community,newsai,community,training,false,newsai,newsai,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-opencode,Unknown operator (opencode),community,opencode,community,agent,false,opencode,opencode,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-operator,Unknown operator (Operator),community,Operator,community,agent,false,Operator,Operator,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-shap-user,Unknown operator (Shap-User),community,Shap-User,community,user_fetch,false,Shap-User,Shap-User,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-spider,Unknown operator (Spider),community,Spider,community,training,false,Spider,Spider,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-tavilybot,Unknown operator (TavilyBot),community,TavilyBot,community,other,false,TavilyBot,TavilyBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-terra-cotta,Unknown operator (Terra Cotta),community,Terra Cotta,community,other,false,Terra Cotta,Terra Cotta,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-trae,Unknown operator (Trae),community,Trae,community,agent,false,Trae,Trae,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-useai,Unknown operator (UseAI),community,UseAI,community,user_fetch,false,UseAI,UseAI,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-unknown-webzio-extended,Unknown operator (webzio-extended),community,webzio-extended,community,training,false,webzio-extended,webzio-extended,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-wrtnbot,Unknown operator (WRTNBot),community,WRTNBot,community,agent,false,WRTNBot,WRTNBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 unknown-zanistabot,Unknown operator (ZanistaBot),community,ZanistaBot,community,search,false,ZanistaBot,ZanistaBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+valyu,Valyu,community,HenkBot,community,other,false,HenkBot,HenkBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 velen-crawler,Velen Crawler,community,VelenPublicWebCrawler,community,other,false,VelenPublicWebCrawler,VelenPublicWebCrawler,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 webspark,WEBSPARK,community,WARDBot,community,training,false,WARDBot,WARDBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 webz-io,Webz.io,community,omgili,community,other,false,omgili,omgili,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 webz-io,Webz.io,community,omgilibot,community,other,false,omgilibot,omgilibot,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+webz-io,Webz.io,community,Webzio-Extended,community,training,false,Webzio-Extended,Webzio-Extended,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 xai,xAI,researched,Grok API web search,researched,user_fetch,false,,,unstated,false,none_found,,,,https://docs.x.ai/developers/tools/web-search
 xai,xAI,researched,Grok Bot,researched,agent,false,,,unstated,false,none_found,,,,https://docs.x.ai/grok-bot/overview
 xai,xAI,researched,grok-agent,researched,user_fetch,false,grok-agent,,unstated,false,none_found,,,,https://raw.githubusercontent.com/xai-org/grok-build/main/crates/codegen/xai-grok-tools/src/implementations/grok_build/web_fetch/mod.rs;https://raw.githubusercontent.com/xai-org/grok-build/main/crates/codegen/xai-grok-tools/src/implementations/grok_build/web_fetch/config.rs

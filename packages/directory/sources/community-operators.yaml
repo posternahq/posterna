@@ -1,8 +1,42 @@
-# Display names for community operators whose `operator` field in
-# ai.robots.txt's robots.json is a sentence or a bare URL rather than a name.
-# Keys are the exact field values. Values use the field's own words.
-# Operators not listed here are named by the build's own rules: the text of a
-# Markdown link, a bare URL's host, or the words before the first clause.
-"the Chinese company Huawei": Huawei
-"https://safe.search.brave.com/help/brave-search-crawler": Brave Search
-"Anyone who downloads the Lightpanda client. Possibly being used by a [Grok-adjacent](https://github.com/lightpanda-io/browser/issues/3156#issuecomment-5217843616) organization's botnet.": Lightpanda client users
+# Curated help for community records from ai.robots.txt's robots.json.
+# Records attributed here stay labeled `community`.
+
+# Display names for operators whose `operator` field is a sentence or a bare
+# URL rather than a name. Keys are the exact field values; values use the
+# field's own words. Fields not listed here are named by the build's own rules:
+# the text of a Markdown link, a bare URL's host, or the words before the
+# first clause.
+operator_names:
+  "the Chinese company Huawei": Huawei
+  "https://safe.search.brave.com/help/brave-search-crawler": Brave Search
+  "Anyone who downloads the Lightpanda client. Possibly being used by a [Grok-adjacent](https://github.com/lightpanda-io/browser/issues/3156#issuecomment-5217843616) organization's botnet.": Lightpanda client users
+
+# Entries whose operator field says "Unclear at this time." but whose own
+# description in robots.json names the operator. `evidence` is copied verbatim
+# from that description; the build fails if it is no longer there. Entries
+# whose description names only a product (Code, Cursor), hedges ("associated
+# with"), or names no company are left unattributed.
+described_operators:
+  Codex: { operator: OpenAI, evidence: "Codex is an AI coding agent by OpenAI" }
+  Dot: { operator: OpenAI, evidence: "Dot is an OpenAI AI agent" }
+  Operator: { operator: OpenAI, evidence: "Operator is an AI agent created by OpenAI" }
+  Muse: { operator: Meta, evidence: "Muse is a personal AI agent created by Meta" }
+  Trae: { operator: ByteDance, evidence: "developed by ByteDance" }
+  ApifyBot: { operator: Apify, evidence: "crawler by Apify" }
+  ApifyWebsiteContentCrawler: { operator: Apify, evidence: "web crawler by Apify" }
+  ExaBot: { operator: Exa, evidence: "power Exa's AI search engine" }
+  ExaUser: { operator: Exa, evidence: "ExaUser is Exa's on-demand fetcher" }
+  TavilyBot: { operator: Tavily, evidence: "web crawler by Tavily" }
+  # The existing community operator "Ceramic AI" (ai.robots.txt lists its TerraCotta agent).
+  Terra Cotta: { operator: Ceramic AI, evidence: "Terra Cotta is Ceramic's web crawler" }
+  Webzio-Extended: { operator: Webz.io, evidence: "used by Webz.io" }
+  HenkBot: { operator: Valyu, evidence: "crawls the web on behalf of Valyu" }
+  # The existing community operator "Parallel" (parallel.ai, which runs ShapBot).
+  Shap-User: { operator: Parallel, evidence: "users of Parallel Web Systems products" }
+  Kangaroo Bot: { operator: Kangaroo LLM, evidence: "used by the company Kangaroo LLM" }
+  AddSearchBot: { operator: AddSearch, evidence: "for AddSearch's AI-powered site search" }
+  AgentDataBot: { operator: AgentData, evidence: "builds AgentData's company-intelligence database" }
+  BixelBot: { operator: Bixel, evidence: "for Bixel's structured company-data platform" }
+  ElevenlabsBot: { operator: ElevenLabs, evidence: "ElevenLabs agents' knowledge bases" }
+  HarkBot: { operator: Hark, evidence: "on behalf of signed-in Hark users" }
+  LinerBot: { operator: Liner, evidence: "used by Liner AI assistant" }

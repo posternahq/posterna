@@ -15,7 +15,7 @@ import { loadFetched, readManifest } from "./lib/manifest";
 import { buildDirectory } from "./lib/merge";
 import { agentsCsv, schemaValidators, summary } from "./lib/outputs";
 import { buildReport } from "./lib/report";
-import { loadCommunityOperatorNames, loadOperatorSources } from "./lib/sources";
+import { loadCommunityAttributions, loadOperatorSources } from "./lib/sources";
 
 function readJson<T>(path: string): T | null {
   return existsSync(path) ? (JSON.parse(readFileSync(path, "utf8")) as T) : null;
@@ -36,10 +36,12 @@ async function main(): Promise<void> {
     throw new Error(`ai.robots.txt robots.json is required but was not fetched (${why}).`);
   }
 
+  const attributions = loadCommunityAttributions();
   const { directory, keys, log } = await buildDirectory({
     generatedAt: new Date(),
     researched,
-    communityOperatorNames: loadCommunityOperatorNames(),
+    communityOperatorNames: attributions.operatorNames,
+    describedOperators: attributions.describedOperators,
     community: {
       list: parseCommunityList(new TextDecoder().decode(robotsJson.body)),
       source: {

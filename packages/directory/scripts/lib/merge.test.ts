@@ -131,6 +131,7 @@ async function build(
     generatedAt: NOW,
     researched: [parseOperatorSource(exampleYaml, "example.yaml")],
     communityOperatorNames: new Map(),
+    describedOperators: new Map(),
     community: {
       list: community,
       source: {
@@ -317,6 +318,7 @@ describe("buildDirectory", () => {
       generatedAt: NOW,
       researched,
       communityOperatorNames: new Map(),
+      describedOperators: new Map(),
       community: null,
       fetched: new Map([
         file(dir("missing.test"), "http_error", null, 404),
@@ -367,5 +369,77 @@ describe("findDuplicates", () => {
     expect(findDuplicates(copy).join("\n")).toMatch(
       /duplicate agent name: example\/ExampleBot and other-corp\/ExampleBot/,
     );
+  });
+});
+
+describe("description-based attributions", () => {
+  const extra: CommunityList = {
+    "Example-Helper": {
+      operator: "Unclear at this time.",
+      function: "AI Agents",
+      description: "Example-Helper is an AI agent created by Example that books travel.",
+    },
+    Gadget: {
+      operator: "Unclear at this time.",
+      function: "AI Assistants",
+      description: "Gadget is run by Widget Co for its assistant.",
+    },
+  };
+  const withExtra = {
+    list: { ...community, ...extra },
+    source: {
+      url: "https://example.org/robots.json",
+      title: "robots.json",
+      fetched_at: FETCHED_AT,
+    },
+  };
+
+  it("attaches an entry to the operator its own description names, still labeled community", async () => {
+    const { directory, log } = await build({
+      community: withExtra,
+      describedOperators: new Map([
+        ["Example-Helper", { operator: "Example", evidence: "created by Example" }],
+        ["Gadget", { operator: "Widget Co", evidence: "run by Widget Co" }],
+      ]),
+    });
+    expect(log.problems).toEqual([]);
+    const helper = directory.operators
+      .find((op) => op.slug === "example")
+      ?.agents.find((agent) => agent.name === "Example-Helper");
+    expect(helper).toMatchObject({ coverage: "community", purpose: "agent" });
+    expect(helper?.note).toContain("named in its ai.robots.txt description");
+    expect(log.claimed).toContainEqual({
+      community: "Example-Helper",
+      operator: "example",
+      how: "description",
+    });
+    const widget = directory.operators.find((op) => op.slug === "widget-co");
+    expect(widget).toMatchObject({ name: "Widget Co", coverage: "community" });
+    expect(widget?.note).toContain("named in the agent's own description");
+    expect(log.described.map((entry) => entry.community).sort()).toEqual([
+      "Example-Helper",
+      "Gadget",
+    ]);
+  });
+
+  it("fails when the quoted phrase is not in the description", async () => {
+    const { log } = await build({
+      community: withExtra,
+      describedOperators: new Map([
+        ["Gadget", { operator: "Widget Co", evidence: "built by Widget Co" }],
+      ]),
+    });
+    expect(log.problems.join("\n")).toMatch(/does not contain "built by Widget Co"/);
+  });
+
+  it("reports attributions that no longer apply instead of using them", async () => {
+    const { directory, log } = await build({
+      community: withExtra,
+      describedOperators: new Map([["Gone-Bot", { operator: "Widget Co", evidence: "anything" }]]),
+    });
+    expect(log.staleDescriptions).toEqual([
+      { community: "Gone-Bot", reason: "no longer in robots.json" },
+    ]);
+    expect(directory.operators.find((op) => op.slug === "widget-co")).toBeUndefined();
   });
 });

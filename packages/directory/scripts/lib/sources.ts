@@ -313,21 +313,53 @@ export function loadOperatorSources(dir = SOURCES_DIR): OperatorSource[] {
   return files.map((name) => parseOperatorSource(readFileSync(join(dir, name), "utf8"), name));
 }
 
-/**
- * Display names for community operators whose ai.robots.txt `operator` field
- * is a sentence rather than a name. Keys are exact field values.
- */
-export function loadCommunityOperatorNames(path = COMMUNITY_OPERATORS_PATH): Map<string, string> {
-  const data: unknown = parse(readFileSync(path, "utf8")) ?? {};
-  if (typeof data !== "object" || data === null || Array.isArray(data)) {
-    throw new Error(`${path}: expected a mapping of operator field to display name`);
+export interface CommunityAttributions {
+  /** Display names for operator fields that are a sentence or a URL. Keys are exact field values. */
+  operatorNames: Map<string, string>;
+  /** Operators for entries whose operator field is unclear but whose description names one. */
+  describedOperators: Map<string, { operator: string; evidence: string }>;
+}
+
+const attributionsSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["operator_names", "described_operators"],
+  properties: {
+    operator_names: {
+      type: "object",
+      additionalProperties: { type: "string", minLength: 1 },
+    },
+    described_operators: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        additionalProperties: false,
+        required: ["operator", "evidence"],
+        properties: {
+          operator: { type: "string", minLength: 1 },
+          evidence: { type: "string", minLength: 3 },
+        },
+      },
+    },
+  },
+} as const;
+const validateAttributions = ajv.compile(attributionsSchema);
+
+/** Loads sources/community-operators.yaml. */
+export function loadCommunityAttributions(path = COMMUNITY_OPERATORS_PATH): CommunityAttributions {
+  const data: unknown = parse(readFileSync(path, "utf8"));
+  if (!validateAttributions(data)) {
+    const details = (validateAttributions.errors ?? [])
+      .map((error) => `${error.instancePath || "/"} ${error.message ?? ""}`)
+      .join("; ");
+    throw new Error(`${path}: ${details}`);
   }
-  const names = new Map<string, string>();
-  for (const [field, name] of Object.entries(data)) {
-    if (typeof name !== "string" || name.trim() === "") {
-      throw new Error(`${path}: "${field}" must map to a non-empty name`);
-    }
-    names.set(field, name.trim());
-  }
-  return names;
+  const file = data as unknown as {
+    operator_names: Record<string, string>;
+    described_operators: Record<string, { operator: string; evidence: string }>;
+  };
+  return {
+    operatorNames: new Map(Object.entries(file.operator_names)),
+    describedOperators: new Map(Object.entries(file.described_operators)),
+  };
 }

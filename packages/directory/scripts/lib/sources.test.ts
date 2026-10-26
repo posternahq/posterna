@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { loadCommunityOperatorNames, loadOperatorSources, parseOperatorSource } from "./sources";
+import { loadCommunityAttributions, loadOperatorSources, parseOperatorSource } from "./sources";
 
 const valid = `
 slug: example
@@ -89,8 +89,13 @@ describe("committed researched sources", () => {
     });
   });
 
-  it("loads the community operator names", () => {
-    expect(loadCommunityOperatorNames().get("the Chinese company Huawei")).toBe("Huawei");
+  it("loads the community attributions", () => {
+    const attributions = loadCommunityAttributions();
+    expect(attributions.operatorNames.get("the Chinese company Huawei")).toBe("Huawei");
+    expect(attributions.describedOperators.get("Codex")).toEqual({
+      operator: "OpenAI",
+      evidence: "Codex is an AI coding agent by OpenAI",
+    });
   });
 });
 

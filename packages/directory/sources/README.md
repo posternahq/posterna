@@ -67,6 +67,13 @@ signing:                      # Web Bot Auth key directory
   sources: [bots]
 ```
 
+## Community records
+
+`community-operators.yaml` holds the only curation applied to ai.robots.txt records, which always stay labeled `community`:
+
+- `operator_names`: display names for `operator` fields that are a sentence or a bare URL.
+- `described_operators`: entries whose operator field says "Unclear at this time." but whose own description names the operator. Each one quotes the phrase that names it, and the build fails if that phrase is not in the description. Descriptions that name only a product, hedge ("associated with"), or name no company are not attributed.
+
 ## How the build decides signing status
 
 | What happened | Status |
