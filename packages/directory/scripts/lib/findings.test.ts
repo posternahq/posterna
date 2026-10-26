@@ -36,6 +36,7 @@ describe("looksLikeIpList", () => {
     ["https://example.com/openapi.json", false],
     ["https://example.com/robots.txt", false],
     ["https://example.com/logo.png", false],
+    ["https://example.com/og/docs/guides/ip-addresses.png", false],
   ])("%s is %s", (url, expected) => {
     expect(looksLikeIpList(url)).toBe(expected);
   });
@@ -65,6 +66,9 @@ sources:
   - id: survey
     url: https://survey.example.org/results
     title: A third-party survey
+  - id: guide
+    url: https://example.com/docs/ip-addresses
+    title: IP addresses guide
 agents:
   - name: ExampleBot
     user_agent_tokens: [ExampleBot]
@@ -122,7 +126,7 @@ const directory = {
 describe("ownSourceIds", () => {
   it("leaves out pages cited only as a third-party report", () => {
     const op = parseOperatorSource(exampleYaml, "example.yaml");
-    expect([...ownSourceIds(op)]).toEqual(["bots"]);
+    expect([...ownSourceIds(op)]).toEqual(["bots", "guide"]);
   });
 });
 
@@ -135,6 +139,7 @@ describe("findNewThings", () => {
        <a href="/examplebot.json">known list</a>
        <a href="/examplesearchbot.json">new list</a>
        <a href="/all-ranges.json">company ranges</a>
+       <a href="https://example.com/docs/ip-addresses">our IP guide, already cited</a>
        <a href="https://agents.example.com/.well-known/http-message-signatures-directory">keys</a>`,
     ),
     page(

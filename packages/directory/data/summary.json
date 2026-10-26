@@ -1,6 +1,6 @@
 {
   "version": "2026-10-26",
-  "generated_at": "2026-10-26T22:23:38Z",
+  "generated_at": "2026-10-26T23:08:07Z",
   "operators": {
     "total": 125,
     "by_coverage": {
@@ -40,9 +40,9 @@
   },
   "keys": 13,
   "ip_lists": {
-    "total": 21,
-    "fetched": 21,
-    "prefixes": 5598
+    "total": 23,
+    "fetched": 23,
+    "prefixes": 7643
   },
   "reverse_dns_rules": 4
 }

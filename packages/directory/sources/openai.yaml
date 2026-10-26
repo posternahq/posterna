@@ -16,6 +16,9 @@ sources:
   - id: castle
     url: https://blog.castle.io/how-to-authenticate-openai-operator-requests-using-http-message-signatures/
     title: How to authenticate OpenAI Operator requests using HTTP message signatures (Castle, third party)
+  - id: ip-egress
+    url: https://developers.openai.com/api/docs/guides/ip-addresses
+    title: IP egress ranges
 
 agents:
   - name: GPTBot
@@ -91,7 +94,9 @@ agents:
     note: >-
       Also used for GPT Actions. OpenAI names only OAI-SearchBot and GPTBot as
       robots.txt tags, so robots_token is null. OpenAI says ChatGPT-User does not
-      decide whether content appears in search; OAI-SearchBot does.
+      decide whether content appears in search; OAI-SearchBot does. OpenAI's IP
+      egress guide lists GPT Actions under the separate chatgpt-connectors ranges,
+      which are not linked here (see that list's note).
 
 ip_lists:
   - id: gptbot
@@ -106,6 +111,28 @@ ip_lists:
   - id: chatgpt-user
     url: https://openai.com/chatgpt-user.json
     source: bots
+  # From OpenAI's IP egress guide: ranges for outbound requests from OpenAI
+  # products to services a site controls. OpenAI gives no user-agent token for
+  # either, so neither list is linked to an agent.
+  - id: chatgpt-connectors
+    url: https://openai.com/chatgpt-connectors.json
+    source: ip-egress
+    note: >-
+      OpenAI publishes these as the "ChatGPT connectors" ranges for ChatGPT
+      integrations, used for "Plugins, connectors, GPT Actions, and agentic
+      commerce". Not linked to an agent: OpenAI documents no user-agent token for
+      these requests. ChatGPT-User, which OpenAI also mentions with GPT Actions,
+      keeps its own list (chatgpt-user.json), and an agent can point at only one
+      list.
+  - id: chatgpt-agents
+    url: https://openai.com/chatgpt-agents.json
+    source: ip-egress
+    note: >-
+      OpenAI publishes these as the "ChatGPT agents" ranges and lists them for
+      Codex cloud, used for "Connections from Codex cloud to services such as
+      GitHub". Not linked to an agent: OpenAI documents no user-agent token for
+      Codex cloud, and the guide does not say whether ChatGPT agent's browser uses
+      these ranges.
 
 reverse_dns: null
 

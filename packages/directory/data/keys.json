@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-26T22",
-  "generated_at": "2026-10-26T22:23:38Z",
+  "version": "2026-10-26T23",
+  "generated_at": "2026-10-26T23:08:07Z",
   "operators": {
     "amazon": {
       "directory_url": "https://kzejmtkesloc1.keydirectory.signer.ap-northeast-1.on.aws/.well-known/http-message-signatures-directory",
@@ -10,7 +10,7 @@
     },
     "browserbase": {
       "directory_url": "https://www.browserbase.com/.well-known/http-message-signatures-directory",
-      "fetched_at": "2026-10-26T21:37:52.095Z",
+      "fetched_at": "2026-10-26T23:06:40.182Z",
       "status": "live",
       "keys": [
         {
@@ -24,7 +24,7 @@
           "thumbprint": "DJuTDnlBxNZzalQhhvktwvkF3lWss-T56g7s4xubuhU",
           "kid": "DJuTDnlBxNZzalQhhvktwvkF3lWss-T56g7s4xubuhU",
           "first_seen": "2026-10-26T21:32:57.945Z",
-          "last_seen": "2026-10-26T21:37:52.095Z"
+          "last_seen": "2026-10-26T23:06:40.182Z"
         },
         {
           "jwk": {
@@ -37,13 +37,13 @@
           "thumbprint": "NVhTndQWodGQ47Kmhm1bhTdt0swWS7EHmUEMo-opsXU",
           "kid": "NVhTndQWodGQ47Kmhm1bhTdt0swWS7EHmUEMo-opsXU",
           "first_seen": "2026-10-26T21:32:57.945Z",
-          "last_seen": "2026-10-26T21:37:52.095Z"
+          "last_seen": "2026-10-26T23:06:40.182Z"
         }
       ]
     },
     "duckduckgo": {
       "directory_url": "https://assistbot.duckduckgo.com/.well-known/http-message-signatures-directory",
-      "fetched_at": "2026-10-26T21:38:04.911Z",
+      "fetched_at": "2026-10-26T23:06:53.586Z",
       "status": "live",
       "keys": [
         {
@@ -56,13 +56,13 @@
           "thumbprint": "Ov3HDsa8JQ39dPEYFvFFN-cUpnz9yNI8LDvr-5LeiBM",
           "kid": "Ov3HDsa8JQ39dPEYFvFFN-cUpnz9yNI8LDvr-5LeiBM",
           "first_seen": "2026-10-26T21:33:10.953Z",
-          "last_seen": "2026-10-26T21:38:04.911Z"
+          "last_seen": "2026-10-26T23:06:53.586Z"
         }
       ]
     },
     "google": {
       "directory_url": "https://agent.bot.goog/.well-known/http-message-signatures-directory",
-      "fetched_at": "2026-10-26T21:38:11.279Z",
+      "fetched_at": "2026-10-26T23:07:00.504Z",
       "status": "live",
       "keys": [
         {
@@ -80,7 +80,7 @@
           "thumbprint": "_fmS_hfpckRfp1x7fDExtVKVaYtcu1WJX1Io5LIow24",
           "kid": "mhxuPw",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-26T21:38:11.279Z"
+          "last_seen": "2026-10-26T23:07:00.504Z"
         },
         {
           "jwk": {
@@ -97,7 +97,7 @@
           "thumbprint": "c8D-_KOv7e9F83sFV2aCQUY5EuDbEVp5_sN86S8bKTc",
           "kid": "Ggh50g",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-26T21:38:11.279Z"
+          "last_seen": "2026-10-26T23:07:00.504Z"
         },
         {
           "jwk": {
@@ -114,7 +114,7 @@
           "thumbprint": "cBovpyiY9PIQIFEfaw7w_0Wwwwx4UF2LY6w0lQURHBU",
           "kid": "cYSMkA",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-26T21:38:11.279Z"
+          "last_seen": "2026-10-26T23:07:00.504Z"
         },
         {
           "jwk": {
@@ -131,7 +131,7 @@
           "thumbprint": "I10hzgxlf59i39kdp5Lib4Tfbg-FO4ZMwmAEDwG88bY",
           "kid": "bUCe2A",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-26T21:38:11.279Z"
+          "last_seen": "2026-10-26T23:07:00.504Z"
         },
         {
           "jwk": {
@@ -148,13 +148,13 @@
           "thumbprint": "ImfgehCo9CQ0CTvJyuAY3dt6p5xMvJVutWoGpHtmVME",
           "kid": "DYiMjA",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-26T21:38:11.279Z"
+          "last_seen": "2026-10-26T23:07:00.504Z"
         }
       ]
     },
     "meta": {
       "directory_url": "https://www.meta.com/.well-known/http-message-signatures-directory",
-      "fetched_at": "2026-10-26T21:38:20.754Z",
+      "fetched_at": "2026-10-26T23:07:09.952Z",
       "status": "live",
       "keys": [
         {
@@ -166,7 +166,7 @@
           "thumbprint": "2h6d-naMeNYCEY_tziKuRgyrXhviX1wPZnK3YvpkJpo",
           "kid": null,
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-26T21:38:20.754Z"
+          "last_seen": "2026-10-26T23:07:09.952Z"
         },
         {
           "jwk": {
@@ -177,7 +177,7 @@
           "thumbprint": "6CdRjLYItMBcIR0Sn0QS97MEDoUm3Xmr7dV9DwEOU7E",
           "kid": null,
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-26T21:38:20.754Z"
+          "last_seen": "2026-10-26T23:07:09.952Z"
         },
         {
           "jwk": {
@@ -188,7 +188,7 @@
           "thumbprint": "co8Mqi_ams-_h9I-gXZ-NsG1BfSN34LTyIZaw9hUUGk",
           "kid": null,
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-26T21:38:20.754Z"
+          "last_seen": "2026-10-26T23:07:09.952Z"
         },
         {
           "jwk": {
@@ -199,7 +199,7 @@
           "thumbprint": "Iy80tzAcbbb85lkjfKieYYwxAqinLDqDUBXjVMEnI_s",
           "kid": null,
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-26T21:38:20.754Z"
+          "last_seen": "2026-10-26T23:07:09.952Z"
         },
         {
           "jwk": {
@@ -210,7 +210,7 @@
           "thumbprint": "PZZZiz0rLbE9RZJ1DyryOFQzzqVwf96kCcr44MMKP0M",
           "kid": null,
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-26T21:38:20.754Z"
+          "last_seen": "2026-10-26T23:07:09.952Z"
         }
       ]
     },

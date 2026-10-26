@@ -1,13 +1,6 @@
 {
   "findings": [
     {
-      "operator": "openai",
-      "kind": "ip_list_link",
-      "value": "https://developers.openai.com/api/docs/guides/ip-addresses",
-      "source": "https://developers.openai.com/api/docs/bots",
-      "detail": null
-    },
-    {
       "operator": "posterna",
       "kind": "evidence",
       "value": "key directory host: posterna.com",

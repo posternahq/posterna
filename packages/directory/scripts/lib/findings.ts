@@ -98,6 +98,8 @@ export function extractLinks(html: string, base: string): string[] {
 /** Does this URL look like a published list of IP prefixes? */
 export function looksLikeIpList(url: string): boolean {
   const path = new URL(url).pathname.toLowerCase();
+  // Images, styles, scripts and fonts are never lists, whatever their path says.
+  if (/\.(png|jpe?g|gif|svg|webp|ico|css|js|mjs|woff2?|ttf|pdf|mp4)$/.test(path)) return false;
   if (/ip-?addresses|ip-?ranges|ipranges|ip-?prefixes/.test(path)) return true;
   const file = path.split("/").pop() ?? "";
   if (file === "robots.txt") return false;
@@ -200,6 +202,8 @@ export function findNewThings(
       }
     };
     const own = ownSourceIds(op);
+    // Pages the operator file already cites are known, even if their URL looks like a list.
+    const cited = new Set(op.sources.map((ref) => listIdentity(ref.url)));
     for (const ref of op.sources.filter((candidate) => own.has(candidate.id))) {
       const file = fetched.get(ref.url);
       if (!file?.body || file.entry.outcome !== "ok") continue;
@@ -215,7 +219,11 @@ export function findNewThings(
               detail: null,
             });
           }
-        } else if (looksLikeIpList(link) && !knownLists.has(listIdentity(link))) {
+        } else if (
+          looksLikeIpList(link) &&
+          !knownLists.has(listIdentity(link)) &&
+          !cited.has(listIdentity(link))
+        ) {
           add({
             operator: op.slug,
             kind: "ip_list_link",
