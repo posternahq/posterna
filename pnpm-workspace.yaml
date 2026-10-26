@@ -1,0 +1,11 @@
+packages:
+  - packages/*
+  - examples/*
+
+# Pin exact versions when adding dependencies (docs/SPEC.md section 9).
+saveExact: true
+
+# No dependency install scripts run in this repository. esbuild ships its
+# binary as an optional dependency, so it works without its postinstall.
+ignoredBuiltDependencies:
+  - esbuild

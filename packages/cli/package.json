@@ -1,0 +1,57 @@
+{
+  "name": "posterna",
+  "version": "0.1.0-alpha.0",
+  "description": "The Posterna command line: set up agent verification, diagnose deployments and check policy.",
+  "keywords": [
+    "ai-agents",
+    "crawlers",
+    "bots",
+    "web-bot-auth",
+    "http-message-signatures",
+    "cli",
+    "robots.txt"
+  ],
+  "license": "MIT",
+  "author": "Joe Waltman",
+  "homepage": "https://posterna.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posternahq/posterna.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/posternahq/posterna/issues"
+  },
+  "type": "module",
+  "bin": {
+    "posterna": "./dist/bin.js"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  }
+}

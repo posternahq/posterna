@@ -1,0 +1,40 @@
+{
+  "name": "posterna-monorepo",
+  "private": true,
+  "description": "Posterna open-source packages: verify AI agents and crawlers inside your own app.",
+  "license": "MIT",
+  "homepage": "https://posterna.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posternahq/posterna.git"
+  },
+  "bugs": {
+    "url": "https://github.com/posternahq/posterna/issues"
+  },
+  "type": "module",
+  "packageManager": "pnpm@10.34.7",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "biome check .",
+    "format": "biome check --write .",
+    "typecheck": "tsc -p tsconfig.json && pnpm -r typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "bench": "node scripts/bench.mjs",
+    "build": "pnpm -r build",
+    "directory:fetch": "pnpm --filter @posterna/directory data:fetch",
+    "directory:build": "pnpm --filter @posterna/directory data:build",
+    "changeset": "changeset"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.3",
+    "@changesets/cli": "2.31.1",
+    "@types/node": "20.19.43",
+    "tsup": "8.5.1",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "4.1.12"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "@posterna/core",
+  "version": "0.1.0-alpha.0",
+  "description": "Verify AI agents and crawlers inside your own process: verifier, policy engine and counters client.",
+  "keywords": [
+    "ai-agents",
+    "crawlers",
+    "bots",
+    "web-bot-auth",
+    "http-message-signatures",
+    "rfc9421",
+    "verification",
+    "policy"
+  ],
+  "license": "MIT",
+  "author": "Joe Waltman",
+  "homepage": "https://posterna.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posternahq/posterna.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/posternahq/posterna/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  }
+}
