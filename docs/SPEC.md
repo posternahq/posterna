@@ -37,6 +37,14 @@ Principles, in priority order:
 
 Both JSON files are published at `https://posterna.com/v1/directory.json` and `https://posterna.com/v1/keys.json`, each with a detached signature at the same URL plus `.sig`: Ed25519 over the exact file bytes, base64url. `@posterna/core` embeds the list of trusted Posterna directory public keys and rejects any file whose signature does not verify. Every package release also bundles a snapshot of both files as the fallback.
 
+Build pipeline (in `packages/directory`):
+
+- `sources/<slug>.yaml`: one hand-curated file per researched operator. Every fact cites a source page; quotes are verbatim. `sources/README.md` documents the format.
+- `pnpm directory:fetch` downloads robots.json, every cited page, IP list and key directory into `raw/` (not committed) and records each outcome in `raw/manifest.json` (committed). It identifies as `PosternaDirectoryBuilder/0.1 (+https://posterna.com/directory)`, honors robots.txt (RFC 9309), uses timeouts and never retries.
+- `pnpm directory:build` writes `data/` and `docs/directory-build-report.md`, validates both JSON files against the JSON Schemas in `packages/core/src/schema/`, and fails on invalid or duplicate data. It checks every quote, token and documented URL against the fetched copy of the page it cites and reports the result.
+- `pnpm directory:sign <file>` writes the `.sig` file from a private JWK in `POSTERNA_DIRECTORY_SIGNING_KEY`.
+- When this build cannot fetch an IP list, it keeps the last published prefixes with their original fetch date and says so in the list's note.
+
 ### 3.2 Operator record
 
 - `slug`, `name`, `website`, `docs_url`, `coverage` (`researched` or `community`)
@@ -50,7 +58,16 @@ Both JSON files are published at `https://posterna.com/v1/directory.json` and `h
 - `identity_anchors`: list, schema only in v1
 - `sources`: list of `{url, title, fetched_at}`
 
-keys.json: `{version, generated_at, operators: {<slug>: {directory_url, fetched_at, status, keys: [{jwk, thumbprint, kid, first_seen, last_seen}]}}}`. Every key carries an RFC 7638 thumbprint computed by Posterna, whatever kid convention the operator uses.
+Additions to the record above, used by the build:
+
+- directory.json wraps the records: `{schema: 1, version (YYYY-MM-DD), generated_at, license: "CC-BY-4.0", attribution, operators: [...]}`, operators sorted by slug.
+- Operator: `note`.
+- Agent: `coverage` (`researched` when the facts come from the operator's own documentation, `community` when they come only from ai.robots.txt; a researched operator can have community agents), `aliases` (other names the operator's docs or ai.robots.txt use), and `purpose_quote` (the short quote behind `purpose`; null for community agents). `user_agent_tokens` may be empty for robots-only control tokens (such as Google-Extended) and for agents identified only by signature.
+- `verification.ip_lists[]`: also `prefixes` (normalized: strict dotted-quad IPv4 or RFC 5952 IPv6, host bits cleared, deduplicated, IPv4 first then numeric order), `note` and `sources` (the page that documents the list URL). `prefix_count` counts normalized prefixes; `sha256` is of the fetched file bytes.
+- `verification.reverse_dns` and each `verification.asn` entry: also `note` and `sources`.
+- Signing `status`: `live` when the key directory was fetched in the build and held at least one valid public key; `none_found` when nothing is documented or reported, or the URL returned 404 or no valid keys; `reported` when a documented or reported directory could not be fetched (robots.txt, timeout, error) or no URL is known; `pending` only for Posterna's own probe; `not_probed` for community operators. `kid_convention` is derived from the fetched keys.
+
+keys.json: `{version, generated_at, operators: {<slug>: {directory_url, fetched_at, status, keys: [{jwk, thumbprint, kid, first_seen, last_seen}]}}}`. `version` is the build hour, `YYYY-MM-DDTHH`. Every key carries an RFC 7638 thumbprint computed by Posterna, whatever kid convention the operator uses. Only public JWK members are stored; a key published with private members is rejected.
 
 ### 3.3 Content rules
 

@@ -1,0 +1,121 @@
+slug: microsoft
+name: Microsoft
+website: https://www.microsoft.com/
+docs_url: https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0
+checked_on: "2026-10-26"
+
+# No ai.robots.txt entry names Bing's crawlers. AzureAI-SearchBot (operator
+# "Unclear at this time.") is left out: Microsoft's crawler pages do not
+# mention it and its attribution is disputed by third parties.
+community_agents: []
+
+# The Bing Webmaster help pages (www.bing.com/webmasters/help/...) are a
+# JavaScript app: plain HTML fetches return the same shell for every article.
+# The article text is served by the same site as JSON, {"HtmlContent": "..."},
+# from the URLs below, which is where every quote here comes from.
+sources:
+  - id: crawlers
+    url: https://www.bing.com/webmasters/api/help/htmlcontent?ArticleId=8c184ec0
+    title: "Which Crawlers Does Bing Use? (article body of https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0)"
+  - id: verify
+    url: https://www.bing.com/webmasters/api/help/htmlcontent?ArticleId=3905dc26
+    title: "How to Verify Bingbot (article body of https://www.bing.com/webmasters/help/how-to-verify-bingbot-3905dc26)"
+  - id: verify-tool
+    url: https://www.bing.com/webmasters/api/help/htmlcontent?ArticleId=2195837f
+    title: "Verify Bingbot (article body of https://www.bing.com/webmasters/help/verify-bingbot-2195837f)"
+  - id: report-issue
+    url: https://www.bing.com/webmasters/api/help/htmlcontent?ArticleId=25c19802
+    title: "How to Report an Issue with Bingbot (article body of https://www.bing.com/webmasters/help/how-to-report-an-issue-with-bingbot-25c19802)"
+
+agents:
+  - name: Bingbot
+    user_agent_tokens: [bingbot]
+    robots_token: Bingbot
+    purpose: search
+    purpose_quote: "Bingbot is our standard crawler and handles most of our crawling needs each day."
+    purpose_source: crawlers
+    search_engine: true
+    robots_policy: honors
+    robots_quote: "Bingbot honors robots.txt directives, including the\u202Fcrawl-delay: setting"
+    robots_source: report-issue
+    ip_list: bingbot
+    aliases: [MSNBOT]
+    aliases_source: verify-tool
+    note: "Bing's search crawler; its user agent strings carry the token as bingbot/2.0. The robots quote is the opening of a longer sentence and keeps the narrow no-break space (\\u202F) the page has before crawl-delay. The Verify Bingbot article refers to Bingbot traffic using a Bingbot or MSNBOT user agent string, hence the alias. Bing's guidelines say Copilot and grounding results rely on the same crawl, and use NOARCHIVE and NOCACHE meta directives (not a separate robots.txt token) for Copilot use."
+  - name: AdIdxBot
+    user_agent_tokens: [adidxbot]
+    robots_token: null
+    purpose: ads
+    purpose_quote: "AdIdxBot is the crawler used by Bing Ads."
+    purpose_source: crawlers
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Robots.txt files can be configured to tell Bing crawlers how to interact with your website."
+    robots_source: crawlers
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: "Its user agent strings carry the token as adidxbot/2.0. Bing names no robots.txt token for it; the robots quote is Bing's general statement about its crawlers. Bing publishes an IP list only for Bingbot, so none is linked."
+  - name: BingPreview
+    user_agent_tokens: []
+    robots_token: null
+    purpose: preview
+    purpose_quote: "BingPreview generates page snapshots for Bing."
+    purpose_source: crawlers
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Robots.txt files can be configured to tell Bing crawlers how to interact with your website."
+    robots_source: crawlers
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: "Not a robots-only token: Bing's crawler page lists, for BingPreview, the same user agent strings as Bingbot (bingbot/2.0), so no separate BingPreview token is documented and its requests cannot be told apart from Bingbot by user agent. Bing names no robots.txt token for it."
+  - name: MicrosoftPreview
+    user_agent_tokens: [MicrosoftPreview]
+    robots_token: null
+    purpose: preview
+    purpose_quote: "MicrosoftPreview generates page snapshots for Microsoft products."
+    purpose_source: crawlers
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Robots.txt files can be configured to tell Bing crawlers how to interact with your website."
+    robots_source: crawlers
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: "Bing names no robots.txt token for it; the robots quote is Bing's general statement about its crawlers. No IP list is documented for it."
+  - name: BingVideoPreview
+    user_agent_tokens: [BingVideoPreview]
+    robots_token: null
+    purpose: preview
+    purpose_quote: "BingVideoPreview\u00A0is a crawler used by Microsoft to provide previews of videos only in Bing."
+    purpose_source: crawlers
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Robots.txt files can be configured to tell Bing crawlers how to interact with your website."
+    robots_source: crawlers
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: "The purpose quote keeps the non-breaking space (\\u00A0) the page has after BingVideoPreview. Bing names no robots.txt token for it. No IP list is documented for it."
+
+ip_lists:
+  - id: bingbot
+    url: https://www.bing.com/toolbox/bingbot.json
+    source: verify
+
+reverse_dns:
+  suffixes: [search.msn.com]
+  forward_confirm: true
+  quote: "Perform a reverse DNS lookup using the IP address from the logs to verify that it resolves to a name that end with\u00A0search.msn.com"
+  source: verify
+
+asn: []
+
+signing:
+  directory_url: null
+  basis: none
+  status: null
+  covers: []
+  note: "Bing's crawler and verification pages do not mention Web Bot Auth or HTTP message signatures, and no third-party report was found. On 2026-10-26 the key directory path returned 404 on www.bing.com and www.microsoft.com."
+  sources: [crawlers, verify]

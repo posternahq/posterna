@@ -1,0 +1,129 @@
+# xAI publishes no page about crawlers, crawler user agents or robots.txt
+# handling. Checked on 2026-10-26: docs.x.ai (llms.txt, llms-full.txt,
+# sitemap.xml, the Grok Bot, Grok Build, API tools and FAQ pages), the
+# xai-org GitHub organization, and x.ai (answers 403 to scripted requests,
+# including /legal/privacy-policy, so its legal pages could not be read).
+# GrokBot, GrokAppAndroid and xAI-Grok are known only from ai.robots.txt and
+# stay community claims. The agents below are the ones xAI's own docs or code
+# describe as reaching websites.
+slug: xai
+name: xAI
+website: https://x.ai/
+docs_url: https://docs.x.ai/grok-bot/overview
+checked_on: "2026-10-26"
+
+# "Grok Bot" is listed in ai.robots.txt with operator "Unclear at this time."
+# but its description names xAI, and xAI documents Grok Bot (agent below).
+community_agents: [GrokBot, GrokAppAndroid, xAI-Grok, Grok Bot]
+
+sources:
+  - id: grok-bot
+    url: https://docs.x.ai/grok-bot/overview
+    title: Grok Bot
+  - id: grok-bot-faq
+    url: https://docs.x.ai/grok-bot/faq
+    title: Grok Bot FAQ
+  - id: grok-bot-security-faq
+    url: https://docs.x.ai/grok-bot/security-faq
+    title: Grok Bot security FAQ
+  - id: web-search
+    url: https://docs.x.ai/developers/tools/web-search
+    title: Web Search
+  - id: grok-build-settings
+    url: https://docs.x.ai/build/settings/reference
+    title: Grok Build settings reference
+  - id: grok-build-webfetch
+    url: https://raw.githubusercontent.com/xai-org/grok-build/main/crates/codegen/xai-grok-tools/src/implementations/grok_build/web_fetch/mod.rs
+    title: Grok Build web_fetch tool (source, xai-org/grok-build)
+  - id: grok-build-webfetch-config
+    url: https://raw.githubusercontent.com/xai-org/grok-build/main/crates/codegen/xai-grok-tools/src/implementations/grok_build/web_fetch/config.rs
+    title: Grok Build web_fetch configuration (source, xai-org/grok-build)
+
+agents:
+  - name: Grok Bot
+    user_agent_tokens: []
+    robots_token: null
+    purpose: agent
+    purpose_quote: "Each Bot works on a persistent cloud computer with a browser, filesystem, and terminal, so tasks finish in your real tools instead of as chat drafts."
+    purpose_source: grok-bot
+    search_engine: false
+    robots_policy: unstated
+    robots_quote: null
+    robots_source: null
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: >-
+      xAI's docs give no User-Agent string or token for Grok Bot's browser and
+      say nothing about robots.txt. On sites that resist automation the FAQ
+      says "The Bot should hand those steps to you rather than bypassing
+      them." (source grok-bot-faq). Hosted computers use shared static egress
+      ranges, but these are not published: "Current ranges are available from
+      your account team." (source grok-bot-security-faq). Members can also
+      route a computer's traffic through their own desktop or network, which
+      then shows that network's IP address.
+
+  - name: grok-agent
+    user_agent_tokens: [grok-agent]
+    robots_token: null
+    purpose: user_fetch
+    purpose_quote: "Fetch the content of a specific URL and return it as markdown."
+    purpose_source: grok-build-webfetch
+    search_engine: false
+    robots_policy: unstated
+    robots_quote: null
+    robots_source: null
+    ip_list: null
+    aliases: [web_fetch]
+    aliases_source: grok-build-webfetch-config
+    note: >-
+      The web_fetch tool of the Grok Build coding CLI (xai-org/grok-build).
+      Its source sets the User-Agent to "Mozilla/5.0 (compatible;
+      grok-agent/1.0; +https://x.ai)" (USER_AGENT_STRING in config.rs, source
+      grok-build-webfetch-config). The token comes from xAI's own source code,
+      not from a docs page. The tool runs on the user's own machine (or an
+      egress proxy the user sets), so there is no xAI IP range. It is off
+      unless the user turns it on (GROK_WEB_FETCH, "Off by default for
+      security.", source grok-build-settings) and by default only fetches a
+      built-in allowlist of documentation domains. No robots.txt check appears
+      in the web_fetch source files read on 2026-10-26, and no docs page
+      states a robots.txt policy.
+
+  - name: Grok API web search
+    user_agent_tokens: []
+    robots_token: null
+    purpose: user_fetch
+    purpose_quote: "The Web Search tool enables Grok to search the web in real-time and browse web pages to find information."
+    purpose_source: web-search
+    search_engine: false
+    robots_policy: unstated
+    robots_quote: null
+    robots_source: null
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: >-
+      The server-side web_search tool of the xAI API, run when an API caller
+      enables it. The docs do not say what User-Agent, IP addresses or
+      robots.txt policy its page fetches use, so its requests cannot be told
+      apart from other traffic. How the consumer Grok apps (grok.com, iOS,
+      Android) fetch pages is not documented either.
+
+ip_lists: []
+
+reverse_dns: null
+
+asn: []
+
+signing:
+  directory_url: null
+  basis: none
+  status: null
+  covers: []
+  note: >-
+    No xAI page mentions Web Bot Auth or HTTP message signatures. On
+    2026-10-26 /.well-known/http-message-signatures-directory returned 404 on
+    x.ai, grok.com, docs.x.ai, api.x.ai and accounts.x.ai; on www.x.ai it
+    redirects to the x.ai home page. No third-party report of an xAI key
+    directory was found.
+  sources: []

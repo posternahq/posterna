@@ -1,0 +1,462 @@
+slug: google
+name: Google
+website: https://www.google.com/
+docs_url: https://developers.google.com/crawling/docs/crawlers-fetchers/overview-google-crawlers
+checked_on: "2026-10-26"
+
+# Google-Agent, Google-CloudVertexBot, Google-Extended, GoogleOther,
+# GoogleOther-Image and GoogleOther-Video match agents below. The rest stay
+# community agents: Google-Firebase, GoogleAgent-Mariner and
+# GoogleAgent-URLContext (operator "Google" in ai.robots.txt, not on Google's
+# crawler pages), and CloudVertexBot, Gemini-Deep-Research, Google-Gemini-CLI,
+# Google-NotebookLM and NotebookLM (operator "Unclear at this time." in
+# ai.robots.txt, but the names are Google products). Google-NotebookLM is the
+# former user agent of Gemini Notebook below.
+community_agents:
+  - CloudVertexBot
+  - Gemini-Deep-Research
+  - Google-Agent
+  - Google-CloudVertexBot
+  - Google-Extended
+  - Google-Firebase
+  - Google-Gemini-CLI
+  - Google-NotebookLM
+  - GoogleAgent-Mariner
+  - GoogleAgent-URLContext
+  - GoogleOther
+  - GoogleOther-Image
+  - GoogleOther-Video
+  - NotebookLM
+
+sources:
+  - id: overview
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/overview-google-crawlers
+    title: Overview of Google crawlers and fetchers (user agents)
+  - id: common
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers
+    title: List of Google's common crawlers
+  - id: special
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/google-special-case-crawlers
+    title: List of Google's special-case crawlers
+  - id: user-triggered
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers
+    title: List of Google user-triggered fetchers
+  - id: verify
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/verify-google-requests
+    title: Verify requests from Google crawlers and fetchers
+  - id: web-bot-auth
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/web-bot-auth
+    title: Authenticate requests with Web Bot Auth (experimental)
+  - id: apis-google
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/apis-user-agent
+    title: APIs-Google user agent
+  - id: feedfetcher
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/feedfetcher
+    title: Feedfetcher
+  - id: read-aloud
+    url: https://developers.google.com/crawling/docs/crawlers-fetchers/read-aloud-user-agent
+    title: Google Read Aloud user agent
+
+agents:
+  # Common crawlers. Google: reverse DNS crawl-***-***-***-***.googlebot.com or
+  # geo-crawl-***-***-***-***.geo.googlebot.com, IPs in common-crawlers.json.
+  - name: Googlebot
+    user_agent_tokens: [Googlebot]
+    robots_token: Googlebot
+    purpose: search
+    purpose_quote: "Crawling preferences addressed to the Googlebot user agent affect Google Search (including Discover and all Google Search features), as well as other products such as Google Images, Video mode, Google News, and Discover."
+    purpose_source: common
+    search_engine: true
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: common-crawlers
+    aliases: [Googlebot Smartphone, Googlebot Desktop]
+    aliases_source: common
+    note: "Common crawler. Googlebot Smartphone and Googlebot Desktop are the two documented subtypes; both obey the Googlebot robots.txt token. Reverse DNS crawl-***-***-***-***.googlebot.com or geo-crawl-***-***-***-***.geo.googlebot.com."
+  - name: Googlebot Image
+    user_agent_tokens: [Googlebot-Image]
+    robots_token: Googlebot-Image
+    purpose: search
+    purpose_quote: "Crawling preferences addressed to the Googlebot-Image user agent affect Google Images, Discover, Video mode, and all features in Google Search where images, logos, and favicons are presented."
+    purpose_source: common
+    search_engine: true
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: common-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Common crawler. Google lists two robots.txt tokens for it, Googlebot-Image and Googlebot; matching either one applies a rule."
+  - name: Googlebot Video
+    user_agent_tokens: [Googlebot-Video]
+    robots_token: Googlebot-Video
+    purpose: search
+    purpose_quote: "Crawling preferences addressed to the Googlebot-Video user agent affect video-related Google Search features and other products dependent on videos."
+    purpose_source: common
+    search_engine: true
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: common-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Common crawler. Google lists two robots.txt tokens for it, Googlebot-Video and Googlebot."
+  - name: Googlebot News
+    user_agent_tokens: []
+    robots_token: Googlebot-News
+    purpose: search
+    purpose_quote: "Crawling preferences addressed to the Googlebot-News user agent affect the Google News product, including news.google.com and the Google News app."
+    purpose_source: common
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: "Robots.txt token only. Google says Googlebot-News has no separate HTTP user agent string and crawling is done with various Googlebot user agent strings, so its requests arrive as Googlebot (which is marked as the search engine crawler). Documented as affecting Google News rather than Google Search, so search_engine is false here."
+  - name: Google StoreBot
+    user_agent_tokens: [Storebot-Google]
+    robots_token: Storebot-Google
+    purpose: search
+    purpose_quote: "Crawling preferences addressed to the Storebot-Google user agent affect all surfaces of Google Shopping (for example, the Shopping tab in Google Search and Google Shopping)."
+    purpose_source: common
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: common-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Common crawler for Google Shopping. Google says it affects the Shopping tab in Google Search, but it is a shopping crawler rather than one of the Googlebot search crawlers, so search_engine is false here (a judgment call). Its only robots.txt token is Storebot-Google."
+  - name: Google-InspectionTool
+    user_agent_tokens: [Google-InspectionTool]
+    robots_token: Google-InspectionTool
+    purpose: other
+    purpose_quote: "Crawling preferences addressed to the Google-InspectionTool user agent affect Search testing tools such as the Rich Result Test and URL inspection in Search Console."
+    purpose_source: common
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: common-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Common crawler used by Search Console testing tools. Google says it has no effect on Google Search or other products. Google lists two robots.txt tokens for it, Google-InspectionTool and Googlebot."
+  - name: GoogleOther
+    user_agent_tokens: [GoogleOther]
+    robots_token: GoogleOther
+    purpose: other
+    purpose_quote: "GoogleOther is the generic crawler that may be used by various product teams for fetching publicly accessible content from sites."
+    purpose_source: common
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: common-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Common crawler. Google gives one-off crawls for internal research and development as an example use."
+  - name: GoogleOther-Image
+    user_agent_tokens: [GoogleOther-Image]
+    robots_token: GoogleOther-Image
+    purpose: other
+    purpose_quote: "GoogleOther-Image is the version of GoogleOther optimized for fetching publicly accessible image URLs."
+    purpose_source: common
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: common-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Common crawler. Google lists two robots.txt tokens for it, GoogleOther-Image and GoogleOther."
+  - name: GoogleOther-Video
+    user_agent_tokens: [GoogleOther-Video]
+    robots_token: GoogleOther-Video
+    purpose: other
+    purpose_quote: "GoogleOther-Video is the version of GoogleOther optimized for fetching publicly accessible video URLs."
+    purpose_source: common
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: common-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Common crawler. Google lists two robots.txt tokens for it, GoogleOther-Video and GoogleOther."
+  - name: Google-CloudVertexBot
+    user_agent_tokens: [Google-CloudVertexBot]
+    robots_token: Google-CloudVertexBot
+    purpose: other
+    purpose_quote: "Crawling preferences addressed to the Google-CloudVertexBot user agent affect crawls requested by the site owners' for building Vertex AI Agents."
+    purpose_source: common
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "They always obey robots.txt rules when crawling automatically."
+    robots_source: common
+    ip_list: common-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Common crawler. Google documents only a User-Agent substring (Google-CloudVertexBot), not a full string. Google lists two robots.txt tokens for it, Google-CloudVertexBot and Googlebot, and says it has no effect on Google Search or other products."
+  - name: Google-Extended
+    user_agent_tokens: []
+    robots_token: Google-Extended
+    purpose: training
+    purpose_quote: "Google-Extended is a standalone product token that web publishers can use to manage whether content Google crawls from their sites may be used for training future generations of Gemini models"
+    purpose_source: common
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Crawling is done with existing Google user agent strings; the robots.txt user-agent token is used in a control capacity."
+    robots_source: common
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: "Robots.txt control token only, with no HTTP user agent string of its own: requests come from Google's existing crawlers (such as Googlebot). Google says it also governs grounding in Gemini Apps and Grounding with Google Search on Vertex AI, and does not affect inclusion or ranking in Google Search. The purpose quote is the opening of a longer sentence."
+
+  # Special-case crawlers. Google: may ignore robots.txt, reverse DNS
+  # rate-limited-proxy-***-***-***-***.google.com, IPs in special-crawlers.json.
+  - name: APIs-Google
+    user_agent_tokens: [APIs-Google]
+    robots_token: APIs-Google
+    purpose: other
+    purpose_quote: "APIs-Google is the user agent used by Google APIs to deliver push notification messages."
+    purpose_source: apis-google
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "The special-case crawlers may ignore robots.txt rules and so they operate from a different IP range than the common crawlers."
+    robots_source: special
+    ip_list: special-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Special-case crawler. Google says it ignores the global user agent (*) and does not follow rules for the Googlebot user agent; it obeys a group addressed to APIs-Google. The APIs-Google page says a reverse DNS lookup shows the googlebot.com or google.com domain."
+  - name: AdsBot Mobile Web
+    user_agent_tokens: [AdsBot-Google-Mobile]
+    robots_token: AdsBot-Google-Mobile
+    purpose: ads
+    purpose_quote: "Crawling preferences addressed to the AdsBot-Google-Mobile user agent affect Google Ads' ability to check web page ad quality."
+    purpose_source: special
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "The special-case crawlers may ignore robots.txt rules and so they operate from a different IP range than the common crawlers."
+    robots_source: special
+    ip_list: special-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Special-case crawler. Google says it ignores the global user agent (*); it obeys a group addressed to AdsBot-Google-Mobile. An older iPhone variant with the same token is listed by Google as retired."
+  - name: AdsBot
+    user_agent_tokens: [AdsBot-Google]
+    robots_token: AdsBot-Google
+    purpose: ads
+    purpose_quote: "Crawling preferences addressed to the AdsBot-Google user agent affect Google Ads' ability to check web page ad quality."
+    purpose_source: special
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "The special-case crawlers may ignore robots.txt rules and so they operate from a different IP range than the common crawlers."
+    robots_source: special
+    ip_list: special-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Special-case crawler. Google says it ignores the global user agent (*); it obeys a group addressed to AdsBot-Google."
+  - name: Google-Safety
+    user_agent_tokens: [Google-Safety]
+    robots_token: null
+    purpose: other
+    purpose_quote: "The Google-Safety user agent handles abuse-specific crawling, such as malware discovery for publicly posted links on Google properties."
+    purpose_source: special
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "The Google-Safety user agent ignores robots.txt rules."
+    robots_source: special
+    ip_list: special-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Special-case crawler with no robots.txt token: Google says it is unaffected by crawling preferences."
+  - name: Mediapartners-Google
+    user_agent_tokens: [Mediapartners-Google]
+    robots_token: Mediapartners-Google
+    purpose: ads
+    purpose_quote: "The Mediapartners-Google crawler visits participating sites in order to provide them with relevant ads."
+    purpose_source: special
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "The special-case crawlers may ignore robots.txt rules and so they operate from a different IP range than the common crawlers."
+    robots_source: special
+    ip_list: special-crawlers
+    aliases: []
+    aliases_source: null
+    note: "Special-case crawler (AdSense and Ad Manager). Google says it ignores the global user agent (*); it obeys a group addressed to Mediapartners-Google."
+
+  # User-triggered fetchers. Google: generally ignore robots.txt. IPs in
+  # user-triggered-fetchers-google.json for fetchers controlled by Google
+  # (reverse DNS google-proxy-***-***-***-***.google.com) and
+  # user-triggered-agents.json for Google-Agent.
+  - name: Chrome Web Store
+    user_agent_tokens: [Google-CWS]
+    robots_token: null
+    purpose: user_fetch
+    purpose_quote: "The Chrome Web Store fetcher requests URLs that developers provide in the metadata of their Chrome extensions and themes."
+    purpose_source: user-triggered
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Because the fetch was requested by a user, these fetchers generally ignore robots.txt rules."
+    robots_source: user-triggered
+    ip_list: user-triggered-fetchers-google
+    aliases: []
+    aliases_source: null
+    note: "User-triggered fetcher. Google does not map each fetcher to an IP file; it says fetchers controlled by Google originate from user-triggered-fetchers-google.json and resolve to a google.com hostname, so this Google product fetcher is linked to that file."
+  - name: Feedfetcher
+    user_agent_tokens: [FeedFetcher-Google]
+    robots_token: null
+    purpose: user_fetch
+    purpose_quote: "Feedfetcher is used for crawling RSS or Atom feeds for Google News and WebSub."
+    purpose_source: user-triggered
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Feedfetcher behaves as a direct agent of the human user, not as a robot, so it ignores robots.txt entries."
+    robots_source: feedfetcher
+    ip_list: user-triggered-fetchers-google
+    aliases: []
+    aliases_source: null
+    note: "User-triggered fetcher. The Feedfetcher page says its IP addresses are in user-triggered-fetchers-google.json. Google suggests serving a 404, 410 or other error status to the Feedfetcher-Google user agent to stop it."
+  - name: Gemini Notebook
+    user_agent_tokens: [Google-GeminiNotebook]
+    robots_token: null
+    purpose: user_fetch
+    purpose_quote: "The Gemini Notebook fetcher requests individual URLs that Gemini Notebook users have provided as sources for their projects."
+    purpose_source: user-triggered
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Because the fetch was requested by a user, these fetchers generally ignore robots.txt rules."
+    robots_source: user-triggered
+    ip_list: user-triggered-fetchers-google
+    aliases: [Google-NotebookLM]
+    aliases_source: user-triggered
+    note: "User-triggered fetcher. Google lists Google-NotebookLM as its former agent, supported until August 2026. IP file inferred from Google's statement that fetchers controlled by Google use user-triggered-fetchers-google.json."
+  - name: Google-Agent
+    user_agent_tokens: [Google-Agent]
+    robots_token: null
+    purpose: agent
+    purpose_quote: "Google-Agent is used by agents hosted on Google infrastructure to navigate the web and perform actions upon user request."
+    purpose_source: user-triggered
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Because the fetch was requested by a user, these fetchers generally ignore robots.txt rules."
+    robots_source: user-triggered
+    ip_list: user-triggered-agents
+    aliases: []
+    aliases_source: null
+    note: "Listed by Google with the user-triggered fetchers; Google says it uses IP ranges from user-triggered-agents.json. Google signs a subset of its requests with Web Bot Auth (experimental), identified as https://agent.bot.goog; see signing."
+  - name: Google Messages
+    user_agent_tokens: [GoogleMessages]
+    robots_token: null
+    purpose: preview
+    purpose_quote: "Google Messages fetcher is used to generate link previews for URLs sent in chat messages."
+    purpose_source: user-triggered
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Because the fetch was requested by a user, these fetchers generally ignore robots.txt rules."
+    robots_source: user-triggered
+    ip_list: user-triggered-fetchers-google
+    aliases: []
+    aliases_source: null
+    note: "User-triggered fetcher. IP file inferred from Google's statement that fetchers controlled by Google use user-triggered-fetchers-google.json."
+  - name: Google Pinpoint
+    user_agent_tokens: [Google-Pinpoint]
+    robots_token: null
+    purpose: user_fetch
+    purpose_quote: "The Google-Pinpoint fetcher requests individual URLs that Pinpoint users specified as sources for their personal collections of documents."
+    purpose_source: user-triggered
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Because the fetch was requested by a user, these fetchers generally ignore robots.txt rules."
+    robots_source: user-triggered
+    ip_list: user-triggered-fetchers-google
+    aliases: []
+    aliases_source: null
+    note: "User-triggered fetcher. IP file inferred from Google's statement that fetchers controlled by Google use user-triggered-fetchers-google.json."
+  - name: Google Publisher Center
+    user_agent_tokens: [GoogleProducer]
+    robots_token: null
+    purpose: user_fetch
+    purpose_quote: "Google Publisher Center fetches and processes feeds that publishers explicitly supplied for use in Google News landing pages."
+    purpose_source: user-triggered
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Because the fetch was requested by a user, these fetchers generally ignore robots.txt rules."
+    robots_source: user-triggered
+    ip_list: user-triggered-fetchers-google
+    aliases: []
+    aliases_source: null
+    note: "User-triggered fetcher. IP file inferred from Google's statement that fetchers controlled by Google use user-triggered-fetchers-google.json."
+  - name: Google Read Aloud
+    user_agent_tokens: [Google-Read-Aloud]
+    robots_token: null
+    purpose: user_fetch
+    purpose_quote: "Upon user request, Google Read Aloud fetches and reads out web pages using text-to-speech (TTS)."
+    purpose_source: user-triggered
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Since Google Read Aloud is initiated by a user, not a result of automated web crawl, you can't opt out by using a robots.txt file."
+    robots_source: read-aloud
+    ip_list: user-triggered-fetchers-google
+    aliases: [google-speakr]
+    aliases_source: read-aloud
+    note: "User-triggered fetcher. google-speakr is the older, deprecated name of the user agent. Google offers the nopagereadaloud meta tag as the opt-out. IP file inferred from Google's statement that fetchers controlled by Google use user-triggered-fetchers-google.json."
+  - name: Google Site Verifier
+    user_agent_tokens: [Google-Site-Verification]
+    robots_token: null
+    purpose: user_fetch
+    purpose_quote: "Google Site Verifier fetches Search Console verification tokens."
+    purpose_source: user-triggered
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Because the fetch was requested by a user, these fetchers generally ignore robots.txt rules."
+    robots_source: user-triggered
+    ip_list: user-triggered-fetchers-google
+    aliases: []
+    aliases_source: null
+    note: "User-triggered fetcher. IP file inferred from Google's statement that fetchers controlled by Google use user-triggered-fetchers-google.json."
+
+ip_lists:
+  - id: common-crawlers
+    url: https://developers.google.com/static/crawling/ipranges/common-crawlers.json
+    source: common
+  - id: special-crawlers
+    url: https://developers.google.com/static/crawling/ipranges/special-crawlers.json
+    source: special
+  - id: user-triggered-fetchers-google
+    url: https://developers.google.com/static/crawling/ipranges/user-triggered-fetchers-google.json
+    source: user-triggered
+  - id: user-triggered-agents
+    url: https://developers.google.com/static/crawling/ipranges/user-triggered-agents.json
+    source: user-triggered
+
+# Google documents a different hostname pattern per crawler type (verify page):
+#   common crawlers:          crawl-***-***-***-***.googlebot.com or
+#                             geo-crawl-***-***-***-***.geo.googlebot.com
+#   special-case crawlers:    rate-limited-proxy-***-***-***-***.google.com
+#   user-triggered (Google):  google-proxy-***-***-***-***.google.com
+#   user-triggered (users):   ***-***-***-***.gae.googleusercontent.com
+#
+# Posterna leaves out googleusercontent.com and Google's
+# user-triggered-fetchers.json on purpose: both cover apps run by Google Cloud
+# customers, so accepting them would let anyone on Google Cloud pass as a
+# Google crawler (docs/SPEC.md section 11, spoof cases).
+reverse_dns:
+  suffixes: [googlebot.com, google.com]
+  forward_confirm: true
+  quote: "Verify that the domain name is either googlebot.com, google.com, or googleusercontent.com."
+  source: verify
+  note: "googleusercontent.com is left out on purpose: Google uses it for user-triggered fetchers run by Google Cloud customers, so it does not identify a Google crawler. The matching customer IP list (user-triggered-fetchers.json) is left out for the same reason."
+
+asn: []
+
+signing:
+  directory_url: https://agent.bot.goog/.well-known/http-message-signatures-directory
+  basis: documented
+  status: null
+  covers: [Google-Agent]
+  note: "Experimental. Google says only a subset of Google-Agent requests are signed, authenticated as https://agent.bot.goog, with the Signature-Agent header set to g=\"https://agent.bot.goog\" and the Signature and Signature-Input headers labeled g. Google says not every request is signed and recommends falling back to IP, reverse DNS and user-agent checks."
+  sources: [web-bot-auth, user-triggered]

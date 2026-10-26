@@ -1,0 +1,42 @@
+# Posterna lists itself (docs/SPEC.md section 3.3). The probe and its key
+# directory are not live yet, so signing is pending and is not fetched.
+slug: posterna
+name: Posterna
+website: https://posterna.com/
+docs_url: https://github.com/posternahq/posterna/blob/main/docs/SPEC.md
+checked_on: "2026-10-26"
+note: The specification is the only documentation so far. Its repository is private until launch, so the page may not be fetchable yet.
+community_agents: []
+
+sources:
+  - id: spec
+    url: https://github.com/posternahq/posterna/blob/main/docs/SPEC.md
+    title: Posterna v1 specification
+
+agents:
+  - name: PosternaProbe
+    user_agent_tokens: [PosternaProbe]
+    robots_token: null
+    purpose: other
+    purpose_quote: send a request signed with an ephemeral key to the site's debug route
+    purpose_source: spec
+    search_engine: false
+    robots_policy: unstated
+    robots_quote: null
+    robots_source: null
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: Sent only by `posterna doctor`, which a site owner runs against their own site.
+
+ip_lists: []
+reverse_dns: null
+asn: []
+
+signing:
+  directory_url: https://posterna.com/.well-known/http-message-signatures-directory
+  basis: documented
+  status: pending
+  covers: [PosternaProbe]
+  note: Not live yet.
+  sources: [spec]

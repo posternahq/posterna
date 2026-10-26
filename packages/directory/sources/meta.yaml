@@ -1,0 +1,140 @@
+slug: meta
+name: Meta
+website: https://www.meta.com/
+docs_url: https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers
+checked_on: "2026-10-26"
+
+# FacebookBot is no longer on Meta's crawler page (its old URL,
+# /docs/sharing/bot/, now redirects there), so it stays a community agent.
+# Meta-ExternalAgent, meta-externalfetcher and Meta-ExternalFetcher have the
+# operator "Unclear at this time." in robots.json; they are Meta's tokens.
+community_agents:
+  - FacebookBot
+  - facebookexternalhit
+  - meta-externalagent
+  - Meta-ExternalAgent
+  - meta-externalfetcher
+  - Meta-ExternalFetcher
+  - meta-webindexer
+
+sources:
+  - id: crawlers
+    url: https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers
+    title: Meta Web Crawlers
+  - id: wba-survey
+    url: https://modpagespeed.com/blog/which-ai-crawlers-sign-their-requests/
+    title: 55 of 150 AI crawler operators publish Web Bot Auth keys (third party, mod_pagespeed blog)
+  - id: wba-survey-data
+    url: https://modpagespeed.com/data/web-bot-auth-2026-10-19/results.tsv
+    title: Web Bot Auth key directory probe results, 19 October 2026 (third party)
+
+agents:
+  - name: FacebookExternalHit
+    user_agent_tokens: [facebookexternalhit]
+    robots_token: facebookexternalhit
+    purpose: preview
+    purpose_quote: "The primary purpose of FacebookExternalHit is to crawl the content of an app or website that was shared on one of Meta’s family of apps, such as Facebook, Instagram, or Messenger."
+    purpose_source: crawlers
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Note that the FacebookExternalHit crawler might bypass robots.txt when performing security or integrity checks, such as checking for malware or malicious content."
+    robots_source: crawlers
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: >-
+      Meta's page gives no robots.txt example for this crawler; robots_token is
+      the product token from its documented User-Agent string. The page tells
+      site owners to allow-list the crawler's user agent strings or, as the
+      more secure option, its IP addresses, but it publishes no IP list or ASN.
+
+  - name: Meta-WebIndexer
+    user_agent_tokens: [meta-webindexer]
+    robots_token: meta-webindexer
+    purpose: search
+    purpose_quote: "The Meta-WebIndexer crawler navigates the web to improve Meta AI search result quality for users."
+    purpose_source: crawlers
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "In order to block these crawlers, add a disallow for the relevant crawler to robots.txt."
+    robots_source: crawlers
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: null
+
+  - name: Meta-ExternalAds
+    user_agent_tokens: [meta-externalads]
+    robots_token: meta-externalads
+    purpose: ads
+    purpose_quote: "The Meta-ExternalAds crawler crawls the web for use cases such as improving advertising and other business-related products and services."
+    purpose_source: crawlers
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "In order to block these crawlers, add a disallow for the relevant crawler to robots.txt."
+    robots_source: crawlers
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: null
+
+  - name: Meta-ExternalAgent
+    user_agent_tokens: [meta-externalagent]
+    robots_token: meta-externalagent
+    purpose: training
+    purpose_quote: "The Meta-ExternalAgent crawler crawls the web for use cases such as training foundation AI models or improving products by indexing content directly."
+    purpose_source: crawlers
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "In order to block these crawlers, add a disallow for the relevant crawler to robots.txt."
+    robots_source: crawlers
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: null
+
+  - name: Meta-ExternalFetcher
+    user_agent_tokens: [meta-externalfetcher]
+    robots_token: meta-externalfetcher
+    purpose: user_fetch
+    purpose_quote: "The Meta-ExternalFetcher crawler fetches individual links at a user’s request and supports product functions such as evaluating and improving agentic AI capabilities"
+    purpose_source: crawlers
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "The Meta-ExternalFetcher crawler may bypass robots.txt because it performs fetches that were requested by the user."
+    robots_source: crawlers
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: >-
+      Meta's page gives no robots.txt example for this crawler; robots_token is
+      the product token from its documented User-Agent string. The same
+      sentence goes on to say it helps "AI navigate websites to complete tasks
+      for users", so it also serves agent-style tasks.
+
+ip_lists: []
+
+reverse_dns: null
+
+# Meta's crawler page no longer documents an ASN or a whois route lookup.
+asn: []
+
+signing:
+  directory_url: https://www.meta.com/.well-known/http-message-signatures-directory
+  basis: reported
+  status: null
+  covers: []
+  note: >-
+    Meta's crawler documentation does not mention HTTP message signatures or
+    Web Bot Auth. A third-party survey (mod_pagespeed blog, probe of 19 October
+    2026) lists this directory, which it took from Cloudflare Radar, and
+    attributes it to a bot it calls Meta-ExternalTest; Meta's own page does not
+    list that bot, so covers is left empty. On 2026-10-26 the URL returned 200
+    with content type application/http-message-signatures-directory+json and
+    five Ed25519 keys without kid values. https://meta.com/ redirects (301) to
+    the www host; https://www.facebook.com/ returns 404 for the well-known path.
+    The developers.facebook.com page answered 400 to a browser-like User-Agent,
+    200 HTML to the directory builder's User-Agent and 200 Markdown to curl's
+    default User-Agent; the quotes here use the HTML wording (curly
+    apostrophes), while the Markdown rendering has straight ones.
+  sources: [wba-survey, wba-survey-data]

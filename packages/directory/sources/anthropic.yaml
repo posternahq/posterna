@@ -1,0 +1,93 @@
+slug: anthropic
+name: Anthropic
+website: https://www.anthropic.com/
+docs_url: https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler
+checked_on: "2026-10-26"
+
+# Claude-Code is listed in ai.robots.txt with operator "Unclear at this time.";
+# it is included because the name is Anthropic's Claude product name.
+# anthropic-ai and Claude-Web are not described in Anthropic's current article.
+community_agents: [anthropic-ai, Claude-Code, Claude-SearchBot, Claude-User, Claude-Web, ClaudeBot]
+
+sources:
+  - id: bots
+    url: https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler
+    title: Does Anthropic crawl data from the web, and how can site owners block the crawler?
+
+agents:
+  - name: ClaudeBot
+    user_agent_tokens: [ClaudeBot]
+    robots_token: ClaudeBot
+    purpose: training
+    purpose_quote: "ClaudeBot helps enhance the utility and safety of our generative AI models by collecting web content that could potentially contribute to their training."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Anthropic’s Bots respect “do not crawl” signals by honoring industry standard directives in robots.txt."
+    robots_source: bots
+    ip_list: anthropic-bots
+    aliases: []
+    aliases_source: null
+    note: >-
+      Anthropic also says it supports the non-standard Crawl-delay directive. The
+      article does not give full User-Agent strings; the token is the bot name it
+      uses in its robots.txt examples.
+
+  - name: Claude-User
+    user_agent_tokens: [Claude-User]
+    robots_token: Claude-User
+    purpose: user_fetch
+    purpose_quote: "When individuals ask questions to Claude, it may access websites using a Claude-User agent."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Anthropic’s Bots respect “do not crawl” signals by honoring industry standard directives in robots.txt."
+    robots_source: bots
+    ip_list: anthropic-bots
+    aliases: []
+    aliases_source: null
+    note: >-
+      The robots.txt statement covers all three of Anthropic's bots, including
+      this user-triggered one. The article also says Claude-User lets site owners
+      control which sites these user-initiated requests can reach. No full
+      User-Agent string is given; the token is the bot name the article uses.
+
+  - name: Claude-SearchBot
+    user_agent_tokens: [Claude-SearchBot]
+    robots_token: Claude-SearchBot
+    purpose: search
+    purpose_quote: "Claude-SearchBot navigates the web to improve search result quality for users."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Anthropic’s Bots respect “do not crawl” signals by honoring industry standard directives in robots.txt."
+    robots_source: bots
+    ip_list: anthropic-bots
+    aliases: []
+    aliases_source: null
+    note: >-
+      No full User-Agent string is given; the token is the bot name the article
+      uses.
+
+ip_lists:
+  # One list for all of Anthropic's bots; the article links it as "this list"
+  # in: "If a crawler has a source IP address on this list, it indicates that
+  # the crawler is coming from Anthropic." It is not split per bot.
+  - id: anthropic-bots
+    url: https://claude.com/crawling/bots.json
+    source: bots
+
+reverse_dns: null
+
+asn: []
+
+signing:
+  directory_url: null
+  basis: none
+  status: null
+  covers: []
+  note: >-
+    Anthropic's article does not mention request signing, and no third-party
+    report was found. On 2026-10-26 /.well-known/http-message-signatures-directory
+    returned 404 on claude.ai, claude.com and www.anthropic.com.
+  sources: []

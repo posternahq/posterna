@@ -1,0 +1,73 @@
+slug: perplexity
+name: Perplexity
+website: https://www.perplexity.ai/
+docs_url: https://docs.perplexity.ai/docs/resources/perplexity-crawlers
+checked_on: "2026-10-26"
+
+community_agents: [Perplexity-User, PerplexityBot]
+
+sources:
+  - id: bots
+    url: https://docs.perplexity.ai/docs/resources/perplexity-crawlers
+    title: Perplexity Crawlers
+
+agents:
+  - name: PerplexityBot
+    user_agent_tokens: [PerplexityBot]
+    robots_token: PerplexityBot
+    purpose: search
+    purpose_quote: "PerplexityBot is designed to surface and link websites in search results on Perplexity."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Webmasters can use the following robots.txt tags to manage how their sites and content interact with Perplexity."
+    robots_source: bots
+    ip_list: perplexitybot
+    aliases: []
+    aliases_source: null
+    note: >-
+      Perplexity says PerplexityBot is not used to crawl content for AI foundation
+      models, and that robots.txt changes may take up to 24 hours to apply.
+
+  - name: Perplexity-User
+    user_agent_tokens: [Perplexity-User]
+    robots_token: Perplexity-User
+    purpose: user_fetch
+    purpose_quote: "When users ask Perplexity a question, it might visit a web page to help provide an accurate answer and include a link to the page in its response."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Since a user requested the fetch, this fetcher generally ignores robots.txt rules."
+    robots_source: bots
+    ip_list: perplexity-user
+    aliases: []
+    aliases_source: null
+    note: >-
+      The same page also lists Perplexity-User among its robots.txt tags and says
+      it "controls which sites these user requests can access", but states that
+      the fetcher generally ignores robots.txt rules.
+
+ip_lists:
+  # Both documented URLs redirect (one hop) to the same path on www.perplexity.ai.
+  - id: perplexitybot
+    url: https://www.perplexity.com/perplexitybot.json
+    source: bots
+  - id: perplexity-user
+    url: https://www.perplexity.com/perplexity-user.json
+    source: bots
+
+reverse_dns: null
+
+asn: []
+
+signing:
+  directory_url: null
+  basis: none
+  status: null
+  covers: []
+  note: >-
+    Perplexity's crawler page does not mention request signing, and no
+    third-party report was found. On 2026-10-26
+    /.well-known/http-message-signatures-directory returned 404 on
+    www.perplexity.ai (perplexity.ai and perplexity.com redirect there).
+  sources: []

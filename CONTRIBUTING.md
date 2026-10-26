@@ -81,6 +81,8 @@ These come from the spec and are not up for trade-offs in a pull request:
 - An agent's purpose comes from the operator's own documentation, with a short quote. Otherwise it comes from ai.robots.txt and the record is labeled `community`.
 - Mark an agent as signing (`signs: true`, signing status `live`) only when its key directory was fetched and parsed. Third-party sightings are `reported`.
 
+Researched facts live in `packages/directory/sources/<operator>.yaml` (format in `packages/directory/sources/README.md`). Change them there, then run `pnpm directory:fetch` and `pnpm directory:build`, and check the evidence section of `docs/directory-build-report.md`: every quote and token should be found verbatim on the page it cites.
+
 If you run an agent or crawler and your entry is wrong or missing, open an issue or pull request with a link to your own documentation.
 
 ## Code of conduct

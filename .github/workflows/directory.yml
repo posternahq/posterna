@@ -1,0 +1,86 @@
+name: Directory rebuild
+
+# Rebuilds the operator directory from public sources every day and opens a
+# pull request when facts change (docs/SPEC.md section 3.1). A person reviews
+# and merges it. This workflow never commits to main.
+#
+# Opening the pull request needs the repository setting "Allow GitHub Actions
+# to create and approve pull requests" (Settings > Actions > General).
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: directory-rebuild
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    name: Fetch, build and propose
+    if: github.repository == 'posternahq/posterna'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      BRANCH: directory/daily-update
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Fetch sources
+        run: pnpm directory:fetch
+
+      - name: Build directory
+        run: pnpm directory:build
+
+      - name: Compare with main
+        id: diff
+        run: pnpm --filter @posterna/directory data:changed
+
+      # Pushes made with the workflow token do not start CI, so test here.
+      - name: Test the rebuilt data
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm test
+
+      - name: Open or update the pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git add packages/directory/data packages/directory/raw/manifest.json docs/directory-build-report.md
+          git commit --signoff -m "Directory: daily rebuild $(date -u +%F)"
+          git push --force origin "$BRANCH"
+
+          body="$RUNNER_TEMP/pr-body.md"
+          {
+            echo "Automated rebuild of the operator directory from public sources."
+            echo
+            echo "A person must review this before merging: check the diff of \`packages/directory/data/\` and the updated \`docs/directory-build-report.md\` (signing status, IP lists, evidence checks, fetch failures)."
+            echo
+            echo "The workflow ran \`pnpm test\` on this data before opening the pull request. Pushes made by the workflow do not start CI on their own; close and reopen the pull request to run it."
+          } > "$body"
+
+          if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+            gh pr create --base main --head "$BRANCH" --title "Directory: daily rebuild" --body-file "$body"
+          else
+            echo "Updated the open pull request for $BRANCH."
+          fi

@@ -1,0 +1,68 @@
+slug: common-crawl
+name: Common Crawl
+website: https://commoncrawl.org/
+docs_url: https://commoncrawl.org/ccbot
+checked_on: "2026-10-26"
+
+community_agents: [CCBot]
+
+sources:
+  - id: ccbot
+    url: https://commoncrawl.org/ccbot
+    title: Common Crawl - CCBot
+  - id: faq
+    url: https://commoncrawl.org/faq
+    title: Common Crawl FAQ
+  - id: about
+    url: https://commoncrawl.org/about
+    title: About Common Crawl
+
+agents:
+  - name: CCBot
+    user_agent_tokens: [CCBot]
+    robots_token: CCBot
+    purpose: training
+    purpose_quote: "Common Crawl data, typically after filtering and processing by third parties, has been a primary training data source for many large language models."
+    purpose_source: about
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Add these lines to your robots.txt file and our crawler will stop crawling your website"
+    robots_source: faq
+    ip_list: ccbot
+    aliases: []
+    aliases_source: null
+    note: >-
+      CCBot builds Common Crawl's open web archive, which anyone can download.
+      Model training is done by third parties using the published data, not by
+      Common Crawl itself. The FAQ also says CCBot obeys Crawl-delay. The
+      documented User-Agent is CCBot/2.0 (https://commoncrawl.org/faq/); the
+      FAQ says an older version identified itself as CCBot/1.0. The reverse DNS
+      suffix comes from the documented example, where 18.97.14.84 resolves to
+      18-97-14-84.crawl.commoncrawl.org and that name resolves forward to the
+      same address. Reverse DNS covers IPv4 only: the FAQ marks the IPv6 range
+      "no reverse DNS".
+
+ip_lists:
+  - id: ccbot
+    url: https://index.commoncrawl.org/ccbot.json
+    source: ccbot
+
+reverse_dns:
+  suffixes: [crawl.commoncrawl.org]
+  forward_confirm: true
+  quote: "CCBot is now run on dedicated IP address ranges with reverse DNS. This allows webmasters to verify whether a logged request stems from the real CCBot, for example:"
+  source: faq
+
+# Not documented.
+asn: []
+
+signing:
+  directory_url: null
+  basis: none
+  status: null
+  covers: []
+  note: >-
+    Common Crawl's pages do not mention HTTP message signatures or Web Bot
+    Auth. On 2026-10-26 https://commoncrawl.org/.well-known/http-message-signatures-directory
+    returned 404.
+  sources: []

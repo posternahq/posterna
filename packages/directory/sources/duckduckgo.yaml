@@ -1,0 +1,91 @@
+slug: duckduckgo
+name: DuckDuckGo
+website: https://duckduckgo.com/
+docs_url: https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot
+checked_on: "2026-10-26"
+
+# DuckAssistBot has the operator "Unclear at this time." in robots.json; it is
+# DuckDuckGo's crawler. DuckDuckBot has no entry in robots.json.
+community_agents: [DuckAssistBot]
+
+sources:
+  - id: duckduckbot
+    url: https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot
+    title: Is DuckDuckBot related to DuckDuckGo? (DuckDuckGo Help Pages)
+  - id: duckassistbot
+    url: https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot
+    title: Is DuckAssistBot related to DuckDuckGo? (DuckDuckGo Help Pages)
+  - id: wba-survey
+    url: https://modpagespeed.com/blog/which-ai-crawlers-sign-their-requests/
+    title: 55 of 150 AI crawler operators publish Web Bot Auth keys (third party, mod_pagespeed blog)
+  - id: wba-survey-data
+    url: https://modpagespeed.com/data/web-bot-auth-2026-10-19/results.tsv
+    title: Web Bot Auth key directory probe results, 19 October 2026 (third party)
+
+agents:
+  - name: DuckDuckBot
+    user_agent_tokens: [DuckDuckBot]
+    robots_token: DuckDuckBot
+    purpose: search
+    purpose_quote: "DuckDuckBot’s job is to constantly improve our search results and offer users the best and most secure search experience possible."
+    purpose_source: duckduckbot
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "It respects WWW::RobotRules and originates from these IP addresses"
+    robots_source: duckduckbot
+    ip_list: duckduckbot
+    aliases: []
+    aliases_source: null
+    note: >-
+      DuckDuckGo's search crawler. search_engine is false only because the
+      directory flags a short list of search crawlers for now. WWW::RobotRules
+      (linked on the page) is a Perl robots.txt parser. The documented
+      User-Agent is DuckDuckBot/1.1; (+http://duckduckgo.com/duckduckbot.html).
+
+  - name: DuckAssistBot
+    user_agent_tokens: [DuckAssistBot]
+    robots_token: DuckAssistBot
+    purpose: search
+    purpose_quote: "DuckAssistBot is a web crawler for DuckDuckGo Search that crawls pages in real-time for our AI-assisted answers"
+    purpose_source: duckassistbot
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Once you’ve updated the file to disallow the DuckAssistBot user agent, the change will take effect after 72 hours and DuckAssistBot will stop crawling your site."
+    robots_source: duckassistbot
+    ip_list: duckassistbot
+    aliases: []
+    aliases_source: null
+    note: >-
+      Fetches pages in real time for AI-assisted answers in DuckDuckGo search
+      results. The page says "This data is not used in any way to train AI
+      models." and that opting out does not affect organic search rankings. The
+      documented User-Agent is DuckAssistBot/1.2;
+      (+http://duckduckgo.com/duckassistbot.html).
+
+ip_lists:
+  - id: duckduckbot
+    url: https://duckduckgo.com/duckduckbot.json
+    source: duckduckbot
+  - id: duckassistbot
+    url: https://duckduckgo.com/duckassistbot.json
+    source: duckassistbot
+
+reverse_dns: null
+
+asn: []
+
+signing:
+  directory_url: https://assistbot.duckduckgo.com/.well-known/http-message-signatures-directory
+  basis: reported
+  status: null
+  covers: []
+  note: >-
+    DuckDuckGo's help pages do not mention HTTP message signatures or Web Bot
+    Auth. A third-party survey (mod_pagespeed blog, probe of 19 October 2026)
+    lists this directory, which it took from Cloudflare Radar, but does not say
+    which DuckDuckGo agent signs; the host name suggests DuckAssistBot, which
+    is not confirmed, so covers is left empty. On 2026-10-26 the URL returned
+    200 with content type application/http-message-signatures-directory+json
+    and one Ed25519 key with a kid. https://duckduckgo.com/ returns 404 for the
+    well-known path.
+  sources: [wba-survey, wba-survey-data]

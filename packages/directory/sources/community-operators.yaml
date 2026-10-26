@@ -1,0 +1,8 @@
+# Display names for community operators whose `operator` field in
+# ai.robots.txt's robots.json is a sentence or a bare URL rather than a name.
+# Keys are the exact field values. Values use the field's own words.
+# Operators not listed here are named by the build's own rules: the text of a
+# Markdown link, a bare URL's host, or the words before the first clause.
+"the Chinese company Huawei": Huawei
+"https://safe.search.brave.com/help/brave-search-crawler": Brave Search
+"Anyone who downloads the Lightpanda client. Possibly being used by a [Grok-adjacent](https://github.com/lightpanda-io/browser/issues/3156#issuecomment-5217843616) organization's botnet.": Lightpanda client users

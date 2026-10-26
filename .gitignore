@@ -18,3 +18,7 @@ coverage/
 *.log
 .vscode/
 .idea/
+
+# Directory pipeline: fetched files stay local; the manifest is committed
+packages/directory/raw/*
+!packages/directory/raw/manifest.json

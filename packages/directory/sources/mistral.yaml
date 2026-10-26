@@ -1,0 +1,92 @@
+slug: mistral
+name: Mistral AI
+website: https://mistral.ai/
+docs_url: https://docs.mistral.ai/robots
+checked_on: "2026-10-26"
+
+# MistralAI-User/1.0 is a separate ai.robots.txt key (operator "Mistral AI")
+# for the same agent as MistralAI-User, written with its version number.
+community_agents: [MistralAI-Index, MistralAI-Training, MistralAI-User, MistralAI-User/1.0]
+
+sources:
+  - id: bots
+    url: https://docs.mistral.ai/robots
+    title: Mistral crawlers
+
+agents:
+  - name: MistralAI-User
+    user_agent_tokens: [MistralAI-User]
+    robots_token: MistralAI-User
+    purpose: user_fetch
+    purpose_quote: "When users ask Vibe a question, it may visit a web page to help answer and include a link to the source in its response."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "MistralAI-User governs which sites these user requests can be made to."
+    robots_source: bots
+    ip_list: mistralai-user
+    aliases: []
+    aliases_source: null
+    note: >-
+      Mistral lists MistralAI-User among its robots.txt tags and does not say it
+      may ignore robots.txt. Mistral says it is not used for automatic crawling or
+      for generative AI training.
+
+  - name: MistralAI-Index
+    user_agent_tokens: [MistralAI-Index]
+    robots_token: MistralAI-Index
+    purpose: search
+    purpose_quote: "It indexes content for Mistral search, which helps answer user questions in Vibe."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "To help webmasters manage how their sites and content interact with AI, Mistral uses specific robots.txt tags."
+    robots_source: bots
+    ip_list: mistralai-index
+    aliases: []
+    aliases_source: null
+    note: >-
+      The robots.txt statement is the page's general one for all three agents;
+      there is no MistralAI-Index specific sentence. Mistral says content crawled
+      by MistralAI-Index is not used for generative AI training.
+
+  - name: MistralAI-Training
+    user_agent_tokens: [MistralAI-Training]
+    robots_token: MistralAI-Training
+    purpose: training
+    purpose_quote: "MistralAI-Training crawls web content to help build datasets for training Mistral generative AI models."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Webmasters can disallow this user agent in their robots.txt file."
+    robots_source: bots
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: Mistral's page publishes no IP list for MistralAI-Training.
+
+ip_lists:
+  # Linked from the page as "MistralAI-User IP addresses" and
+  # "MistralAI-Index IP addresses".
+  - id: mistralai-user
+    url: https://mistral.ai/mistralai-user-ips.json
+    source: bots
+  - id: mistralai-index
+    url: https://mistral.ai/mistralai-index-ips.json
+    source: bots
+
+reverse_dns: null
+
+asn: []
+
+signing:
+  directory_url: null
+  basis: none
+  status: null
+  covers: []
+  note: >-
+    Mistral's crawler page does not mention request signing, and no third-party
+    report was found. On 2026-10-26 /.well-known/http-message-signatures-directory
+    returned 404 on mistral.ai and docs.mistral.ai; chat.mistral.ai returned its
+    web app HTML (status 200), not a key directory.
+  sources: []

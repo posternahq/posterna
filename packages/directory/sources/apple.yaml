@@ -1,0 +1,79 @@
+slug: apple
+name: Apple
+website: https://www.apple.com/
+docs_url: https://support.apple.com/en-us/119829
+checked_on: "2026-10-26"
+
+# Both match agents below. Applebot has operator "Unclear at this time." in
+# ai.robots.txt, but the name is Apple's crawler.
+community_agents: [Applebot, Applebot-Extended]
+
+sources:
+  - id: about-applebot
+    url: https://support.apple.com/en-us/119829
+    title: About Applebot
+
+agents:
+  - name: Applebot
+    user_agent_tokens: [Applebot]
+    robots_token: Applebot
+    purpose: search
+    purpose_quote: "Enabling Applebot in robots.txt allows website content to appear in search results for Apple users around the world in these products."
+    purpose_source: about-applebot
+    search_engine: true
+    robots_policy: honors
+    robots_quote: "Applebot respects standard robots.txt directives in general search crawls that are targeted at Applebot."
+    robots_source: about-applebot
+    ip_list: applebot
+    aliases: []
+    aliases_source: null
+    note: "Search crawler for Spotlight, Siri and Safari. Apple says data it crawls may also be used to train Apple foundation models unless the site disallows Applebot-Extended. If robots.txt does not mention Applebot but mentions Googlebot, Applebot follows the Googlebot rules. Apple says Applebot does not follow crawl-delay."
+  - name: Applebot-Extended
+    user_agent_tokens: []
+    robots_token: Applebot-Extended
+    purpose: training
+    purpose_quote: "With Applebot-Extended, web publishers can choose to opt out of their website content being used to train Apple’s general purpose foundation models powering generative AI features across Apple products, including Apple Intelligence, Services, and Developer Tools."
+    purpose_source: about-applebot
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Web publishers can opt-out from having their content used to train generative foundation models by disallowing Applebot-Extended in the robots.txt file."
+    robots_source: about-applebot
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: "Robots.txt control token only. Apple says Applebot-Extended does not crawl webpages and is only used to decide how data crawled by Applebot is used, so requests come from Applebot. Disallowing it does not remove a site from Apple search results."
+  - name: iTMS
+    user_agent_tokens: [iTMS]
+    robots_token: null
+    purpose: other
+    purpose_quote: "The iTMS user agent only crawls URLs associated with registered content on Apple Podcasts."
+    purpose_source: about-applebot
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "The iTMS user agent does not follow robots.txt, as it is not a general search crawler."
+    robots_source: about-applebot
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: "Listed by Apple under special crawlers (Apple online properties). Apple says iTMS traffic may come from applebot.apple.com hosts, but does not say its addresses are in the Applebot IP list, so no IP list is linked."
+
+ip_lists:
+  - id: applebot
+    url: https://search.developer.apple.com/applebot.json
+    source: about-applebot
+
+reverse_dns:
+  suffixes: [applebot.apple.com]
+  forward_confirm: true
+  quote: "Traffic coming from Applebot is generally identified by using reverse DNS in the *.applebot.apple.com domain."
+  source: about-applebot
+
+asn: []
+
+signing:
+  directory_url: null
+  basis: none
+  status: null
+  covers: []
+  note: "Apple's Applebot page does not mention Web Bot Auth or HTTP message signatures, and no third-party report was found. On 2026-10-26 https://www.apple.com/.well-known/http-message-signatures-directory returned 404 and applebot.apple.com does not resolve as a host."
+  sources: [about-applebot]

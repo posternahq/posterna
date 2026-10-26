@@ -1,0 +1,83 @@
+slug: browserbase
+name: Browserbase
+website: https://www.browserbase.com/
+docs_url: https://docs.browserbase.com/platform/identity/web-bot-auth
+checked_on: "2026-10-26"
+
+# ai.robots.txt has no entry for Browserbase (checked 2026-10-26).
+community_agents: []
+
+sources:
+  - id: what-is
+    url: https://docs.browserbase.com/welcome/what-is-browserbase
+    title: What is Browserbase?
+  - id: identity
+    url: https://docs.browserbase.com/platform/identity/overview
+    title: Agent Identity
+  - id: web-bot-auth
+    url: https://docs.browserbase.com/platform/identity/web-bot-auth
+    title: Web Bot Auth
+  - id: verified
+    url: https://docs.browserbase.com/platform/identity/verified-customization
+    title: Verified
+  - id: fetch
+    url: https://docs.browserbase.com/platform/fetch/overview
+    title: Fetch
+  - id: cloudflare-blog
+    url: https://www.browserbase.com/blog/cloudflare-browserbase-pioneering-identity
+    title: "Cloudflare & Browserbase: pioneering identity for AI agents"
+
+agents:
+  - name: Browserbase
+    user_agent_tokens: []
+    robots_token: null
+    purpose: agent
+    purpose_quote: "Browserbase is the complete platform to build and deploy agents that browse and interact with the web like humans."
+    purpose_source: what-is
+    search_engine: false
+    robots_policy: unstated
+    robots_quote: null
+    robots_source: null
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: >-
+      Cloud browser sessions run by Browserbase customers' agents; the traffic
+      is driven by the customer, not by Browserbase itself. Sessions present an
+      ordinary browser User-Agent with no Browserbase product token: for
+      Verified sessions, choosing an OS "changes the user agent and browser
+      environment to match the selected platform" (source verified), and the
+      Fetch API is routed "with a real browser User-Agent by default" (source
+      fetch). No IP ranges, reverse DNS rule or ASN are published; sessions can
+      also exit through Browserbase-managed proxies or a customer's own proxy.
+      robots.txt: the docs advise customers to check robots.txt ("Check
+      robots.txt for crawling guidelines when applicable.", best practices on
+      the identity page) but do not say the platform itself enforces it, so the
+      policy is recorded as unstated. The only verifiable identity is Web Bot
+      Auth, which is in beta and enabled per customer account (see signing).
+
+ip_lists: []
+
+reverse_dns: null
+
+asn: []
+
+signing:
+  directory_url: https://www.browserbase.com/.well-known/http-message-signatures-directory
+  basis: documented
+  status: null
+  covers: [Browserbase]
+  note: >-
+    Browserbase's docs say it offers Web Bot Auth to sign browser traffic
+    ("Browserbase offers Web Bot Auth in beta.") and that it must be switched
+    on per account ("Contact Browserbase to enable Web Bot Auth for your
+    account."), so only sessions of enabled customers are signed; unsigned
+    Browserbase sessions look like ordinary browsers. The docs describe keys
+    published at /.well-known/http-message-signatures-directory but do not
+    name Browserbase's own directory URL or the Signature-Agent value it
+    sends. The URL above is that standard path on browserbase.com (the bare
+    domain redirects to www); on 2026-10-26 it answered 200 with content type
+    application/http-message-signatures-directory+json and two Ed25519 keys.
+    Which Browserbase products are signed (browser sessions only, or also
+    Fetch) is not documented.
+  sources: [web-bot-auth, identity, cloudflare-blog]

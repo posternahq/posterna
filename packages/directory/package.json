@@ -57,7 +57,17 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
-    "data:fetch": "tsx scripts/fetch.ts",
-    "data:build": "tsx scripts/build.ts"
+    "data:fetch": "tsx scripts/fetch-sources.ts",
+    "data:build": "tsx scripts/build-directory.ts",
+    "data:sign": "tsx scripts/sign-file.ts",
+    "data:changed": "tsx scripts/data-changed.ts"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "ipaddr.js": "2.5.0",
+    "jose": "6.2.12",
+    "robots-parser": "3.0.1",
+    "yaml": "2.9.1"
   }
 }

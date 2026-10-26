@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://posterna.com/schema/v1/keys.schema.json",
+  "title": "Posterna operator signing keys (keys.json)",
+  "description": "Public keys fetched from each signing operator's key directory. See docs/SPEC.md section 3.2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "generated_at", "operators"],
+  "properties": {
+    "version": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}$" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "operators": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "additionalProperties": { "$ref": "#/$defs/operator" }
+    }
+  },
+  "$defs": {
+    "base64url": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+    "jwk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kty"],
+      "properties": {
+        "kty": { "enum": ["OKP", "EC", "RSA"] },
+        "crv": { "type": "string" },
+        "x": { "$ref": "#/$defs/base64url" },
+        "y": { "$ref": "#/$defs/base64url" },
+        "n": { "$ref": "#/$defs/base64url" },
+        "e": { "$ref": "#/$defs/base64url" },
+        "alg": { "type": "string" },
+        "use": { "type": "string" },
+        "kid": { "type": "string" },
+        "key_ops": { "type": "array", "items": { "type": "string" } },
+        "nbf": { "type": "number" },
+        "exp": { "type": "number" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kty": { "const": "OKP" } } },
+          "then": { "required": ["crv", "x"] }
+        },
+        {
+          "if": { "properties": { "kty": { "const": "EC" } } },
+          "then": { "required": ["crv", "x", "y"] }
+        },
+        {
+          "if": { "properties": { "kty": { "const": "RSA" } } },
+          "then": { "required": ["n", "e"] }
+        }
+      ]
+    },
+    "key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jwk", "thumbprint", "kid", "first_seen", "last_seen"],
+      "properties": {
+        "jwk": { "$ref": "#/$defs/jwk" },
+        "thumbprint": { "type": "string", "pattern": "^[A-Za-z0-9_-]{43}$" },
+        "kid": { "type": ["string", "null"], "minLength": 1 },
+        "first_seen": { "type": "string", "format": "date-time" },
+        "last_seen": { "type": "string", "format": "date-time" }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["directory_url", "fetched_at", "status", "keys"],
+      "properties": {
+        "directory_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://[^/]+/\\.well-known/http-message-signatures-directory$"
+        },
+        "fetched_at": {
+          "anyOf": [{ "type": "string", "format": "date-time" }, { "type": "null" }]
+        },
+        "status": { "enum": ["live", "reported", "none_found", "pending", "not_probed"] },
+        "keys": { "type": "array", "items": { "$ref": "#/$defs/key" } }
+      }
+    }
+  }
+}

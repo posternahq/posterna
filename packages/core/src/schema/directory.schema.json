@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://posterna.com/schema/v1/directory.schema.json",
+  "title": "Posterna operator directory (directory.json)",
+  "description": "One record per operator. See docs/SPEC.md section 3.2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "version", "generated_at", "license", "attribution", "operators"],
+  "properties": {
+    "schema": { "const": 1 },
+    "version": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "license": { "const": "CC-BY-4.0" },
+    "attribution": { "type": "string", "minLength": 1 },
+    "operators": { "type": "array", "items": { "$ref": "#/$defs/operator" } }
+  },
+  "$defs": {
+    "httpsUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+    "nullableText": { "type": ["string", "null"], "minLength": 1 },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 64 },
+    "purpose": {
+      "enum": ["training", "search", "user_fetch", "agent", "preview", "ads", "other"]
+    },
+    "coverage": { "enum": ["researched", "community"] },
+    "fetchedAt": {
+      "type": "string",
+      "anyOf": [{ "format": "date-time" }, { "format": "date" }]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "title", "fetched_at"],
+      "properties": {
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "title": { "type": "string", "minLength": 1 },
+        "fetched_at": { "$ref": "#/$defs/fetchedAt" }
+      }
+    },
+    "sources": { "type": "array", "items": { "$ref": "#/$defs/source" } },
+    "signing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "directory_url",
+        "kid_convention",
+        "purpose_field",
+        "covers",
+        "note",
+        "sources"
+      ],
+      "properties": {
+        "status": { "enum": ["live", "reported", "none_found", "pending", "not_probed"] },
+        "directory_url": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://[^/]+/\\.well-known/http-message-signatures-directory$"
+            },
+            { "type": "null" }
+          ]
+        },
+        "kid_convention": { "enum": ["thumbprint", "short_id", "none", null] },
+        "purpose_field": { "$ref": "#/$defs/nullableText" },
+        "covers": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "note": { "$ref": "#/$defs/nullableText" },
+        "sources": { "$ref": "#/$defs/sources" }
+      }
+    },
+    "ipList": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent",
+        "url",
+        "format",
+        "prefix_count",
+        "fetched_at",
+        "sha256",
+        "prefixes",
+        "note",
+        "sources"
+      ],
+      "properties": {
+        "agent": { "type": "string", "minLength": 1 },
+        "url": { "$ref": "#/$defs/httpsUrl" },
+        "format": { "type": ["string", "null"], "minLength": 1 },
+        "prefix_count": { "type": ["integer", "null"], "minimum": 0 },
+        "fetched_at": {
+          "anyOf": [{ "type": "string", "format": "date-time" }, { "type": "null" }]
+        },
+        "sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "prefixes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^([0-9]{1,3}(\\.[0-9]{1,3}){3}/[0-9]{1,2}|[0-9a-f:.]+/[0-9]{1,3})$"
+          }
+        },
+        "note": { "$ref": "#/$defs/nullableText" },
+        "sources": { "$ref": "#/$defs/sources" }
+      }
+    },
+    "reverseDns": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["suffixes", "forward_confirm", "note", "sources"],
+      "properties": {
+        "suffixes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$" }
+        },
+        "forward_confirm": { "type": "boolean" },
+        "note": { "$ref": "#/$defs/nullableText" },
+        "sources": { "type": "array", "$ref": "#/$defs/sources", "minItems": 1 }
+      }
+    },
+    "asn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asn", "note", "sources"],
+      "properties": {
+        "asn": { "type": "integer", "minimum": 1, "maximum": 4294967295 },
+        "note": { "$ref": "#/$defs/nullableText" },
+        "sources": { "type": "array", "$ref": "#/$defs/sources", "minItems": 1 }
+      }
+    },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "coverage",
+        "user_agent_tokens",
+        "aliases",
+        "purpose",
+        "purpose_quote",
+        "search_engine",
+        "robots_token",
+        "robots_policy",
+        "robots_quote",
+        "ip_list_agent",
+        "signs",
+        "note",
+        "sources"
+      ],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "coverage": { "$ref": "#/$defs/coverage" },
+        "user_agent_tokens": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "purpose": { "$ref": "#/$defs/purpose" },
+        "purpose_quote": { "$ref": "#/$defs/nullableText" },
+        "search_engine": { "type": "boolean" },
+        "robots_token": { "$ref": "#/$defs/nullableText" },
+        "robots_policy": { "enum": ["honors", "may_ignore", "unstated"] },
+        "robots_quote": { "$ref": "#/$defs/nullableText" },
+        "ip_list_agent": { "$ref": "#/$defs/nullableText" },
+        "signs": { "type": "boolean" },
+        "note": { "$ref": "#/$defs/nullableText" },
+        "sources": { "type": "array", "$ref": "#/$defs/sources", "minItems": 1 }
+      }
+    },
+    "identityAnchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value", "note", "sources"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "value": { "type": "string", "minLength": 1 },
+        "note": { "$ref": "#/$defs/nullableText" },
+        "sources": { "type": "array", "$ref": "#/$defs/sources", "minItems": 1 }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "name",
+        "website",
+        "docs_url",
+        "coverage",
+        "note",
+        "verification",
+        "agents",
+        "observed",
+        "enrollment",
+        "identity_anchors",
+        "sources"
+      ],
+      "properties": {
+        "slug": { "$ref": "#/$defs/slug" },
+        "name": { "type": "string", "minLength": 1 },
+        "website": { "anyOf": [{ "$ref": "#/$defs/httpsUrl" }, { "type": "null" }] },
+        "docs_url": { "anyOf": [{ "$ref": "#/$defs/httpsUrl" }, { "type": "null" }] },
+        "coverage": { "$ref": "#/$defs/coverage" },
+        "note": { "$ref": "#/$defs/nullableText" },
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["signing", "ip_lists", "reverse_dns", "asn"],
+          "properties": {
+            "signing": { "$ref": "#/$defs/signing" },
+            "ip_lists": { "type": "array", "items": { "$ref": "#/$defs/ipList" } },
+            "reverse_dns": { "anyOf": [{ "$ref": "#/$defs/reverseDns" }, { "type": "null" }] },
+            "asn": { "type": "array", "items": { "$ref": "#/$defs/asn" } }
+          }
+        },
+        "agents": { "type": "array", "items": { "$ref": "#/$defs/agent" } },
+        "observed": { "type": "object", "maxProperties": 0 },
+        "enrollment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": { "status": { "enum": ["none", "requested", "enrolled"] } }
+        },
+        "identity_anchors": { "type": "array", "items": { "$ref": "#/$defs/identityAnchor" } },
+        "sources": { "type": "array", "$ref": "#/$defs/sources", "minItems": 1 }
+      }
+    }
+  }
+}

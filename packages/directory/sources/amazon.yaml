@@ -1,0 +1,221 @@
+slug: amazon
+name: Amazon
+website: https://www.amazon.com/
+docs_url: https://developer.amazon.com/docs/amazonbot/amazonbot.html
+checked_on: "2026-10-26"
+
+# amazon-QBusiness, Amzn-SearchBot and NovaAct have the operator "Unclear at
+# this time." in robots.json; the names are Amazon's (Amazon Q Business,
+# Amazon's search crawler, Amazon Nova Act).
+community_agents:
+  - amazon-kendra
+  - amazon-QBusiness
+  - Amazonbot
+  - AmazonBuyForMe
+  - Amzn-SearchBot
+  - Amzn-User
+  - bedrockbot
+  - NovaAct
+
+sources:
+  - id: bots
+    url: https://developer.amazon.com/docs/amazonbot/amazonbot.html
+    title: Amazon Web Search crawlers | Amazonbot
+  - id: bedrock-webcrawler
+    url: https://docs.aws.amazon.com/bedrock/latest/userguide/webcrawl-data-source-connector.html
+    title: Crawl web pages for your knowledge base (Amazon Bedrock User Guide)
+  - id: kendra-robots
+    url: https://docs.aws.amazon.com/kendra/latest/dg/stop-web-crawler.html
+    title: Configuring the robots.txt file for Amazon Kendra Web Crawler
+  - id: qbusiness-robots
+    url: https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/stop-web-crawler.html
+    title: Configuring a robots.txt file for Amazon Q Business Web Crawler
+  - id: qbusiness-webcrawler
+    url: https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/connector-webcrawler.html
+    title: Connecting Web Crawler to Amazon Q Business
+  - id: agentcore-browser
+    url: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/browser-tool.html
+    title: Interact with web applications using Amazon Bedrock AgentCore Browser
+  - id: agentcore-web-bot-auth
+    url: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/browser-web-bot-auth.html
+    title: Reducing CAPTCHAs with Web Bot Auth (Amazon Bedrock AgentCore)
+  - id: wba-survey
+    url: https://modpagespeed.com/blog/which-ai-crawlers-sign-their-requests/
+    title: 55 of 150 AI crawler operators publish Web Bot Auth keys (third party, mod_pagespeed blog)
+  - id: wba-survey-data
+    url: https://modpagespeed.com/data/web-bot-auth-2026-10-19/results.tsv
+    title: Web Bot Auth key directory probe results, 19 October 2026 (third party)
+
+agents:
+  - name: Amazonbot
+    user_agent_tokens: [Amazonbot]
+    robots_token: Amazonbot
+    purpose: training
+    purpose_quote: "This helps us provide more accurate information to customers and may be used to train Amazon AI models."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Automated crawling from these listed user agents respects the Robots Exclusion Protocol, honoring the user-agent and the allow/disallow directives."
+    robots_source: bots
+    ip_list: amazonbot
+    aliases: []
+    aliases_source: null
+    note: >-
+      Amazon's page says Amazonbot "is used to improve our products and
+      services" and may be used to train Amazon AI models; training is the
+      purpose that sets it apart from Amzn-SearchBot and Amzn-User, which the
+      page says do not crawl for generative AI model training.
+
+  - name: Amzn-SearchBot
+    user_agent_tokens: [Amzn-SearchBot]
+    robots_token: Amzn-SearchBot
+    purpose: search
+    purpose_quote: "Amzn-SearchBot is used to improve search experiences in Amazon products and services."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "If robots.txt files don’t mention Amzn-SearchBot but allow other search bots, Amzn-SearchBot will crawl in accordance with the robots.txt directives given to other search bots."
+    robots_source: bots
+    ip_list: amzn-searchbot
+    aliases: []
+    aliases_source: null
+    note: >-
+      Without its own robots.txt group, Amzn-SearchBot follows the rules given
+      to other search bots.
+
+  - name: Amzn-User
+    user_agent_tokens: [Amzn-User]
+    robots_token: Amzn-User
+    purpose: user_fetch
+    purpose_quote: "Amzn-User supports user actions, such as responding to Alexa queries that require up-to-date information."
+    purpose_source: bots
+    search_engine: false
+    robots_policy: may_ignore
+    robots_quote: "Because actions taken by Amzn-User can be initiated by a user, it may not follow all robots.txt directives."
+    robots_source: bots
+    ip_list: amzn-user
+    aliases: []
+    aliases_source: null
+    note: null
+
+  - name: Amazon Bedrock Web Crawler
+    user_agent_tokens: []
+    robots_token: bedrockbot
+    purpose: other
+    purpose_quote: "The Amazon Bedrock provided Web Crawler connects to and crawls URLs you have selected for use in your Amazon Bedrock knowledge base."
+    purpose_source: bedrock-webcrawler
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "The crawler will first look for bedrockbot-UUID rules and then for generic bedrockbot rules in the robots.txt file."
+    robots_source: bedrock-webcrawler
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: >-
+      Crawls sites that an AWS customer selects for that customer's Bedrock
+      knowledge base. AWS documents the robots.txt tokens (bedrockbot and
+      bedrockbot-UUID) but not the full User-Agent string, so no User-Agent
+      token is listed. The page says that from September 30, 2026 new Web
+      Crawler connectors can no longer be created on customer-managed knowledge
+      bases; existing ones keep working.
+
+  - name: Amazon Kendra Web Crawler
+    user_agent_tokens: []
+    robots_token: amazon-kendra
+    purpose: other
+    purpose_quote: "In order to index documents on the web, customers may use Amazon Kendra Web Crawler, indicating which URL(s) should be indexed and other operational parameters."
+    purpose_source: kendra-robots
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "You can modify the robots.txt file of your website to control how Amazon Kendra Web Crawler crawls your website."
+    robots_source: kendra-robots
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: >-
+      Indexes sites that an AWS customer selects for that customer's Kendra
+      search index. AWS documents the robots.txt token amazon-kendra but not
+      the full User-Agent string. The page says Amazon Kendra is no longer open
+      to new customers.
+
+  - name: Amazon Q Business Web Crawler
+    user_agent_tokens: []
+    robots_token: amazon-QBusiness
+    purpose: other
+    purpose_quote: "An Amazon Q Business Web Crawler connector crawls and indexes either public facing websites or internal company websites that use HTTPS."
+    purpose_source: qbusiness-webcrawler
+    search_engine: false
+    robots_policy: honors
+    robots_quote: "Amazon Q Business Web Crawler adheres to the rules set in your website’s robots.txt file, which determines the areas it is allowed or not allowed to visit."
+    robots_source: qbusiness-robots
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: >-
+      Indexes sites that an AWS customer selects for that customer's Amazon Q
+      Business application. AWS documents the robots.txt token
+      amazon-QBusiness but not the full User-Agent string. The pages say Amazon
+      Q Business is no longer open to new customers.
+
+  - name: Amazon Bedrock AgentCore Browser
+    user_agent_tokens: []
+    robots_token: null
+    purpose: agent
+    purpose_quote: "The Amazon Bedrock AgentCore Browser provides a secure, isolated browser environment for your agents to interact with web applications."
+    purpose_source: agentcore-browser
+    search_engine: false
+    robots_policy: unstated
+    robots_quote: null
+    robots_source: null
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: >-
+      A hosted browser that AWS customers' agents drive. AWS documents no
+      User-Agent token, robots.txt token or IP list for it. Web Bot Auth
+      signing is optional per browser: the Web Bot Auth page says the feature
+      is disabled by default and must be enabled when the browser is created.
+
+ip_lists:
+  - id: amazonbot
+    url: https://developer.amazon.com/amazonbot/ip-addresses/
+    source: bots
+  - id: amzn-searchbot
+    url: https://developer.amazon.com/amazonbot/searchbot-ip-addresses/
+    source: bots
+  - id: amzn-user
+    url: https://developer.amazon.com/amazonbot/live-ip-addresses/
+    source: bots
+
+# Amazon's crawler page does not document a reverse DNS rule.
+reverse_dns: null
+
+asn: []
+
+signing:
+  directory_url: https://kzejmtkesloc1.keydirectory.signer.ap-northeast-1.on.aws/.well-known/http-message-signatures-directory
+  basis: reported
+  status: null
+  covers: [Amazon Bedrock AgentCore Browser]
+  note: >-
+    AWS documents that AgentCore Browser signs each request when Web Bot Auth
+    is enabled and that a Signature-Agent header "Points to the public key
+    directory for verification", but AWS names no directory host. The hosts
+    come from a third party (mod_pagespeed probe of 19 October 2026, which took
+    them from Cloudflare Radar's AgentCore Browser entries), one per region:
+    kzejmtkesloc1.keydirectory.signer.ap-northeast-1.on.aws,
+    wdfzm130yrb91.keydirectory.signer.ap-south-1.on.aws,
+    slf696jfe4gp0.keydirectory.signer.ap-southeast-1.on.aws,
+    meh0x7tptr6o1.keydirectory.signer.ap-southeast-2.on.aws,
+    o42g509c7dlj6.keydirectory.signer.eu-central-1.on.aws,
+    c3drvlj8gw240.keydirectory.signer.eu-west-1.on.aws,
+    xhah6q48pbxb4.keydirectory.signer.us-east-1.on.aws,
+    ogtj5xdh5udp4.keydirectory.signer.us-east-2.on.aws and
+    bxtrz00tv0lm1.keydirectory.signer.us-west-2.on.aws, each at
+    /.well-known/http-message-signatures-directory. The third party saw 200
+    with one Ed25519 key at each on 19 October 2026. On 2026-10-26 all nine
+    returned 404 (application/json, body {"error":"JWK not found"}). The
+    directory schema holds one URL, so only the first host is recorded here.
+    These keys identify AWS customers' AgentCore browsers, not Amazonbot,
+    Amzn-SearchBot or Amzn-User.
+  sources: [agentcore-web-bot-auth, wba-survey, wba-survey-data]
