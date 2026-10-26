@@ -34,4 +34,10 @@ The most dangerous failures are false `claimed_failed` results, because that is 
 
 ## Making these measurable
 
-Most of these need the reason behind a verdict, and today that is only the human-readable `note`. The counters client (docs/SPEC.md section 7) aggregates by verdict, operator, agent and path group, not by reason. Before enforcement, consider adding a short reason code (for example `expired`, `validity_too_long`, `nonce_rejected`, `unknown_kid`, `outside_ip_list`, `rdns_mismatch`, `rdns_error`, `library_unsupported`) to the verdict and as a counter dimension. A reason code carries no per-request data, so it keeps to the rule that requests never leave the origin.
+Most of these need the reason behind a verdict, and today that is only the human-readable `note`. The counters client (docs/SPEC.md section 7) aggregates by verdict, operator, agent and path group, not by reason.
+
+**Decision (26 October 2026): reason codes are added when the counters client is built**, so they are part of the counter format from the start rather than retrofitted. That work adds an optional `reason` to `VerdictResult` (docs/SPEC.md section 4.6), a `reason` counter dimension (section 7) with the matching ingest schema in the cloud, and conformance vectors that assert the code. A reason code carries no per-request data, so it keeps to the rule that requests never leave the origin.
+
+Starting list of codes, to be settled then: `expired`, `created_in_future`, `validity_too_long`, `nonce_replayed`, `nonce_rejected`, `wrong_authority`, `signature_invalid`, `unknown_kid`, `no_keys`, `outside_ip_list`, `rdns_mismatch`, `rdns_unconfirmed`, `rdns_pending`, `rdns_error`, `no_dns`, `library_unsupported`, `library_error`, `directory_unavailable`, `clock_invalid`. Items 13 and 14 need narrower codes (for example `community_token_on_browser`, `missing_accept_language`) because the User-Agent itself must never leave the site.
+
+Until reason codes and counters exist, the only way to check these items is directly on a site Posterna controls, once an adapter runs there.
