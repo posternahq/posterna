@@ -44,7 +44,8 @@ pnpm install
 | `pnpm check` | Lint and format check (Biome). `pnpm format` fixes what it can. |
 | `pnpm typecheck` | TypeScript, strict |
 | `pnpm test` | Unit and conformance tests (Vitest) |
-| `pnpm bench` | Hot path benchmark |
+| `pnpm bench` | Hot path benchmark; fails at 5 ms p99 (see `docs/benchmark.md`) |
+| `pnpm conformance:generate` | Rewrites the conformance fixtures and vectors in `conformance/` |
 | `pnpm build` | Build every package (tsup, ESM and CJS with type declarations) |
 | `pnpm changeset` | Describe a change for the next release |
 | `pnpm directory:fetch`, `pnpm directory:build` | Directory data pipeline |

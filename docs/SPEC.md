@@ -90,8 +90,9 @@ A Fetch API `Request` or a Node `IncomingMessage`, plus configuration: `trustedP
 ### 4.2 Client IP and host resolution
 
 - `trustedProxies`: a list of CIDRs (or a hop count) for the proxies in front of the app. The client IP is the rightmost address in `X-Forwarded-For` (or `Forwarded`) that is not a trusted proxy. With no configuration, the socket address is used and `X-Forwarded-For` is ignored.
+- `forwardedHeader` (`x-forwarded-for` by default, or `forwarded`) names the one header the trusted proxies maintain. The other is never read, so a client cannot inject it. Forwarding headers are read only when the socket peer is a trusted proxy. With a hop count N, the client is the address N hops to the left of the socket. An unreadable entry ends the walk at the nearest trusted hop.
 - `publicHost`: the hostname agents sign (`@authority`). If set, it is used. Otherwise `X-Forwarded-Host` is honored only from a trusted proxy, else `Host`.
-- Runtime proxy guard: if 80 percent or more of the last 200 requests resolve to private, loopback, link-local or carrier-grade NAT addresses, the install marks itself `proxySuspect`, suspends all enforcement, and reports the state. This is the misconfiguration that would make real Googlebot look spoofed.
+- Runtime proxy guard: if 80 percent or more of the last 200 requests resolve to private, loopback, link-local or carrier-grade NAT addresses, the install marks itself `proxySuspect`, suspends all enforcement, and reports the state. This is the misconfiguration that would make real Googlebot look spoofed. Requests with no address at all are not counted.
 
 ### 4.3 Identifying the claim
 
@@ -99,20 +100,27 @@ A Fetch API `Request` or a Node `IncomingMessage`, plus configuration: `trustedP
 2. Otherwise match `User-Agent` against directory agents: exact token match first, then pattern.
 3. No match: no claim.
 
+Signature-Agent members of a type other than `directory`, or whose value is not an https origin, are ignored. When Signature-Agent names no listed operator (or cannot be read), nothing is fetched and the `User-Agent` is still matched as in step 2, so an invented Signature-Agent cannot turn a failed check into `declared_unverifiable`; only when that also finds nothing is the request `declared_unverifiable`. A Signature-Agent without Signature and Signature-Input is treated as an unsigned request.
+
 ### 4.4 Signature path
 
 - Only operators whose `directory_url` is in the loaded directory are eligible. A `Signature-Agent` naming an unknown URL is a claim that cannot be verified: `declared_unverifiable`, never a network fetch.
 - Keys come from keys.json. Match by kid; when the operator uses no kid, try each key; when the kid is unknown, the request is `declared_unverifiable` and an early keys refresh is scheduled.
 - Verify the RFC 9421 signature with Cloudflare's libraries over the covered components the drafts require (including `@authority` and `signature-agent`), checking `created` and `expires` with 60 seconds of clock skew and a maximum validity window of 5 minutes, the `tag` parameter where the drafts define it, and nonce replay against a per-instance LRU.
 - Valid: `verified_by_signature`. Present but invalid: `claimed_failed`.
+- Key selection: by kid, then by the key's RFC 7638 thumbprint, then every key when the operator publishes no kid. Known test keys (the RFC 9421 example key) are never loaded. The `alg` parameter is optional, as in the drafts.
+- Each Web Bot Auth signature on a request is checked on its own; one valid signature verifies the request.
+- A signature the library cannot evaluate (for example one covering `@query-param`) fails open (4.8); it is not `claimed_failed`.
+- Library gaps and the drafts' ambiguities, with the reading chosen: `docs/notes/upstream-gaps.md`, `docs/notes/drafts.md`.
 
 ### 4.5 IP and reverse DNS path
 
-- IP lists are compiled at load time into a prefix matcher (IPv4 and IPv6). A match: `verified_by_ip`.
+- IP lists are compiled at load time into a prefix matcher (IPv4 and IPv6). A match: `verified_by_ip`. An agent is checked against its own list (`ip_list_agent`), else against all of its operator's lists.
 - If the operator documents reverse DNS: forward-confirmed reverse DNS (resolve PTR, require the suffix, resolve the name forward, require the original IP). Lookups run in the background with a 1 second timeout and are cached (positive 24 hours, negative 1 hour). A request whose lookup is not cached yet is `declared_unverifiable` while the lookup runs; later requests from that IP get the cached result.
 - A claim for an operator that publishes ranges or rDNS rules, from an address that fails both: `claimed_failed`.
 - A claim for an operator that publishes neither keys, nor ranges, nor rDNS rules: `declared_unverifiable`.
 - Runtimes without `node:dns` (edge runtimes) skip rDNS and use `declared_unverifiable` where rDNS would have decided.
+- A lookup that errors or times out is remembered for one minute; meanwhile requests from that address fail open (4.8).
 
 ### 4.6 Verdicts and API
 
@@ -259,11 +267,11 @@ Response: `{ "accepted": <n>, "modeOverride": null | "monitor" }`.
 
 ## 10. Performance
 
-p99 under 5 ms per request on a warm cache for the signature and IP paths, measured by a benchmark that CI runs. rDNS lookups are excluded because they run in the background.
+p99 under 5 ms per request on a warm cache for the signature and IP paths, measured by a benchmark that CI runs. rDNS lookups are excluded because they run in the background. Method and results: `docs/benchmark.md`.
 
 ## 11. Testing
 
-- Conformance vectors in `conformance/` (JSON: request, config, directory fixture, expected VerdictResult and Decision). The TypeScript runner executes them; future ports reuse them.
+- Conformance vectors in `conformance/` (JSON: request, config, directory fixture, expected VerdictResult and Decision). The TypeScript runner executes them; future ports reuse them. Format: `conformance/README.md`.
 - Signed requests generated with throwaway Ed25519 keys; RFC 9421 published Ed25519 test vectors; snapshots of the live key directories for parsing and thumbprint tests.
 - Interop edge cases: parameterized covered components, dictionary-form Signature-Agent, multiple signatures on one request, legacy kid derivation, nonce persistence, clock skew, sf-string serialization.
 - Spoof cases: a claimed ClaudeBot from an AWS address, a claimed Googlebot from a non-crawler Google Cloud address, a valid-looking Signature-Agent not in the directory.

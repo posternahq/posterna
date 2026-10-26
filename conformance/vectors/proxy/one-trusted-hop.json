@@ -1,0 +1,49 @@
+{
+  "id": "proxy/one-trusted-hop",
+  "description": "One trusted proxy: the client is the rightmost X-Forwarded-For entry.",
+  "spec": [
+    "4.2"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "trustedProxies": [
+      "10.0.0.0/8"
+    ]
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-forwarded-for",
+            "192.0.2.10"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "192.0.2.10"
+        }
+      }
+    }
+  ]
+}

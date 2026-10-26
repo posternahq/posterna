@@ -1,0 +1,50 @@
+{
+  "id": "signature/expired-within-skew",
+  "description": "A signature that expired 30 seconds ago is still accepted within the 60 second skew.",
+  "spec": [
+    "4.4",
+    "12"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:eDp6XDc/jOy3pOZmc7dr8ROwk+pkefOPriVEhzasmEeLHb3Fz6ziyzi1E4pbF8AUnpBmc+roAeQUYlCXSzIGAA==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015800;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793015970;nonce=\"3kyia+qMEZh0v1SU/9ypZVbvUFaMOdTtCrADZUNvgW3UBxR460PCznuEgwkSr6IFNI1JOH3Z97ppGSkamwMdpg==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

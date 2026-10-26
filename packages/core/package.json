@@ -55,5 +55,12 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@posterna/directory": "workspace:*",
+    "http-message-sig": "0.3.0",
+    "ipaddr.js": "2.5.0",
+    "structured-headers": "2.0.3",
+    "web-bot-auth": "0.2.0"
   }
 }

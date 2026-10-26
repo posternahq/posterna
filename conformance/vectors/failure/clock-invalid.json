@@ -1,0 +1,52 @@
+{
+  "id": "failure/clock-invalid",
+  "description": "The system clock returns an invalid time: a correctly signed request fails open with an error instead of being judged.",
+  "spec": [
+    "4.8"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "inject": {
+    "clock": "invalid"
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:CmfHy/9I9SvZAT2tVsISSO9wJ/Q3LRvIbTihyHIORMILz8OeUQCaCY/PMfNuhVYK3PrxcwqO+YTuOJA+Hn/mBw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"EjI+8SSCrbki3FrNTXX9Ws6iG/vPDCFtBAzjphnLntbh4/rv3RXHqGL0C5UuYpSOne0tcXEpzvfn/Np8OwdswA==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "unknown_automation",
+        "operator": null,
+        "agent": null,
+        "purpose": null,
+        "method": "none",
+        "error": true
+      }
+    }
+  ]
+}

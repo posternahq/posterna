@@ -1,0 +1,42 @@
+{
+  "id": "signature/sf-escaped-quote",
+  "description": "A Signature-Agent string with an escaped quote is not a valid URI and is ignored; nothing is fetched.",
+  "spec": [
+    "4.3",
+    "9"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example/\\\"x\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "none",
+        "error": false
+      }
+    }
+  ]
+}

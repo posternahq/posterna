@@ -1,0 +1,77 @@
+{
+  "id": "spoof/googlebot-from-google-cloud",
+  "description": "A claimed Googlebot from a Google Cloud customer address (8.34.210.0/24, from Google's cloud.json) whose reverse DNS is under googleusercontent.com, which Posterna does not accept for Google crawlers: claimed_failed once the lookup finishes.",
+  "spec": [
+    "4.5",
+    "11"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "dns": {
+    "reverse": {
+      "8.34.210.10": [
+        "10.210.34.8.bc.googleusercontent.com"
+      ]
+    },
+    "forward": {
+      "10.210.34.8.bc.googleusercontent.com": [
+        "8.34.210.10"
+      ]
+    }
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "8.34.210.10",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "none",
+        "error": false
+      }
+    },
+    {
+      "settle_before": true,
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "8.34.210.10",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "rdns",
+        "error": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "ip/operator-publishes-nothing",
+  "description": "A claim for a researched operator that publishes no keys, IP lists or reverse DNS rules is declared_unverifiable.",
+  "spec": [
+    "4.5"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.9",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; QuietBot/1.0)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "quiet-operator",
+        "agent": "QuietBot",
+        "purpose": "other",
+        "method": "none",
+        "error": false
+      }
+    }
+  ]
+}

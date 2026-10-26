@@ -1,0 +1,37 @@
+{
+  "id": "ip/in-list-ipv6",
+  "description": "A claimed ExampleBot from an address in its published IPv6 list.",
+  "spec": [
+    "4.5"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "2001:db8:10:ff::1",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false
+      }
+    }
+  ]
+}

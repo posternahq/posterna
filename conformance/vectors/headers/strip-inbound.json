@@ -1,0 +1,60 @@
+{
+  "id": "headers/strip-inbound",
+  "description": "Inbound X-Agent-* and X-Posterna-* headers are dropped before anything reads them, so a client cannot forge a verdict.",
+  "spec": [
+    "4.7",
+    "9"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+          ],
+          [
+            "accept",
+            "text/html,application/xhtml+xml"
+          ],
+          [
+            "accept-language",
+            "en-US,en;q=0.9"
+          ],
+          [
+            "x-agent-verdict",
+            "verified_by_signature"
+          ],
+          [
+            "X-Agent-Operator",
+            "google"
+          ],
+          [
+            "x-posterna-action",
+            "allow"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "human",
+        "method": "none",
+        "error": false,
+        "stripped": [
+          "x-agent-operator",
+          "x-agent-verdict",
+          "x-posterna-action"
+        ]
+      }
+    }
+  ]
+}

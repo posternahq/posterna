@@ -1,0 +1,59 @@
+{
+  "id": "rfc9421/draft-e21-dictionary",
+  "description": "draft-ietf-webbotauth-httpsig-protocol-00 Appendix E.2.1: dictionary-form Signature-Agent, verified with Cloudflare's web-bot-auth.",
+  "spec": [
+    "11"
+  ],
+  "type": "rfc9421",
+  "profile": "web-bot-auth",
+  "source": "https://datatracker.ietf.org/doc/html/draft-ietf-webbotauth-httpsig-protocol-00#appendix-E.2.1",
+  "public_key": {
+    "kty": "OKP",
+    "crv": "Ed25519",
+    "x": "JrQLj5P_89iXES9-vFgrIy29clF9CC_oPPsw3c5D0bs"
+  },
+  "keyid": "poqkLGiymh_W0uP6PZFw-dvez3QJT5SolqXBCW38r0U",
+  "label": "sig2",
+  "now": 1735689610,
+  "request": {
+    "method": "POST",
+    "target_uri": "https://example.com/foo?param=Value&Pet=dog",
+    "headers": [
+      [
+        "host",
+        "example.com"
+      ],
+      [
+        "date",
+        "Tue, 20 Apr 2021 02:07:55 GMT"
+      ],
+      [
+        "content-type",
+        "application/json"
+      ],
+      [
+        "content-digest",
+        "sha-512=:WZDPaVn/7XgHaAy8pmojAkGWoRx2UFChF41A2svX+TaPm+AbwAgBWnrIiYllu7BNNyealdVLvRwEmTHWXvJwew==:"
+      ],
+      [
+        "content-length",
+        "18"
+      ],
+      [
+        "signature-agent",
+        "agent2=\"https://signature-agent.test\""
+      ],
+      [
+        "signature-input",
+        "sig2=(\"@authority\" \"signature-agent\";key=\"agent2\");created=1735689600;keyid=\"poqkLGiymh_W0uP6PZFw-dvez3QJT5SolqXBCW38r0U\";alg=\"ed25519\";expires=4889289600;nonce=\"n9p433xm+NJ3ph3upfBIGmsuwHw387YV7Q/F+6BSpGCVjYCqQw6rznNA8PVVLySrAWsv0hQtFioQb6E1YsauiA==\";tag=\"web-bot-auth\""
+      ],
+      [
+        "signature",
+        "sig2=:RdNFx5Bj6au3YgAMQL/RzmUlZE8QZLIaXGRpw985hWnwPfMxT228NMk6ehRS1PSl4e8PhbNZACSanGdhEwYCCg==:"
+      ]
+    ]
+  },
+  "expected": {
+    "valid": true
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "id": "ip/rdns-wrong-suffix",
+  "description": "Reverse DNS points outside the documented suffix (a lookalike domain): claimed_failed.",
+  "spec": [
+    "4.5"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "dns": {
+    "reverse": {
+      "203.0.113.41": [
+        "crawl.example.attacker.example"
+      ]
+    },
+    "forward": {
+      "crawl.example.attacker.example": [
+        "203.0.113.41"
+      ]
+    }
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.41",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleRdnsBot/1.0)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "rdns-crawler",
+        "agent": "ExampleRdnsBot",
+        "purpose": "training",
+        "method": "none",
+        "error": false
+      }
+    },
+    {
+      "settle_before": true,
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.41",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleRdnsBot/1.0)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "rdns-crawler",
+        "agent": "ExampleRdnsBot",
+        "purpose": "training",
+        "method": "rdns",
+        "error": false
+      }
+    }
+  ]
+}

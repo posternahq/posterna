@@ -1,0 +1,59 @@
+{
+  "id": "proxy/forwarded-host-from-untrusted-client",
+  "description": "X-Forwarded-Host from a client that is not a trusted proxy is ignored.",
+  "spec": [
+    "4.2",
+    "9"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "trustedProxies": [
+      "10.0.0.0/8"
+    ]
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "http",
+        "path": "/",
+        "remote_address": "203.0.113.50",
+        "headers": [
+          [
+            "host",
+            "app.internal:8080"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:CmfHy/9I9SvZAT2tVsISSO9wJ/Q3LRvIbTihyHIORMILz8OeUQCaCY/PMfNuhVYK3PrxcwqO+YTuOJA+Hn/mBw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"EjI+8SSCrbki3FrNTXX9Ws6iG/vPDCFtBAzjphnLntbh4/rv3RXHqGL0C5UuYpSOne0tcXEpzvfn/Np8OwdswA==\";tag=\"web-bot-auth\""
+          ],
+          [
+            "x-forwarded-host",
+            "www.site.example"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "note": "Throwaway Ed25519 key generated for the Posterna conformance suite. Test use only.",
+  "jwk": {
+    "kty": "OKP",
+    "crv": "Ed25519",
+    "x": "mfKBgqrLsgQ4wyabwAc9WGxsvaAKxugi9qBlFKN_F4s",
+    "d": "jd8zMkGaKhaB4sF4SWUE5jjCTEYoRJwP9DuaEEB7ZsM"
+  }
+}

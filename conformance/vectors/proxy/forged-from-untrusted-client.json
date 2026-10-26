@@ -1,0 +1,50 @@
+{
+  "id": "proxy/forged-from-untrusted-client",
+  "description": "A client that is not a trusted proxy sends its own X-Forwarded-For naming a crawler address: ignored.",
+  "spec": [
+    "4.2",
+    "9"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "trustedProxies": [
+      "10.0.0.0/8"
+    ]
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.50",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-forwarded-for",
+            "192.0.2.10"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "203.0.113.50"
+        }
+      }
+    }
+  ]
+}

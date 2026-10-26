@@ -1,0 +1,54 @@
+{
+  "id": "signature/unsupported-sf-parameter",
+  "description": "A signature covering a header with the ;sf parameter, unsupported by the library: fails open with an error.",
+  "spec": [
+    "4.4",
+    "4.8"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "accept",
+            "text/html"
+          ],
+          [
+            "signature",
+            "sig1=:AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\" \"accept\";sf);created=1793015995;expires=1793016060;keyid=\"unused\";alg=\"ed25519\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "unknown_automation",
+        "operator": null,
+        "agent": null,
+        "purpose": null,
+        "method": "none",
+        "error": true
+      }
+    }
+  ]
+}

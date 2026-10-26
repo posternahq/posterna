@@ -1,0 +1,57 @@
+{
+  "id": "spoof/signature-agent-not-in-directory",
+  "description": "A valid-looking, correctly signed request whose Signature-Agent names a directory that is not listed. It must never trigger a fetch: declared_unverifiable.",
+  "spec": [
+    "4.4",
+    "9"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "refresh": {
+    "enabled": true,
+    "responses": {}
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; HelpfulAgent/1.0)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://agents.attacker.example\""
+          ],
+          [
+            "signature",
+            "sig1=:AqQ1DHvlkKt1jwGVsVgdaaYKQ6C+0U8qgHuCHWetGIm0ztDGR2qW/sW0oDBJnvhWXhOCGi55JPNXjwr7XM5pCQ==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"kp8gUivaQ919KiLFhY1RAF2by-zPVCeicw3Lgx3novA\";alg=\"ed25519\";expires=1793016060;nonce=\"+mlbnrfudqChDVb2Kr+WPXwdwSOCdX0oFoYQO32SscuI34sLhz9v8kRjsHmDoor7kGtInnLh3Ymd5qPyaZeAEQ==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": null,
+        "agent": null,
+        "purpose": null,
+        "method": "none",
+        "error": false
+      }
+    }
+  ],
+  "expected_state": {
+    "fetches": 0
+  }
+}

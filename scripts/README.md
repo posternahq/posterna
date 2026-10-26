@@ -2,8 +2,8 @@
 
 Repository maintenance scripts. They are not published.
 
-| Script | Run with | What it does |
-|---|---|---|
-| `bench.mjs` | `pnpm bench` | Placeholder for the hot path benchmark (5 ms p99, `docs/SPEC.md` section 10) |
+There are none at the moment. Package-specific scripts live with their package:
 
-The directory data pipeline lives with its package, in `packages/directory/scripts/`.
+- `pnpm bench` runs `packages/core/bench/verify.bench.ts` (method in `docs/benchmark.md`).
+- `pnpm conformance:generate` runs `packages/core/test/conformance/generate.ts`.
+- The directory data pipeline is in `packages/directory/scripts/`.

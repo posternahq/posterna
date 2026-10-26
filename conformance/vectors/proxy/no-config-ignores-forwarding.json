@@ -1,0 +1,45 @@
+{
+  "id": "proxy/no-config-ignores-forwarding",
+  "description": "With no trustedProxies, X-Forwarded-For is ignored and the socket address is the client.",
+  "spec": [
+    "4.2",
+    "9"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-forwarded-for",
+            "192.0.2.10"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "10.0.0.5"
+        }
+      }
+    }
+  ]
+}

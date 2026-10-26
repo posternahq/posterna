@@ -1,0 +1,49 @@
+{
+  "id": "signature/multiple-one-valid",
+  "description": "Two signatures on one request: one from a key the operator does not publish, one valid. The valid one wins.",
+  "spec": [
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\", sig2=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:crwef4DJxBAJ8cVfL61jKpqxyZK96ZjRzfBnD6lbIaYDmjDVJMBuXNKg9DgjMYPOb0JpYWDaN+jZZQTZDWwlBA==:, sig2=:7gBbDwjQfsYPOfn3FT6bZPK1TCNMM6k/HXtDRTNU/u1PZ/JT/W+eRFwxwJ39mSVG9k7LWT4Lr6O5RMUPWqpRCA==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"kp8gUivaQ919KiLFhY1RAF2by-zPVCeicw3Lgx3novA\";alg=\"ed25519\";expires=1793016060;nonce=\"+mlbnrfudqChDVb2Kr+WPXwdwSOCdX0oFoYQO32SscuI34sLhz9v8kRjsHmDoor7kGtInnLh3Ymd5qPyaZeAEQ==\";tag=\"web-bot-auth\", sig2=(\"@authority\" \"signature-agent\";key=\"sig2\");created=1793015995;keyid=\"4nP9ZlI9K2QGA9CxLFUd-7GBg0SqEl5hhLWP2h6-S3Q\";alg=\"ed25519\";expires=1793016060;nonce=\"J5mqhmmY/wFTrMsItIAYBBUM3ecbj4LygIPM4Jr/SHkIBU2EqmsvViEHZ/chHSa6DRh4UY7vgcKyrjXuo6wXKA==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "signature/valid-dictionary-with-type",
+  "description": "A Signature-Agent member with an explicit type=directory parameter verifies.",
+  "spec": [
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\";type=directory"
+          ],
+          [
+            "signature",
+            "sig1=:W7Cc8+aW0mPzmzLReG3nFX8j3D8qcxZUex3TObTuiMPIhn1/E7B/ROo6FiCV/BCCOus8slnNKqnQDxMqjeX4BQ==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"EjI+8SSCrbki3FrNTXX9Ws6iG/vPDCFtBAzjphnLntbh4/rv3RXHqGL0C5UuYpSOne0tcXEpzvfn/Np8OwdswA==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

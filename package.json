@@ -22,12 +22,13 @@
     "typecheck": "tsc -p tsconfig.json && pnpm -r typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
-    "bench": "node scripts/bench.mjs",
+    "bench": "tsx packages/core/bench/verify.bench.ts",
     "build": "pnpm -r build",
     "directory:fetch": "pnpm --filter @posterna/directory data:fetch",
     "directory:build": "pnpm --filter @posterna/directory data:build",
     "changeset": "changeset",
-    "directory:sign": "pnpm --filter @posterna/directory data:sign"
+    "directory:sign": "pnpm --filter @posterna/directory data:sign",
+    "conformance:generate": "tsx packages/core/test/conformance/generate.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.3",

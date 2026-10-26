@@ -45,8 +45,8 @@ jobs:
       - name: Build
         run: pnpm build
 
-  # Placeholder. A later change adds the hot path benchmark and makes this job
-  # fail when p99 exceeds the 5 ms budget (docs/SPEC.md section 10).
+  # The hot path benchmark: fails when p99 for the signature or IP path is
+  # 5 ms or more (docs/SPEC.md section 10, method in docs/benchmark.md).
   bench:
     name: Bench
     runs-on: ubuntu-latest

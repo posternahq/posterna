@@ -1,0 +1,55 @@
+{
+  "id": "rfc9421/b26-ed25519-tampered",
+  "description": "RFC 9421 Appendix B.2.6 with the covered Date header changed: verification fails.",
+  "spec": [
+    "11"
+  ],
+  "type": "rfc9421",
+  "profile": "rfc9421",
+  "source": "https://www.rfc-editor.org/rfc/rfc9421#appendix-B.2.6",
+  "public_key": {
+    "kty": "OKP",
+    "crv": "Ed25519",
+    "x": "JrQLj5P_89iXES9-vFgrIy29clF9CC_oPPsw3c5D0bs"
+  },
+  "keyid": "test-key-ed25519",
+  "label": "sig-b26",
+  "now": 1618884483,
+  "request": {
+    "method": "POST",
+    "target_uri": "https://example.com/foo?param=Value&Pet=dog",
+    "headers": [
+      [
+        "host",
+        "example.com"
+      ],
+      [
+        "date",
+        "Tue, 20 Apr 2021 02:07:56 GMT"
+      ],
+      [
+        "content-type",
+        "application/json"
+      ],
+      [
+        "content-digest",
+        "sha-512=:WZDPaVn/7XgHaAy8pmojAkGWoRx2UFChF41A2svX+TaPm+AbwAgBWnrIiYllu7BNNyealdVLvRwEmTHWXvJwew==:"
+      ],
+      [
+        "content-length",
+        "18"
+      ],
+      [
+        "signature-input",
+        "sig-b26=(\"date\" \"@method\" \"@path\" \"@authority\" \"content-type\" \"content-length\");created=1618884473;keyid=\"test-key-ed25519\""
+      ],
+      [
+        "signature",
+        "sig-b26=:wqcAqbmYJ2ji2glfAMaRy4gruYYnx2nEFN2HN6jrnDnQCK1u02Gb04v9EDgwUPiu4A0w6vuQv5lIp5WPpBKRCw==:"
+      ]
+    ]
+  },
+  "expected": {
+    "valid": false
+  }
+}

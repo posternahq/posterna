@@ -1,0 +1,50 @@
+{
+  "id": "signature/expired",
+  "description": "A signature that expired more than the 60 second skew ago fails.",
+  "spec": [
+    "4.4",
+    "12"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:yF1C0xtD7Ad/Izst27tdnu1vnk+YH4NyfYalY0S+KnTcoeZYvszxEmE1APiSCyUfD9lPVQNlpH3g87P8rPeyDQ==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015800;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793015900;nonce=\"3kyia+qMEZh0v1SU/9ypZVbvUFaMOdTtCrADZUNvgW3UBxR460PCznuEgwkSr6IFNI1JOH3Z97ppGSkamwMdpg==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

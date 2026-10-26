@@ -1,0 +1,50 @@
+{
+  "id": "signature/sf-uppercase-origin",
+  "description": "Signature-Agent with an uppercase scheme and host still names the listed origin, and the signature covers the member as sent.",
+  "spec": [
+    "4.3",
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"HTTPS://SIGNER.EXAMPLE\""
+          ],
+          [
+            "signature",
+            "sig1=:mHuj4y9cxk5UQkkgcsMyb++Cy0c08nyQOAhM1wbqFwzk2NghCAiqJYosmwnG6KBxiCvbNGDz4j5cinyOSJO6Cw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"EjI+8SSCrbki3FrNTXX9Ws6iG/vPDCFtBAzjphnLntbh4/rv3RXHqGL0C5UuYpSOne0tcXEpzvfn/Np8OwdswA==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

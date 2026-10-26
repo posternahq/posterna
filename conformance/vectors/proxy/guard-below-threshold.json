@@ -1,0 +1,78 @@
+{
+  "id": "proxy/guard-below-threshold",
+  "description": "159 private and 41 public addresses in the last 200 requests stay under the 80 percent threshold.",
+  "spec": [
+    "4.2"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "repeat": 159,
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "192.168.1.10",
+        "headers": [
+          [
+            "user-agent",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+          ],
+          [
+            "accept",
+            "text/html,application/xhtml+xml"
+          ],
+          [
+            "accept-language",
+            "en-US,en;q=0.9"
+          ],
+          [
+            "host",
+            "www.site.example"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "human",
+        "method": "none",
+        "error": false
+      }
+    },
+    {
+      "repeat": 41,
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.70",
+        "headers": [
+          [
+            "user-agent",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+          ],
+          [
+            "accept",
+            "text/html,application/xhtml+xml"
+          ],
+          [
+            "accept-language",
+            "en-US,en;q=0.9"
+          ],
+          [
+            "host",
+            "www.site.example"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "human",
+        "method": "none",
+        "error": false
+      }
+    }
+  ],
+  "expected_state": {
+    "proxySuspect": false
+  }
+}

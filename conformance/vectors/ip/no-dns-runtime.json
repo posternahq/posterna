@@ -1,0 +1,38 @@
+{
+  "id": "ip/no-dns-runtime",
+  "description": "In a runtime without DNS (edge), a claim that reverse DNS would decide is declared_unverifiable.",
+  "spec": [
+    "4.5"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "dns": null,
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.43",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleRdnsBot/1.0)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "rdns-crawler",
+        "agent": "ExampleRdnsBot",
+        "purpose": "training",
+        "method": "none",
+        "error": false
+      }
+    }
+  ]
+}

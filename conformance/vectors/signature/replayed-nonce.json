@@ -1,0 +1,88 @@
+{
+  "id": "signature/replayed-nonce",
+  "description": "The same signed request sent twice: the first verifies, the replay with the same nonce fails.",
+  "spec": [
+    "4.4",
+    "12"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:cJ+/eCQJuWxl2ousaj8EAbcJzmLb8JCa3rxjf0CCt7h1xLh0qAXj7wTnpg17ZfMVF6c8vjoOJuZkH+SqMtWhBw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"j0ULuZKht9I/nkNtjnqiY2zt+7eTZSnm6/MxVuY1sxFLDx8e7t4dspj426uTribnbJNFEFHdKLLLKnEqLfbJPg==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:cJ+/eCQJuWxl2ousaj8EAbcJzmLb8JCa3rxjf0CCt7h1xLh0qAXj7wTnpg17ZfMVF6c8vjoOJuZkH+SqMtWhBw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"j0ULuZKht9I/nkNtjnqiY2zt+7eTZSnm6/MxVuY1sxFLDx8e7t4dspj426uTribnbJNFEFHdKLLLKnEqLfbJPg==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

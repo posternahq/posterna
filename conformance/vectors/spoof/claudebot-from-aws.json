@@ -1,0 +1,38 @@
+{
+  "id": "spoof/claudebot-from-aws",
+  "description": "A claimed ClaudeBot from an AWS EC2 address (216.244.7.0/24, from AWS's published ranges) that is not in Anthropic's crawler list: claimed_failed.",
+  "spec": [
+    "4.5",
+    "11"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "216.244.7.10",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ClaudeBot/1.0)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "anthropic",
+        "agent": "ClaudeBot",
+        "purpose": "training",
+        "method": "ip",
+        "error": false
+      }
+    }
+  ]
+}

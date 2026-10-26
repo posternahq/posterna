@@ -1,0 +1,49 @@
+{
+  "id": "keys/no-kid-thumbprint",
+  "description": "The operator's keys carry no kid and the signature's keyid is the RFC 7638 thumbprint: that key is selected.",
+  "spec": [
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; NoKidAgent/1.0)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://nokid.example\""
+          ],
+          [
+            "signature",
+            "sig1=:dL6CsTzQ3dI3TQLrc5ENo7GAlequVwd/1h7QZpHnJgzGNXk97Ri9ullkzsLFs6n9P3hDq6tOFhp7f+NYZYpqCA==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"6W3fojsAWhwaO6nCYhDJphITqpu_M3c9bM0OCwKRA5A\";alg=\"ed25519\";expires=1793016060;nonce=\"R+wBWQNH7fkb+o/NaY00+Ve3qqEDlhkGR23aSSsNUuZr4kd8bx/rv0+Ejk0AMwic1UAT5H63IKCr3CJyHFT0FA==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "nokid-signer",
+        "agent": "NoKidAgent",
+        "purpose": "user_fetch",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

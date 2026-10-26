@@ -1,0 +1,25 @@
+{
+  "id": "key-directories/browserbase",
+  "description": "Snapshot of browserbase's live key directory, fetched 2026-10-26T21:37:52.095Z. Parsing, kid convention and RFC 7638 thumbprints (expected values computed by the directory pipeline with jose).",
+  "spec": [
+    "3.2",
+    "11"
+  ],
+  "type": "key_directory",
+  "source": "https://www.browserbase.com/.well-known/http-message-signatures-directory",
+  "snapshot": "fixtures/key-directories/browserbase.json",
+  "expected": {
+    "key_count": 2,
+    "kid_convention": "thumbprint",
+    "keys": [
+      {
+        "kid": "DJuTDnlBxNZzalQhhvktwvkF3lWss-T56g7s4xubuhU",
+        "thumbprint": "DJuTDnlBxNZzalQhhvktwvkF3lWss-T56g7s4xubuhU"
+      },
+      {
+        "kid": "NVhTndQWodGQ47Kmhm1bhTdt0swWS7EHmUEMo-opsXU",
+        "thumbprint": "NVhTndQWodGQ47Kmhm1bhTdt0swWS7EHmUEMo-opsXU"
+      }
+    ]
+  }
+}

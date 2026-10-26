@@ -1,0 +1,49 @@
+{
+  "id": "signature/parameterized-signature-agent-key",
+  "description": "A signature labeled sig2 that covers the Signature-Agent member under a different key (agent2) verifies.",
+  "spec": [
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "agent2=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig2=:g1azJVgoi5Dd3SFptNKsWQf9benNDPVCKGhuRAGJjaNiZJNVrWGOhLNIr6w1kFyuisl0R4S3UfqUC0/quTeLCw==:"
+          ],
+          [
+            "signature-input",
+            "sig2=(\"@authority\" \"signature-agent\";key=\"agent2\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"8uBIH5380qPrCWk7s7ZE5NTqFGUTKydlPOneHz+eCzDWJ720G8mUS04XnXhU7aGUjNRLByxDx308e385oALqkA==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

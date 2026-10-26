@@ -39,6 +39,8 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./data/directory.json": "./data/directory.json",
+    "./data/keys.json": "./data/keys.json",
     "./package.json": "./package.json"
   },
   "files": [

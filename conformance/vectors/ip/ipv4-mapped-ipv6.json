@@ -1,0 +1,38 @@
+{
+  "id": "ip/ipv4-mapped-ipv6",
+  "description": "A socket address in IPv4-mapped IPv6 form is read as the IPv4 address it carries.",
+  "spec": [
+    "4.2",
+    "4.5"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "::ffff:192.0.2.77",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false
+      }
+    }
+  ]
+}

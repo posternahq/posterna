@@ -1,0 +1,50 @@
+{
+  "id": "proxy/forwarded-header",
+  "description": "The Forwarded header (RFC 7239), with quoted IPv6 and a port, when the proxies are configured to use it.",
+  "spec": [
+    "4.2"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "trustedProxies": [
+      "10.0.0.0/8"
+    ],
+    "forwardedHeader": "forwarded"
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "forwarded",
+            "for=\"[2001:db8:10::5]:4711\";proto=https, for=10.0.0.7"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "2001:db8:10::5"
+        }
+      }
+    }
+  ]
+}

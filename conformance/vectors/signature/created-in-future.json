@@ -1,0 +1,50 @@
+{
+  "id": "signature/created-in-future",
+  "description": "A signature created 120 seconds in the future, beyond the 60 second skew, fails.",
+  "spec": [
+    "4.4",
+    "12"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:0A8xMmRhlkKykHUrlO3H/FNOaCcbqcbzomzO7tZqTOTEgNDXmz7z+21qNMuAqvZrk7k1gWTjJ2kKG9hxy4G3AA==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793016120;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016200;nonce=\"bzNPb1vpIYU6dkOZFgxroDwjs/uxX9UA232iyJdKRWkRxhQzslxtKcfR5h+7tYJ97QYHgtUcIhk5CBs1THbglg==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

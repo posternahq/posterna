@@ -1,0 +1,74 @@
+{
+  "id": "failure/malformed-directory",
+  "description": "The directory snapshot is malformed (operators is not a list). Every request fails open with an error: a browser is human, a bot is unknown_automation, nothing is claimed_failed.",
+  "spec": [
+    "4.8"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "inject": {
+    "snapshot": "malformed"
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+          ],
+          [
+            "accept",
+            "text/html,application/xhtml+xml"
+          ],
+          [
+            "accept-language",
+            "en-US,en;q=0.9"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "human",
+        "operator": null,
+        "agent": null,
+        "purpose": null,
+        "method": "none",
+        "error": true
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.9",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "unknown_automation",
+        "operator": null,
+        "agent": null,
+        "purpose": null,
+        "method": "none",
+        "error": true
+      }
+    }
+  ]
+}

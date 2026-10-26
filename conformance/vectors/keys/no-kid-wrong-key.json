@@ -1,0 +1,49 @@
+{
+  "id": "keys/no-kid-wrong-key",
+  "description": "No kid, and the signature was made with a key the operator does not publish: every key is tried and none verifies.",
+  "spec": [
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; NoKidAgent/1.0)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://nokid.example\""
+          ],
+          [
+            "signature",
+            "sig1=:YbHQTqumNlz9ejhVkaC+MkUYVQNO4bf+K+9q1Hzjdqoh/A6c38+FJ+V7aHCiwLFYc+Nq1SHov7CeOt3kxgSTAw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"unlabeled-key\";alg=\"ed25519\";expires=1793016060;nonce=\"+mlbnrfudqChDVb2Kr+WPXwdwSOCdX0oFoYQO32SscuI34sLhz9v8kRjsHmDoor7kGtInnLh3Ymd5qPyaZeAEQ==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "nokid-signer",
+        "agent": "NoKidAgent",
+        "purpose": "user_fetch",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

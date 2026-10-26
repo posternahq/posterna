@@ -1,0 +1,37 @@
+{
+  "id": "key-directories/google",
+  "description": "Snapshot of google's live key directory, fetched 2026-10-26T21:38:11.279Z. Parsing, kid convention and RFC 7638 thumbprints (expected values computed by the directory pipeline with jose).",
+  "spec": [
+    "3.2",
+    "11"
+  ],
+  "type": "key_directory",
+  "source": "https://agent.bot.goog/.well-known/http-message-signatures-directory",
+  "snapshot": "fixtures/key-directories/google.json",
+  "expected": {
+    "key_count": 5,
+    "kid_convention": "short_id",
+    "keys": [
+      {
+        "kid": "mhxuPw",
+        "thumbprint": "_fmS_hfpckRfp1x7fDExtVKVaYtcu1WJX1Io5LIow24"
+      },
+      {
+        "kid": "Ggh50g",
+        "thumbprint": "c8D-_KOv7e9F83sFV2aCQUY5EuDbEVp5_sN86S8bKTc"
+      },
+      {
+        "kid": "cYSMkA",
+        "thumbprint": "cBovpyiY9PIQIFEfaw7w_0Wwwwx4UF2LY6w0lQURHBU"
+      },
+      {
+        "kid": "bUCe2A",
+        "thumbprint": "I10hzgxlf59i39kdp5Lib4Tfbg-FO4ZMwmAEDwG88bY"
+      },
+      {
+        "kid": "DYiMjA",
+        "thumbprint": "ImfgehCo9CQ0CTvJyuAY3dt6p5xMvJVutWoGpHtmVME"
+      }
+    ]
+  }
+}

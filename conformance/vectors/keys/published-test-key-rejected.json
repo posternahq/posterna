@@ -1,0 +1,45 @@
+{
+  "id": "keys/published-test-key-rejected",
+  "description": "The protocol draft's test vector E.2.1 is signed with the RFC 9421 example key. Verifiers SHOULD reject known test keys, so this install holds no usable key: declared_unverifiable.",
+  "spec": [
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "example.com"
+          ],
+          [
+            "signature-agent",
+            "agent2=\"https://signature-agent.test\""
+          ],
+          [
+            "signature-input",
+            "sig2=(\"@authority\" \"signature-agent\";key=\"agent2\");created=1735689600;keyid=\"poqkLGiymh_W0uP6PZFw-dvez3QJT5SolqXBCW38r0U\";alg=\"ed25519\";expires=4889289600;nonce=\"n9p433xm+NJ3ph3upfBIGmsuwHw387YV7Q/F+6BSpGCVjYCqQw6rznNA8PVVLySrAWsv0hQtFioQb6E1YsauiA==\";tag=\"web-bot-auth\""
+          ],
+          [
+            "signature",
+            "sig2=:RdNFx5Bj6au3YgAMQL/RzmUlZE8QZLIaXGRpw985hWnwPfMxT228NMk6ehRS1PSl4e8PhbNZACSanGdhEwYCCg==:"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "draft-test-signer",
+        "agent": null,
+        "purpose": null,
+        "method": "none",
+        "error": false
+      }
+    }
+  ]
+}

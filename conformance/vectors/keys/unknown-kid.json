@@ -1,0 +1,57 @@
+{
+  "id": "keys/unknown-kid",
+  "description": "A kid this install does not hold: declared_unverifiable, and an early keys.json refresh is requested.",
+  "spec": [
+    "3.4",
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "refresh": {
+    "enabled": true,
+    "responses": {}
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; LabelAgent/1.0)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://labels.example\""
+          ],
+          [
+            "signature",
+            "sig1=:w1yonmZobTdyj0CdV23KXQqauPDZVaBNInt6GayotbEXRaNZeTC+STggNR80ymL3XVbASHBh58dxQZfl4mpfBw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"k9\";alg=\"ed25519\";expires=1793016060;nonce=\"0JKH8WHBpL+rQuGeED0+MIQsd9ZulTjv6/TeAofGN07h31whcayCN0cx9+1b2xSNoitA7zzKL9OXFkPyy7I4tQ==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "label-signer",
+        "agent": "LabelAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ],
+  "expected_state": {
+    "keys_refresh_requested": true
+  }
+}

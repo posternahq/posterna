@@ -1,0 +1,77 @@
+{
+  "id": "spoof/fake-signature-agent-with-googlebot",
+  "description": "A claimed Googlebot from a documentation address with an invented Signature-Agent: the User-Agent claim is still checked, so the invented header cannot soften the result.",
+  "spec": [
+    "4.3",
+    "4.5"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "dns": {
+    "reverse": {},
+    "forward": {}
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.50",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://agents.attacker.example\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "none",
+        "error": false
+      }
+    },
+    {
+      "settle_before": true,
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.50",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://agents.attacker.example\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "operator": "google",
+        "agent": "Googlebot",
+        "purpose": "search",
+        "method": "rdns",
+        "error": false
+      }
+    }
+  ]
+}

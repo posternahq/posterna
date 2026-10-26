@@ -1,0 +1,37 @@
+{
+  "id": "key-directories/meta",
+  "description": "Snapshot of meta's live key directory, fetched 2026-10-26T21:38:20.754Z. Parsing, kid convention and RFC 7638 thumbprints (expected values computed by the directory pipeline with jose).",
+  "spec": [
+    "3.2",
+    "11"
+  ],
+  "type": "key_directory",
+  "source": "https://www.meta.com/.well-known/http-message-signatures-directory",
+  "snapshot": "fixtures/key-directories/meta.json",
+  "expected": {
+    "key_count": 5,
+    "kid_convention": "none",
+    "keys": [
+      {
+        "kid": null,
+        "thumbprint": "2h6d-naMeNYCEY_tziKuRgyrXhviX1wPZnK3YvpkJpo"
+      },
+      {
+        "kid": null,
+        "thumbprint": "6CdRjLYItMBcIR0Sn0QS97MEDoUm3Xmr7dV9DwEOU7E"
+      },
+      {
+        "kid": null,
+        "thumbprint": "co8Mqi_ams-_h9I-gXZ-NsG1BfSN34LTyIZaw9hUUGk"
+      },
+      {
+        "kid": null,
+        "thumbprint": "Iy80tzAcbbb85lkjfKieYYwxAqinLDqDUBXjVMEnI_s"
+      },
+      {
+        "kid": null,
+        "thumbprint": "PZZZiz0rLbE9RZJ1DyryOFQzzqVwf96kCcr44MMKP0M"
+      }
+    ]
+  }
+}

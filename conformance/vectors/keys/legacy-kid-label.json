@@ -1,0 +1,49 @@
+{
+  "id": "keys/legacy-kid-label",
+  "description": "An operator-chosen kid label (not a thumbprint), as some live directories publish, selects the key.",
+  "spec": [
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; LabelAgent/1.0)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://labels.example\""
+          ],
+          [
+            "signature",
+            "sig1=:DCchp1lpQ+GdN+wcK1oIjLiPQrBMR0S8rKpMqqXCvOy5429Pcd12qMSNZ1EnVqFdQWUKdRSrvLSszIiJ6lulBw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"k1\";alg=\"ed25519\";expires=1793016060;nonce=\"0JKH8WHBpL+rQuGeED0+MIQsd9ZulTjv6/TeAofGN07h31whcayCN0cx9+1b2xSNoitA7zzKL9OXFkPyy7I4tQ==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "label-signer",
+        "agent": "LabelAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

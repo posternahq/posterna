@@ -1,0 +1,50 @@
+{
+  "id": "signature/unsupported-query-param",
+  "description": "A signature covering @query-param, which web-bot-auth 0.2.0 cannot verify: the request fails open with an error, never claimed_failed.",
+  "spec": [
+    "4.4",
+    "4.8"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/docs?page=2",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQ==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\" \"@query-param\";name=\"page\");created=1793015995;expires=1793016060;keyid=\"unused\";alg=\"ed25519\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "unknown_automation",
+        "operator": null,
+        "agent": null,
+        "purpose": null,
+        "method": "none",
+        "error": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "proxy/internal-host-with-public-host",
+  "description": "The app sees an internal Host header; publicHost names the host agents sign, so the signature verifies.",
+  "spec": [
+    "4.2",
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "publicHost": "www.site.example"
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "http",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "app.internal:8080"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:CmfHy/9I9SvZAT2tVsISSO9wJ/Q3LRvIbTihyHIORMILz8OeUQCaCY/PMfNuhVYK3PrxcwqO+YTuOJA+Hn/mBw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"EjI+8SSCrbki3FrNTXX9Ws6iG/vPDCFtBAzjphnLntbh4/rv3RXHqGL0C5UuYpSOne0tcXEpzvfn/Np8OwdswA==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

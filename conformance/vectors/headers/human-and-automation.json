@@ -1,0 +1,95 @@
+{
+  "id": "headers/human-and-automation",
+  "description": "A browser is human; curl is unknown_automation.",
+  "spec": [
+    "4.6"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+          ],
+          [
+            "accept",
+            "text/html,application/xhtml+xml"
+          ],
+          [
+            "accept-language",
+            "en-US,en;q=0.9"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "human",
+        "operator": null,
+        "method": "none",
+        "error": false
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "curl/8.4.0"
+          ],
+          [
+            "accept",
+            "*/*"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "unknown_automation",
+        "operator": null,
+        "method": "none",
+        "error": false
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "unknown_automation",
+        "operator": null,
+        "method": "none",
+        "error": false
+      }
+    }
+  ]
+}

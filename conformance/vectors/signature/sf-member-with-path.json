@@ -1,0 +1,50 @@
+{
+  "id": "signature/sf-member-with-path",
+  "description": "A directory member with a path is ignored (the draft requires an origin), so the signature names no listed operator. The User-Agent claim is then checked: the operator signs and publishes no IP list.",
+  "spec": [
+    "4.3",
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example/keys\""
+          ],
+          [
+            "signature",
+            "sig1=:/02xGs8laGVylAwLweHJjyQXX4rcfhVmWsYqnj3tBz1KfQ9oCFAGt4WGkZQaPqB9yOjo4xH7MEA/qw0tmYxUCA==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"EjI+8SSCrbki3FrNTXX9Ws6iG/vPDCFtBAzjphnLntbh4/rv3RXHqGL0C5UuYpSOne0tcXEpzvfn/Np8OwdswA==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "none",
+        "error": false
+      }
+    }
+  ]
+}

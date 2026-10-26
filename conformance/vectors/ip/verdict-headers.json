@@ -1,0 +1,43 @@
+{
+  "id": "ip/verdict-headers",
+  "description": "The verdict headers passed to the application for a verified request.",
+  "spec": [
+    "4.7"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "192.0.2.77",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "verdict_headers": {
+          "X-Agent-Verdict": "verified_by_ip",
+          "X-Agent-Operator": "ip-crawler",
+          "X-Agent-Purpose": "search",
+          "X-Agent-Method": "ip"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "keys/thumbprint-keyid-with-label-kid",
+  "description": "A keyid equal to the RFC 7638 thumbprint, as the current draft requires, selects the key even when the directory labels it k1.",
+  "spec": [
+    "4.4"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; LabelAgent/1.0)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://labels.example\""
+          ],
+          [
+            "signature",
+            "sig1=:UMyhxsj580QhZVLVlSXIH7Qb9gat2VcVXs1tBs1+fXt3rWsE6yuR4zRYkDpLgUOqNqp5mJHV62WwG5a4R+jGAQ==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"O8JglVYgOL8Uviz0cuB0giDYGFx55-GSjJ3Ly4isxbI\";alg=\"ed25519\";expires=1793016060;nonce=\"0JKH8WHBpL+rQuGeED0+MIQsd9ZulTjv6/TeAofGN07h31whcayCN0cx9+1b2xSNoitA7zzKL9OXFkPyy7I4tQ==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "operator": "label-signer",
+        "agent": "LabelAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

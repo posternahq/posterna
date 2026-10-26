@@ -1,0 +1,73 @@
+{
+  "id": "failure/dns-error",
+  "description": "The DNS server fails (SERVFAIL). The first request is declared_unverifiable while the lookup runs; afterwards the request fails open with an error, never claimed_failed.",
+  "spec": [
+    "4.5",
+    "4.8"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "inject": {
+    "dns": "error"
+  },
+  "config": {
+    "reverseDns": {
+      "timeoutMs": 50
+    }
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.44",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleRdnsBot/1.0)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "operator": "rdns-crawler",
+        "agent": "ExampleRdnsBot",
+        "purpose": "training",
+        "method": "none",
+        "error": false
+      }
+    },
+    {
+      "settle_before": true,
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.44",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleRdnsBot/1.0)"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "unknown_automation",
+        "operator": null,
+        "agent": null,
+        "purpose": null,
+        "method": "none",
+        "error": true
+      }
+    }
+  ]
+}

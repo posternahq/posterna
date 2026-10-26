@@ -1,0 +1,127 @@
+{
+  "version": "2026-10-26T12",
+  "generated_at": "2026-10-26T12:00:00Z",
+  "operators": {
+    "draft-test-signer": {
+      "directory_url": "https://signature-agent.test/.well-known/http-message-signatures-directory",
+      "fetched_at": "2026-10-26T12:00:00Z",
+      "status": "live",
+      "keys": [
+        {
+          "jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "x": "JrQLj5P_89iXES9-vFgrIy29clF9CC_oPPsw3c5D0bs",
+            "kid": "poqkLGiymh_W0uP6PZFw-dvez3QJT5SolqXBCW38r0U"
+          },
+          "thumbprint": "poqkLGiymh_W0uP6PZFw-dvez3QJT5SolqXBCW38r0U",
+          "kid": "poqkLGiymh_W0uP6PZFw-dvez3QJT5SolqXBCW38r0U",
+          "first_seen": "2026-10-26T12:00:00Z",
+          "last_seen": "2026-10-26T12:00:00Z"
+        }
+      ]
+    },
+    "example-signer": {
+      "directory_url": "https://signer.example/.well-known/http-message-signatures-directory",
+      "fetched_at": "2026-10-26T12:00:00Z",
+      "status": "live",
+      "keys": [
+        {
+          "jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "x": "MbqYocUAafZEBMK8k-YEWWCdc7Dcw8s3untjgdu8jKg",
+            "kid": "MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE"
+          },
+          "thumbprint": "MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE",
+          "kid": "MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE",
+          "first_seen": "2026-10-26T12:00:00Z",
+          "last_seen": "2026-10-26T12:00:00Z"
+        },
+        {
+          "jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "x": "ybyCGJ7sJX7TpH_MjUqbYUQDk1E_Wr_pkazqFTv1gWA",
+            "kid": "4nP9ZlI9K2QGA9CxLFUd-7GBg0SqEl5hhLWP2h6-S3Q"
+          },
+          "thumbprint": "4nP9ZlI9K2QGA9CxLFUd-7GBg0SqEl5hhLWP2h6-S3Q",
+          "kid": "4nP9ZlI9K2QGA9CxLFUd-7GBg0SqEl5hhLWP2h6-S3Q",
+          "first_seen": "2026-10-26T12:00:00Z",
+          "last_seen": "2026-10-26T12:00:00Z"
+        }
+      ]
+    },
+    "label-signer": {
+      "directory_url": "https://labels.example/.well-known/http-message-signatures-directory",
+      "fetched_at": "2026-10-26T12:00:00Z",
+      "status": "live",
+      "keys": [
+        {
+          "jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "x": "mfKBgqrLsgQ4wyabwAc9WGxsvaAKxugi9qBlFKN_F4s",
+            "kid": "k1"
+          },
+          "thumbprint": "O8JglVYgOL8Uviz0cuB0giDYGFx55-GSjJ3Ly4isxbI",
+          "kid": "k1",
+          "first_seen": "2026-10-26T12:00:00Z",
+          "last_seen": "2026-10-26T12:00:00Z"
+        },
+        {
+          "jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "x": "F9-u67MeiFLFr0UzVX3BCptZ1CqoAfwynyxABdKRr14",
+            "kid": "k2"
+          },
+          "thumbprint": "ZZIibtlrwvLR6KAii-N64TwW0tadSXk0QzzbOlf6oiA",
+          "kid": "k2",
+          "first_seen": "2026-10-26T12:00:00Z",
+          "last_seen": "2026-10-26T12:00:00Z"
+        }
+      ]
+    },
+    "nokid-signer": {
+      "directory_url": "https://nokid.example/.well-known/http-message-signatures-directory",
+      "fetched_at": "2026-10-26T12:00:00Z",
+      "status": "live",
+      "keys": [
+        {
+          "jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "x": "cKgqkK3zOx6LYWe8eQ699xx_8oEdzuNJ6NaAZLcdOS4"
+          },
+          "thumbprint": "CDtBdBjftILVJy-iQw-eKaHnxYhayh90TklS5M_VXco",
+          "kid": null,
+          "first_seen": "2026-10-26T12:00:00Z",
+          "last_seen": "2026-10-26T12:00:00Z"
+        },
+        {
+          "jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "x": "qNQZWmH_CIfZFk1Fu0f8fqyk67jzzoaQgNDZqxr11yo"
+          },
+          "thumbprint": "6W3fojsAWhwaO6nCYhDJphITqpu_M3c9bM0OCwKRA5A",
+          "kid": null,
+          "first_seen": "2026-10-26T12:00:00Z",
+          "last_seen": "2026-10-26T12:00:00Z"
+        },
+        {
+          "jwk": {
+            "kty": "OKP",
+            "crv": "Ed25519",
+            "x": "LatnRf7c8Mo-p3ueceMeRHPfv8iTHBv1mxKOJvRXwLo"
+          },
+          "thumbprint": "F2NAWEeSkiUBOL7E5OoBMrNDGc_o0FKsgbDkIWHZaic",
+          "kid": null,
+          "first_seen": "2026-10-26T12:00:00Z",
+          "last_seen": "2026-10-26T12:00:00Z"
+        }
+      ]
+    }
+  }
+}
