@@ -19,7 +19,8 @@
 | Machine | Signature p99 | IP p99 | Worst p99 | Headroom |
 |---|---|---|---|---|
 | Apple M3, Node 24.13, macOS (26 October 2026) | 0.170 ms | 0.005 ms | 0.170 ms | about 29x |
+| GitHub Actions `ubuntu-latest`, 2 vCPUs (Intel Xeon Platinum 8573C), Node 22.23 (26 October 2026, commit `b6dbcdd`) | 1.379 ms | 0.026 ms | 1.379 ms | about 3.6x |
 
-The CI numbers are printed in the `Bench` job log. GitHub's standard Linux runners have 2 vCPUs for private repositories and 4 for public ones and are several times slower than a laptop for single-threaded work. Even a 10x slowdown keeps the signature path under 2 ms, so the 5 ms budget leaves room for runner noise without making the check meaningless.
+Every run prints its numbers in the `Bench` job log. GitHub's standard Linux runners have 2 vCPUs for private repositories and 4 for public ones, and are noisy: on the run above the signature path's p50 was 0.263 ms but its single slowest request took 6.6 ms. The budget applies to p99, which stayed at 1.4 ms, so CI has about 3.6x headroom on the signature path and far more on the IP path. If the signature p99 in CI starts creeping toward 5 ms, look at the runner before the code: the same commit runs eight times faster on a laptop.
 
 Almost all of the signature path is the Ed25519 verification itself (Web Crypto, inside Cloudflare's library). The IP path is a binary search over merged prefix ranges compiled when the directory loads.
