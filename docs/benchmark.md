@@ -17,7 +17,7 @@
 
 ## Through the Express middleware
 
-The second benchmark starts an Express app with `posterna()` in front of a trivial route, sends 5,500 requests per scenario over HTTP on the loopback interface (500 warm-up), and times only the middleware for each request:
+The second benchmark starts an Express app with `posterna()` in front of a trivial route. A client in a separate process sends 5,500 requests per scenario over HTTP on the loopback interface (500 warm-up). The bench times only the middleware for each request; the client runs in its own process so its work never lands inside the timed awaits. It times:
 - stripping inbound headers;
 - `verify()` and `decide()`;
 - setting `req.posterna` and the verdict headers;

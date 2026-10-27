@@ -5,8 +5,12 @@
 // response when there is one. Fails when any scenario's p99 is 5 ms or more.
 // Method: docs/benchmark.md.
 
+import { spawn } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import express from "express";
 import {
   BROWSER,
@@ -23,6 +27,34 @@ import {
   WARMUP,
 } from "../../core/bench/fixtures";
 import { posterna } from "../src/index";
+
+/**
+ * The HTTP client runs in a child process, so its work never lands inside the
+ * timed middleware awaits on this process's event loop.
+ */
+const CLIENT = `
+const { readFileSync } = require("node:fs");
+const [base, file] = process.argv.slice(-2);
+const { count, requests } = JSON.parse(readFileSync(file, "utf8"));
+(async () => {
+  for (let i = 0; i < count; i++) {
+    const { path, headers } = requests[i % requests.length];
+    const response = await fetch(base + path, { headers });
+    await response.arrayBuffer();
+  }
+})().catch((error) => { console.error(error); process.exit(1); });
+`;
+
+function runClient(base: string, file: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, ["-e", CLIENT, base, file], {
+      stdio: ["ignore", "ignore", "inherit"],
+    });
+    child.on("exit", (code) =>
+      code === 0 ? resolve() : reject(new Error(`the bench client exited with ${code}`)),
+    );
+  });
+}
 
 interface Scenario {
   name: string;
@@ -127,16 +159,14 @@ async function main(): Promise<void> {
     p99: number;
     max: number;
   }[] = [];
-  for (const scenario of scenarios) {
+  const scratch = mkdtempSync(join(tmpdir(), "posterna-bench-"));
+  for (const [index, scenario] of scenarios.entries()) {
     durations = [];
-    for (let i = 0; i < WARMUP + SAMPLES; i++) {
-      const { path, headers } = scenario.requests[
-        i % scenario.requests.length
-      ] as Scenario["requests"][number];
-      const response = await fetch(`${base}${path}`, { headers });
-      await response.arrayBuffer();
-      if (i === WARMUP - 1) durations = [];
-    }
+    const file = join(scratch, `scenario-${index}.json`);
+    writeFileSync(file, JSON.stringify({ count: WARMUP + SAMPLES, requests: scenario.requests }));
+    await runClient(base, file);
+    // The first WARMUP requests warm the caches and the JIT; only the rest count.
+    durations = durations.slice(WARMUP);
     results.push({
       name: scenario.name,
       outcome: last,
@@ -144,12 +174,13 @@ async function main(): Promise<void> {
       ...percentiles(durations),
     });
   }
+  rmSync(scratch, { recursive: true, force: true });
   middleware.close();
   await new Promise((resolve) => server.close(resolve));
 
   console.log(`\nExpress middleware (@posterna/express), ${machine()}`);
   console.log(
-    `${SAMPLES} requests per scenario over HTTP after ${WARMUP} warm-up requests; time inside the middleware.\n`,
+    `${SAMPLES} requests per scenario over HTTP from a separate client process, after ${WARMUP} warm-up requests; time inside the middleware.\n`,
   );
   console.log("| Scenario | Verdict and action | p50 ms | p95 ms | p99 ms | max ms |");
   console.log("|---|---|---|---|---|---|");
