@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { familyFetch } from "./family-fetch";
 import { clackPrompter } from "./io";
 import { run } from "./run";
 
@@ -18,6 +19,7 @@ process.exitCode = await run(process.argv.slice(2), {
   cwd: process.cwd(),
   env: process.env,
   fetch: globalThis.fetch,
+  fetchOver: familyFetch,
   now: () => Date.now(),
   prompts: interactive ? await clackPrompter() : null,
 });

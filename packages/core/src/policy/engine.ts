@@ -88,7 +88,8 @@ export interface PolicyEngine {
   /**
    * The counters path group for a request path (docs/SPEC.md section 7): the
    * most specific matching `paths` pattern, else the first path segment as
-   * `/<segment>/*`. Segments that look like identifiers become `/:id/*`, so
+   * `/<segment>/*`, or as `/<file>` for a file at the root such as
+   * `/robots.txt`. Segments that look like identifiers become `/:id/*`, so
    * no user name, number or token in a URL is ever reported.
    */
   pathGroup(path: string): string;
@@ -116,9 +117,13 @@ function defaultEnv(): Record<string, string | undefined> {
   return process?.env ?? {};
 }
 
-/** `/docs/intro` is `/docs/*`; `/` is `/`; identifier-like segments are masked. */
+/**
+ * `/docs/intro` is `/docs/*`; a file at the root such as `/robots.txt` is
+ * itself; `/` is `/`; identifier-like segments are masked as `/:id/*`.
+ */
 export function firstSegmentGroup(path: string): string {
-  const raw = path.split("/").find((part) => part.length > 0);
+  const parts = path.split("/").filter((part) => part.length > 0);
+  const raw = parts[0];
   if (raw === undefined) return "/";
   let segment = raw;
   try {
@@ -126,15 +131,25 @@ export function firstSegmentGroup(path: string): string {
   } catch {
     segment = raw;
   }
-  const looksLikeId =
+  // A file extension must not hide an identifier, as in `/<uuid>.png`.
+  const extension = /\.[A-Za-z0-9]{1,10}$/.exec(segment)?.[0] ?? "";
+  const stem = segment.slice(0, segment.length - extension.length);
+  if (looksLikeId(segment) || (extension && looksLikeId(stem))) return "/:id/*";
+  const file = parts.length === 1 && !path.endsWith("/") && extension !== "" && stem !== "";
+  return file ? `/${segment}` : `/${segment}/*`;
+}
+
+/** Digits, a UUID, long hex or token-like strings, anything with `@`, `%` or spaces, or over 32 characters. */
+function looksLikeId(segment: string): boolean {
+  return (
     segment.length > 32 ||
     /[@%\s]/.test(segment) ||
     /^\d[\d_.-]*$/.test(segment) ||
     /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test(segment) ||
     /^[0-9a-f]{12,}$/i.test(segment) ||
     (/\d/.test(segment) && /^[A-Za-z0-9_-]{16,}$/.test(segment)) ||
-    !/^[A-Za-z0-9._~-]+$/.test(segment);
-  return looksLikeId ? "/:id/*" : `/${segment}/*`;
+    !/^[A-Za-z0-9._~-]+$/.test(segment)
+  );
 }
 
 function message(error: unknown): string {

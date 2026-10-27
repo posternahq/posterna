@@ -206,8 +206,56 @@ describe("@posterna/next", () => {
       },
       authority: { host: "www.site.example", source: "publicHost" },
       verdict: { verdict: "verified_by_ip" },
+      policy: { source: "options", problem: null },
       mode: "enforce",
     });
+
+    // A policy file that cannot be read shows up in the report, with the reason.
+    const missing = withPosterna(
+      options({ debugToken: "s3cret", policy: undefined, policyPath: "/nonexistent/agents.yaml" }),
+    );
+    const fallback = (await missing(
+      request(DEBUG_PATH, { ...BROWSER, "x-posterna-debug-token": "s3cret" }),
+      event(),
+    )) as Response;
+    expect((await fallback.json()).policy).toMatchObject({
+      source: "fallback",
+      problem: expect.stringContaining("No policy file at /nonexistent/agents.yaml"),
+    });
+  });
+
+  it("hands a Server Action's sign-up recommendation on in a header the client cannot set", async () => {
+    // The pattern in docs/install.md: Server Actions post to the page's own path.
+    const proxy = withPosterna(options(), (req) => {
+      if (req.method !== "POST" || req.nextUrl.pathname !== "/signup") return;
+      const decision = getPosterna(req)?.decide({ kind: "signup" });
+      const headers = new Headers(req.headers);
+      headers.set("x-signup-recommendation", decision?.enforced ? decision.action : "allow");
+      return NextResponse.next({ request: { headers } });
+    });
+    const post = (headers: Record<string, string>) =>
+      new NextRequest("https://www.site.example/signup", { method: "POST", headers });
+
+    const bot = forwarded(
+      (await proxy(
+        post({
+          "user-agent": "curl/8.4.0",
+          "x-forwarded-for": "203.0.113.5",
+          "x-signup-recommendation": "lift",
+        }),
+        event(),
+      )) as Response,
+    );
+    expect(bot["x-signup-recommendation"]).toBe("challenge");
+    expect(bot["x-agent-verdict"]).toBe("unknown_automation");
+
+    const page = forwarded(
+      (await proxy(
+        request("/signup", { ...BROWSER, "x-forwarded-for": "203.0.113.5" }),
+        event(),
+      )) as Response,
+    );
+    expect(page["x-signup-recommendation"]).toBeUndefined();
   });
 
   it("counts requests and hands a due flush to waitUntil", async () => {

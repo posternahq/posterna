@@ -10,6 +10,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { type PosternaOptions, posterna } from "../../express/src/index";
 import pkg from "../package.json";
 import { FORGED_CLIENT, FORGED_HOST } from "./commands/doctor";
+import { familyFetch } from "./family-fetch";
 import { VERSION } from "./index";
 import type { Io, Prompter } from "./io";
 import { run } from "./run";
@@ -65,6 +66,9 @@ describe("posterna CLI", () => {
       expect(result.out).toMatch(new RegExp(`^  ${command}`, "m"));
     }
     expect(result.out).not.toContain("coming soon");
+    // Every usage is followed by at least two spaces before its summary.
+    expect(result.out).toMatch(/^ {2}init \[--template <name>\] \[--force\] \[--yes\] {2,}Set up/m);
+    expect(result.out).toMatch(/^ {2}--base-url <url> {2,}Posterna cloud/m);
   });
 
   it("rejects unknown commands and options", async () => {
@@ -154,8 +158,56 @@ describe("posterna init", () => {
       "You already have middleware.ts. Wrap your function instead of replacing it",
     );
     expect(existing.out).toContain(
-      "export const middleware = withPosterna({ /* options as below */ }, yourMiddleware);",
+      "export const middleware = withPosterna({ /* options as in https://posterna.com/docs/install */ }, yourMiddleware);",
     );
+
+    const old = await cli(["init"], {
+      cwd: project({ "package.json": JSON.stringify({ dependencies: { next: "14.2.18" } }) }),
+    });
+    expect(old.out).toContain("Detected Next.js 14.");
+    expect(old.out).toContain(
+      "Posterna supports Next.js 15 and 16, and this project uses Next.js 14.",
+    );
+    expect(old.out).not.toContain("withPosterna");
+  });
+
+  it("suggests the client-address setting for a host it recognizes, and the guide otherwise", async () => {
+    const next = JSON.stringify({ dependencies: { next: "16.4.3" } });
+    const railway = await cli(["init"], {
+      cwd: project({ "package.json": next, "railway.json": "{}" }),
+    });
+    expect(railway.out).toContain("// Railway, found from railway.json:");
+    expect(railway.out).toContain('     clientIpHeader: "x-real-ip",');
+
+    const fly = await cli(["init"], {
+      cwd: project({
+        "package.json": JSON.stringify({ dependencies: { express: "5.1.0" } }),
+        "fly.toml": "",
+      }),
+    });
+    expect(fly.out).toContain("// Fly.io, found from fly.toml (3 with Cloudflare in front):");
+    expect(fly.out).toContain("       trustedProxies: 2,");
+
+    const unknown = await cli(["init"], { cwd: project({ "package.json": next }) });
+    expect(unknown.out).toContain("// Set clientIpHeader or trustedProxies for your host:");
+    expect(unknown.out).toContain("// https://posterna.com/docs/install#trusted-proxies");
+    for (const result of [railway, fly, unknown]) {
+      expect(result.out).not.toContain("trustedProxies: 1");
+      expect(result.out).not.toContain("github.com");
+      expect(result.out).toContain(
+        "Before the first release the packages are not on npm: see https://posterna.com/docs/install#pre-release",
+      );
+    }
+  });
+
+  it("reminds about POSTERNA_SITE_KEY and POSTERNA_DEBUG_TOKEN when it cannot ask", async () => {
+    const result = await cli(["init", "--yes"], {
+      cwd: project({ "package.json": JSON.stringify({ dependencies: { express: "5.1.0" } }) }),
+      prompts: scripted([]),
+    });
+    expect(result.code).toBe(0);
+    expect(result.out).toContain("To send counters, set POSTERNA_SITE_KEY on the server");
+    expect(result.out).toContain("set POSTERNA_DEBUG_TOKEN on the server");
   });
 
   it("keeps an existing agents.yaml unless told to replace it", async () => {
@@ -292,8 +344,81 @@ describe("posterna doctor", () => {
     expect(result.out).toContain("PASS  Signature headers");
     expect(result.out).toContain("PASS  Directory: version 2026-10-26");
     expect(result.out).toContain("PASS  Mode: enforce (agents.yaml says enforce).");
+    expect(result.out).toMatch(
+      /PASS {2}Policy: the policy in the adapter options is in use( \(sha256-[0-9a-f]{16}\))?\./,
+    );
     expect(result.out).toContain("Everything Posterna needs is in place.");
     expect(result.code).toBe(0);
+  });
+
+  it("checks IPv4 and IPv6 separately, and skips a family this machine cannot use", async () => {
+    const app = await site({});
+    const noRoute = (async () => {
+      throw Object.assign(new TypeError("fetch failed"), {
+        cause: Object.assign(new Error("connect ENETUNREACH"), { code: "ENETUNREACH" }),
+      });
+    }) as unknown as typeof fetch;
+    // A hostname, not an address, so that both families are tried.
+    const url = app.url.replace("127.0.0.1", "localhost");
+    const result = await cli(["doctor", "--url", url, "--base-url", await cloud("127.0.0.1")], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+      fetchOver: (family) => (family === 4 ? globalThis.fetch : noRoute),
+    });
+    app.close();
+    expect(result.out).toContain("PASS  Client IP (IPv4): the site sees 127.0.0.1");
+    expect(result.out).toContain(
+      "SKIP  Client IP (IPv6): not checked: this machine has no IPv6 route.",
+    );
+    expect(result.out).not.toMatch(/^PASS {2}Client IP:/m);
+    expect(result.code).toBe(0);
+  });
+
+  it("fails a family that reaches a different server, as stale DNS records would", async () => {
+    const app = await site({});
+    const elsewhere = (async () =>
+      new Response("<html>Coming soon</html>", {
+        status: 200,
+        headers: { "content-type": "text/html" },
+      })) as unknown as typeof fetch;
+    const url = app.url.replace("127.0.0.1", "localhost");
+    const result = await cli(["doctor", "--url", url, "--base-url", await cloud("127.0.0.1")], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+      fetchOver: (family) => (family === 4 ? elsewhere : globalThis.fetch),
+    });
+    app.close();
+    expect(result.out).toContain(
+      "FAIL  Client IP (IPv4): over IPv4, " +
+        `${url}/.well-known/posterna/debug answered 200 without a Posterna report, so IPv4 visitors reach a different server.`,
+    );
+    expect(result.out).toContain("Fix: Check the site's A DNS records");
+    expect(result.out).toContain("PASS  Client IP (IPv6): the site sees 127.0.0.1");
+    expect(result.code).toBe(1);
+  });
+
+  it("names the whoami step when posterna.com cannot be reached", async () => {
+    const app = await site({});
+    const cloudUrl = await cloud(null);
+    const result = await cli(["doctor", "--url", app.url, "--base-url", cloudUrl], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+    });
+    app.close();
+    expect(result.out).toContain(
+      `this machine's public address could not be learned: ${cloudUrl}/whoami answered 404 without an address, so the request did not reach Posterna.`,
+    );
+    expect(result.out).toContain("run doctor from another network, or pass --base-url.");
+  });
+
+  it("fails the policy check when agents.yaml was not loaded", async () => {
+    const app = await site({ policy: undefined, policyPath: "/nonexistent/agents.yaml" });
+    const result = await cli(["doctor", "--url", app.url, "--base-url", await cloud("127.0.0.1")], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+    });
+    app.close();
+    expect(result.out).toContain(
+      "FAIL  Policy: your policy was not loaded, so a built-in monitor policy without your rules is in use. The server said: No policy file at /nonexistent/agents.yaml.",
+    );
+    expect(result.out).toContain("Fix: Put agents.yaml in the folder the server starts in");
+    expect(result.code).toBe(1);
   });
 
   it("catches forged forwarding headers being trusted", async () => {
@@ -402,5 +527,29 @@ describe("posterna doctor", () => {
     expect(
       (await cli(["doctor", "--url", "ftp://x"], { env: { POSTERNA_DEBUG_TOKEN: "t" } })).err,
     ).toContain("is not an http or https URL");
+  });
+});
+
+describe("familyFetch", () => {
+  it("connects over the family asked for only", async () => {
+    const server = createServer((req, res) => {
+      res.setHeader("content-type", "application/json");
+      res.end(JSON.stringify({ path: req.url, token: req.headers["x-test"] ?? null }));
+    });
+    const port = await new Promise<number>((resolve) =>
+      server.listen(0, "127.0.0.1", () => resolve((server.address() as AddressInfo).port)),
+    );
+    try {
+      const response = await familyFetch(4)(`http://localhost:${port}/hello`, {
+        headers: { "x-test": "yes" },
+      });
+      expect(response.status).toBe(200);
+      expect(response.headers.get("content-type")).toBe("application/json");
+      expect(await response.json()).toEqual({ path: "/hello", token: "yes" });
+      // Nothing listens on IPv6, so the same URL over IPv6 cannot reach this server.
+      await expect(familyFetch(6)(`http://localhost:${port}/hello`)).rejects.toThrow();
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
   });
 });

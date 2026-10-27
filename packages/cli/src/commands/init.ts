@@ -12,7 +12,8 @@ export type Framework =
   | { kind: "express" }
   | {
       kind: "next";
-      major: 15 | 16;
+      /** The Next.js major version from package.json. The adapter supports 15 and 16. */
+      major: number;
       nodeMiddleware: boolean;
       srcDir: boolean;
       existing: string | null;
@@ -25,8 +26,66 @@ const TEMPLATE_HINTS: Record<TemplateName, string> = {
   "saas-signup": "allow-list, plus recommendations for your sign-up page",
 };
 
-const INSTALL_GUIDE = "https://github.com/posternahq/posterna/blob/main/docs/install.md";
+/** The install guide as posterna.com serves it (the GitHub copy is not public yet). */
+export const INSTALL_GUIDE = "https://posterna.com/docs/install";
 const MATCHER = '"/((?!_next/static|_next/image|favicon.ico).*)"';
+
+/** A host recognized from its config file, with the client-address setting docs/install.md gives for it. */
+export interface Host {
+  name: string;
+  file: string;
+  /** The option line to paste, without a trailing comma. */
+  option: string;
+  note?: string;
+}
+
+const HOSTS: { files: string[]; host: Omit<Host, "file"> }[] = [
+  {
+    files: ["railway.json", "railway.toml", ".railway"],
+    host: { name: "Railway", option: 'clientIpHeader: "x-real-ip"' },
+  },
+  {
+    files: ["vercel.json", ".vercel"],
+    host: { name: "Vercel", option: 'clientIpHeader: "x-vercel-forwarded-for"' },
+  },
+  {
+    files: ["fly.toml"],
+    host: { name: "Fly.io", option: "trustedProxies: 2", note: "3 with Cloudflare in front" },
+  },
+  {
+    files: ["render.yaml"],
+    host: {
+      name: "Render",
+      option: "trustedProxies: 3",
+      note: "check with posterna doctor; use 2 if it reports a forged address",
+    },
+  },
+];
+
+/** The host, from a config file in the project folder. Null when none is found. */
+export function detectHost(cwd: string): Host | null {
+  for (const { files, host } of HOSTS) {
+    const file = files.find((name) => existsSync(join(cwd, name)));
+    if (file) return { ...host, file };
+  }
+  return null;
+}
+
+/** The client-address lines of the options object, at the given indent. */
+function addressLines(host: Host | null, indent: string): string[] {
+  if (!host) {
+    return [
+      `${indent}// Set clientIpHeader or trustedProxies for your host:`,
+      `${indent}// ${INSTALL_GUIDE}#trusted-proxies`,
+    ];
+  }
+  return [
+    `${indent}// ${host.name}, found from ${host.file}${host.note ? ` (${host.note})` : ""}:`,
+    `${indent}${host.option},`,
+  ];
+}
+
+const PRE_RELEASE = `   Before the first release the packages are not on npm: see ${INSTALL_GUIDE}#pre-release`;
 
 function readJson(path: string): Record<string, unknown> | null {
   try {
@@ -59,7 +118,7 @@ export function detectFramework(cwd: string): Framework {
       ) ?? null;
     return {
       kind: "next",
-      major: major >= 16 ? 16 : 15,
+      major,
       nodeMiddleware: major >= 16 || (major === 15 && minor >= 5),
       srcDir,
       existing,
@@ -79,11 +138,14 @@ function packageManager(cwd: string): string {
 /** The code to add, printed for the person to paste. `posterna init` never edits code. */
 export function codeToAdd(framework: Framework, cwd: string): string[] {
   const install = packageManager(cwd);
+  const host = detectHost(cwd);
   if (framework.kind === "express") {
     return [
       `1. Install the middleware:`,
       "",
       `   ${install} @posterna/express`,
+      "",
+      PRE_RELEASE,
       "",
       "2. Add it before your routes:",
       "",
@@ -91,25 +153,37 @@ export function codeToAdd(framework: Framework, cwd: string): string[] {
       "",
       "   app.use(",
       "     posterna({",
-      "       // The proxies in front of your app, for your host:",
-      `       // ${INSTALL_GUIDE}#trusted-proxies`,
-      "       // trustedProxies: 1,",
+      ...addressLines(host, "       "),
+      '       // publicHost: "www.example.com",',
       "     }),",
       "   );",
     ];
   }
+  if (framework.kind === "next" && framework.major < 15) {
+    return [
+      `Posterna supports Next.js 15 and 16, and this project uses Next.js ${framework.major}.`,
+      "Upgrade Next.js first, then run posterna init again.",
+    ];
+  }
   if (framework.kind === "next") {
     const dir = framework.srcDir ? "src/" : "";
-    const file = framework.major === 16 ? "proxy.ts" : "middleware.ts";
-    const exportName = framework.major === 16 ? "proxy" : "middleware";
-    const lines = [`1. Install the integration:`, "", `   ${install} @posterna/next`, ""];
+    const file = framework.major >= 16 ? "proxy.ts" : "middleware.ts";
+    const exportName = framework.major >= 16 ? "proxy" : "middleware";
+    const lines = [
+      `1. Install the integration:`,
+      "",
+      `   ${install} @posterna/next`,
+      "",
+      PRE_RELEASE,
+      "",
+    ];
     if (framework.existing) {
       lines.push(
         `2. You already have ${dir}${framework.existing}. Wrap your function instead of replacing it:`,
         "",
         '   import { withPosterna } from "@posterna/next";',
         "",
-        `   export const ${exportName} = withPosterna({ /* options as below */ }, your${exportName === "proxy" ? "Proxy" : "Middleware"});`,
+        `   export const ${exportName} = withPosterna({ /* options as in ${INSTALL_GUIDE} */ }, your${exportName === "proxy" ? "Proxy" : "Middleware"});`,
         "",
         "   Keep your own `config` export, and make sure its matcher includes the pages you want labeled.",
       );
@@ -120,9 +194,7 @@ export function codeToAdd(framework: Framework, cwd: string): string[] {
         '   import { withPosterna } from "@posterna/next";',
         "",
         `   export const ${exportName} = withPosterna({`,
-        "     // The proxies in front of your app, for your host:",
-        `     // ${INSTALL_GUIDE}#trusted-proxies`,
-        "     // trustedProxies: 1,",
+        ...addressLines(host, "     "),
         '     // publicHost: "www.example.com",',
         "   });",
         "",
@@ -170,14 +242,23 @@ function ignored(cwd: string, file: string): boolean {
   }
 }
 
+const SITE_KEY_REMINDER =
+  "To send counters, set POSTERNA_SITE_KEY on the server to the site key from https://posterna.com/dashboard (optional; without one nothing is sent).";
+
 async function siteKeyStep(io: Io, framework: Framework): Promise<void> {
   const prompts = io.prompts;
-  if (!prompts) return;
+  if (!prompts) {
+    io.out(SITE_KEY_REMINDER);
+    return;
+  }
   const wants = await prompts.confirm(
     "Add a site key from the Posterna dashboard now? (optional; without one nothing is sent)",
     false,
   );
-  if (!wants) return;
+  if (!wants) {
+    io.out(SITE_KEY_REMINDER);
+    return;
+  }
   const key = (await prompts.password("Site key"))?.trim();
   if (!key) return;
   if (!/^psk_[A-Za-z0-9_-]{20,}$/.test(key)) {
@@ -248,6 +329,8 @@ export async function init(io: Io, flags: InitFlags): Promise<number> {
   for (const line of codeToAdd(framework, io.cwd)) io.out(line);
   io.out("");
   await siteKeyStep(io, framework);
-  io.out("Then deploy and run `npx posterna doctor --url https://your-site` to check the setup.");
+  io.out(
+    "Then set POSTERNA_DEBUG_TOKEN on the server to a random value, deploy, and run `npx posterna doctor --url https://your-site` with the same token to check the setup.",
+  );
   return 0;
 }

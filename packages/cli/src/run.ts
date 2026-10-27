@@ -30,7 +30,9 @@ const COMMANDS = [
   },
 ] as const;
 
-const COLUMN = 34;
+/** Wide enough for the longest usage, plus two spaces before the summary. */
+const COLUMN =
+  Math.max(...COMMANDS.map((command) => command.usage.length), "--base-url <url>".length) + 2;
 
 /** Returns the help text for `posterna --help`. */
 export function helpText(): string {

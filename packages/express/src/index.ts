@@ -18,6 +18,7 @@ import {
   enforcementResponse,
   type Policy,
   type PolicyEngine,
+  type PolicyLoad,
   type ProxyOptions,
   stripInboundHeaders,
   type VerdictHeaderNames,
@@ -119,23 +120,25 @@ function message(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+/** The policy to start with, and where it came from (reported by the debug route). */
 function loadPolicy(
   options: PosternaOptions,
   env: Record<string, string | undefined>,
   warn: (m: string) => void,
-) {
-  if (options.policy !== undefined) return options.policy;
+): { policy: string | Policy; load: PolicyLoad } {
+  if (options.policy !== undefined)
+    return { policy: options.policy, load: { source: "options", problem: null } };
   const path = resolvePath(options.policyPath ?? env.POSTERNA_POLICY ?? "agents.yaml");
   try {
-    return readFileSync(path, "utf8");
+    return { policy: readFileSync(path, "utf8"), load: { source: "file", problem: null } };
   } catch (error) {
     const code = (error as { code?: string }).code;
-    warn(
+    const problem =
       code === "ENOENT"
         ? `No policy file at ${path}. Every request is allowed and labeled. Run \`npx posterna init\` to create one.`
-        : `Could not read ${path} (${message(error)}). Every request is allowed and labeled.`,
-    );
-    return FALLBACK_POLICY;
+        : `Could not read ${path} (${message(error)}). Every request is allowed and labeled.`;
+    warn(problem);
+    return { policy: FALLBACK_POLICY, load: { source: "fallback", problem } };
   }
 }
 
@@ -197,10 +200,15 @@ export function posterna(options: PosternaOptions = {}): PosternaMiddleware {
     });
 
   let engine: PolicyEngine;
+  let policyLoad: PolicyLoad;
   try {
-    engine = createPolicyEngine(loadPolicy(options, env, warn), { verifier, env });
+    const loaded = loadPolicy(options, env, warn);
+    policyLoad = loaded.load;
+    engine = createPolicyEngine(loaded.policy, { verifier, env });
   } catch (error) {
-    warn(`agents.yaml is invalid, so every request is allowed and labeled:\n${message(error)}`);
+    const problem = `agents.yaml is invalid, so every request is allowed and labeled:\n${message(error)}`;
+    warn(problem);
+    policyLoad = { source: "fallback", problem };
     engine = createPolicyEngine(FALLBACK_POLICY, { verifier, env });
   }
 
@@ -235,6 +243,7 @@ export function posterna(options: PosternaOptions = {}): PosternaMiddleware {
         verifier,
         engine,
         counters,
+        policy: policyLoad,
       }),
     );
     res.statusCode = 200;

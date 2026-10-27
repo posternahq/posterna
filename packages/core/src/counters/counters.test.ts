@@ -386,9 +386,27 @@ describe("path groups", () => {
     ]) {
       expect(firstSegmentGroup(path), path).toBe("/:id/*");
     }
-    for (const path of ["/blog", "/blog/2026/10/post", "/pricing", "/v1/things", "/robots.txt"]) {
+    for (const path of [
+      "/blog",
+      "/blog/2026/10/post",
+      "/pricing",
+      "/v1/things",
+      "/robots.txt/",
+      "/assets/app.js",
+      "/.well-known",
+    ]) {
       expect(firstSegmentGroup(path), path).toBe(`/${path.split("/")[1]}/*`);
     }
+    // A file at the root is its own group, not a folder.
+    for (const path of ["/robots.txt", "/favicon.ico", "/sitemap.xml", "/llms.txt"]) {
+      expect(firstSegmentGroup(path), path).toBe(path);
+    }
+    expect(engine.pathGroup("/robots.txt?x=1")).toBe("/robots.txt");
+    // Masking still comes first.
+    expect(firstSegmentGroup("/alice@example.com")).toBe("/:id/*");
+    expect(firstSegmentGroup("/0123456789abcdef0123.json")).toBe("/:id/*");
+    expect(firstSegmentGroup("/550e8400-e29b-41d4-a716-446655440000.png/x")).toBe("/:id/*");
+    expect(firstSegmentGroup("/12345.html")).toBe("/:id/*");
   });
 
   it("formats hours in UTC", () => {

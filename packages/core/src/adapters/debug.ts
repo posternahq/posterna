@@ -11,6 +11,16 @@ export const DEBUG_TOKEN_HEADER = "x-posterna-debug-token";
 
 const SIGNATURE_HEADERS = ["signature", "signature-input", "signature-agent"] as const;
 
+/**
+ * Where an adapter's policy came from: agents.yaml (`file`), the `policy`
+ * option (`options`), or the built-in monitor policy used when neither could be
+ * loaded (`fallback`, with the reason in `problem`).
+ */
+export interface PolicyLoad {
+  source: "file" | "options" | "fallback";
+  problem: string | null;
+}
+
 /** What the debug route returns. It is sent only to a caller holding the debug token. */
 export interface DebugReport {
   posterna: { adapter: string; version: string };
@@ -28,6 +38,12 @@ export interface DebugReport {
     /** The lowest directory signing-key generation accepted; null when refresh is off. */
     keyGeneration: number | null;
     reverseDns: boolean;
+  };
+  /** `source` is `unknown` when the adapter did not say. `hash` is null until computed. */
+  policy: {
+    source: PolicyLoad["source"] | "unknown";
+    hash: string | null;
+    problem: string | null;
   };
   mode: "monitor" | "enforce";
   configuredMode: "monitor" | "enforce";
@@ -79,6 +95,7 @@ export function debugReport(input: {
   verifier: Verifier;
   engine: PolicyEngine;
   counters: Counters | null;
+  policy?: PolicyLoad;
 }): DebugReport {
   const resolved = input.verifier.resolve(input.request, input.callOptions ?? {});
   const verifierState = input.verifier.state();
@@ -101,6 +118,11 @@ export function debugReport(input: {
       keysVersion: verifierState.keysVersion,
       keyGeneration: verifierState.directoryKeyGeneration,
       reverseDns: verifierState.reverseDnsAvailable,
+    },
+    policy: {
+      source: input.policy?.source ?? "unknown",
+      hash: policyState.policyHash,
+      problem: input.policy?.problem ?? null,
     },
     mode: policyState.mode,
     configuredMode: policyState.configuredMode,

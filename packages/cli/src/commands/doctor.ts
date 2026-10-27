@@ -1,16 +1,18 @@
 import type { webcrypto } from "node:crypto";
+import { isIP } from "node:net";
 import { DEBUG_PATH, DEBUG_TOKEN_HEADER, type DebugReport } from "@posterna/core";
 import { sign } from "web-bot-auth";
 import { signerFromJWK } from "web-bot-auth/crypto";
 import { VERSION } from "../index";
 import { baseUrl, type Io } from "../io";
+import { INSTALL_GUIDE } from "./init";
 
 export interface DoctorFlags {
   url?: string;
   baseUrl?: string;
 }
 
-type Status = "pass" | "warn" | "fail";
+type Status = "pass" | "warn" | "fail" | "skip";
 interface Check {
   name: string;
   status: Status;
@@ -18,7 +20,7 @@ interface Check {
   fix?: string;
 }
 
-const GUIDE = "https://github.com/posternahq/posterna/blob/main/docs/install.md";
+const PROXY_SETTINGS = `${INSTALL_GUIDE}#trusted-proxies`;
 /** The Signature-Agent the doctor request names. The site never fetches it. */
 const DOCTOR_AGENT = "https://posterna.com";
 const DIRECTORY_MAX_AGE_DAYS = 7;
@@ -29,6 +31,51 @@ const DIRECTORY_MAX_AGE_DAYS = 7;
  */
 export const FORGED_CLIENT = "192.0.2.1";
 export const FORGED_HOST = "doctor.invalid";
+const FORGED_FORWARDING = { "x-forwarded-for": FORGED_CLIENT, "x-forwarded-host": FORGED_HOST };
+
+/** Error codes meaning the host has no address in the family asked for. */
+const NO_ADDRESS = new Set(["ENOTFOUND", "ENODATA", "EAI_NODATA", "EAI_NONAME", "EAI_ADDRFAMILY"]);
+/** Error codes meaning this machine cannot use the family at all. */
+const NO_ROUTE = new Set(["ENETUNREACH", "EHOSTUNREACH", "EADDRNOTAVAIL", "EAFNOSUPPORT"]);
+const TIMED_OUT = new Set(["ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT", "TimeoutError", "AbortError"]);
+
+function errorCode(error: unknown): string | undefined {
+  if (!(error instanceof Error)) return undefined;
+  const own = (error as { code?: unknown }).code;
+  const cause = (error.cause as { code?: unknown } | undefined)?.code;
+  const code = typeof own === "string" ? own : typeof cause === "string" ? cause : undefined;
+  return code ?? (TIMED_OUT.has(error.name) ? error.name : undefined);
+}
+
+/** An error message with its code, for example "fetch failed, ENOTFOUND". */
+function describe(error: unknown): string {
+  if (!(error instanceof Error)) return String(error);
+  const code = errorCode(error);
+  return code && !error.message.includes(code) ? `${error.message}, ${code}` : error.message;
+}
+
+type Whoami = { ip: string } | { failure: string };
+
+/** This machine's public address, as the Posterna cloud sees it. */
+async function whoami(fetchImpl: typeof fetch, cloud: string): Promise<Whoami> {
+  const url = `${cloud}whoami`;
+  try {
+    const response = await fetchImpl(url, { signal: AbortSignal.timeout(10_000) });
+    const text = await response.text();
+    try {
+      const body = JSON.parse(text) as { ip?: unknown } | null;
+      if (response.ok && typeof body?.ip === "string") return { ip: body.ip };
+    } catch {
+      // Not JSON: not Posterna's whoami.
+    }
+    const type = response.headers.get("content-type")?.split(";")[0]?.trim();
+    return {
+      failure: `${url} answered ${response.status}${type ? ` (${type})` : ""} without an address, so the request did not reach Posterna`,
+    };
+  } catch (error) {
+    return { failure: `${url} could not be reached (${describe(error)})` };
+  }
+}
 
 function isPrivate(address: string): boolean {
   return (
@@ -79,7 +126,7 @@ async function signedHeaders(target: URL, now: number): Promise<Record<string, s
 }
 
 function print(io: Io, check: Check): void {
-  const label = { pass: "PASS", warn: "WARN", fail: "FAIL" }[check.status];
+  const label = { pass: "PASS", warn: "WARN", fail: "FAIL", skip: "SKIP" }[check.status];
   io.out(`${label}  ${check.name}: ${check.detail}`);
   if (check.fix) io.out(`      Fix: ${check.fix}`);
 }
@@ -109,25 +156,17 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
 
   const checks: Check[] = [];
   const cloud = baseUrl(flags.baseUrl, io.env);
+  const cloudHost = new URL(cloud).host;
 
-  // 1. This machine's public address, as the cloud sees it.
-  let publicIp: string | null = null;
-  try {
-    const response = await io.fetch(`${cloud}whoami`, { signal: AbortSignal.timeout(10_000) });
-    const body = (await response.json()) as { ip?: unknown };
-    if (response.ok && typeof body.ip === "string") publicIp = body.ip;
-  } catch {
-    publicIp = null;
-  }
-
-  // 2. A signed request to the debug route, with forged forwarding headers a
+  // A signed request to the debug route, with forged forwarding headers a
   // correct setup ignores.
   const target = new URL(DEBUG_PATH, site);
   const probe = async (
+    fetchImpl: typeof fetch,
     forged: Record<string, string>,
-  ): Promise<{ report: DebugReport | null; failure: string }> => {
+  ): Promise<{ report: DebugReport | null; failure: string; error?: unknown }> => {
     try {
-      const response = await io.fetch(target, {
+      const response = await fetchImpl(target, {
         headers: {
           "user-agent": `posterna-doctor/${VERSION}`,
           accept: "application/json",
@@ -147,16 +186,10 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
       }
       return { report: null, failure: `it answered ${response.status} without a Posterna report` };
     } catch (error) {
-      return {
-        report: null,
-        failure: `the request failed (${error instanceof Error ? error.message : String(error)})`,
-      };
+      return { report: null, failure: `the request failed (${describe(error)})`, error };
     }
   };
-  const { report, failure } = await probe({
-    "x-forwarded-for": FORGED_CLIENT,
-    "x-forwarded-host": FORGED_HOST,
-  });
+  const { report, failure } = await probe(io.fetch, FORGED_FORWARDING);
 
   if (!report) {
     print(io, {
@@ -173,58 +206,48 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
     detail: `${report.posterna.adapter} ${report.posterna.version} answered.`,
   });
 
-  // Client IP resolution.
-  const seen = report.client.address;
-  // With clientIpHeader, forge that header too: it is safe only if the host overwrites it.
+  // Client IP resolution. With clientIpHeader, forge that header too: it is
+  // safe only if the host overwrites it.
   const header = report.client.header;
-  const forgedHeader = header ? (await probe({ [header]: FORGED_CLIENT })).report : null;
-  if (header && forgedHeader?.client.address === FORGED_CLIENT) {
-    checks.push({
-      name: "Client IP",
-      status: "fail",
-      detail: `the app believed a ${header} header that doctor forged (${FORGED_CLIENT}): your host does not overwrite it, so any client can claim any address.`,
-      fix: `Remove clientIpHeader and set trustedProxies for your host. See ${GUIDE}#trusted-proxies`,
-    });
-  } else if (seen === FORGED_CLIENT) {
-    checks.push({
-      name: "Client IP",
-      status: "fail",
-      detail: `the app believed an X-Forwarded-For entry that doctor forged (${FORGED_CLIENT}), so any client can claim any address.`,
-      fix: `trustedProxies counts more proxies than there are in front of the app, or a listed range includes clients. See ${GUIDE}#trusted-proxies`,
-    });
-  } else if (publicIp === null) {
-    checks.push({
-      name: "Client IP",
-      status: "warn",
-      detail: `the site sees ${seen ?? "no address"} (from ${report.client.source}), but this machine's public address could not be learned from ${cloud}whoami.`,
-      fix: "Compare it with your public address yourself.",
-    });
-  } else if (seen === publicIp) {
-    checks.push({
-      name: "Client IP",
-      status: "pass",
-      detail: `the site sees ${seen}, this machine's public address.`,
-    });
-  } else if (seen && seen.includes(":") !== publicIp.includes(":")) {
-    checks.push({
-      name: "Client IP",
-      status: "warn",
-      detail: `the site sees ${seen} and whoami saw ${publicIp}: one is IPv4 and the other IPv6, so they cannot be compared.`,
-      fix: "Run doctor from a machine with only IPv4 or only IPv6, or compare the addresses yourself.",
-    });
-  } else {
-    checks.push({
-      name: "Client IP",
-      status: "fail",
-      detail: `the site sees ${seen ?? "no address"} (from ${report.client.source}), but this machine is ${publicIp}.`,
-      fix:
-        seen === null
-          ? `Set clientIpHeader or trustedProxies for your host (Next.js never sees the socket address). See ${GUIDE}#trusted-proxies`
-          : isPrivate(seen)
-            ? `The app sees its proxy's address. Set clientIpHeader or trustedProxies for your host. See ${GUIDE}#trusted-proxies`
-            : `Another proxy or CDN is in front of the app. Count it in trustedProxies, or list its address ranges. See ${GUIDE}#trusted-proxies`,
-    });
+  const clientIp = async (
+    name: string,
+    fetchImpl: typeof fetch,
+    seenReport: DebugReport,
+  ): Promise<Check> => {
+    const mine = await whoami(fetchImpl, cloud);
+    const forgedHeader = header
+      ? (await probe(fetchImpl, { [header]: FORGED_CLIENT })).report
+      : null;
+    return clientIpCheck(name, seenReport, mine, forgedHeader, cloudHost);
+  };
+
+  let familyChecks: Check[] = [];
+  if (io.fetchOver) {
+    const literal = isIP(site.hostname.replace(/^\[|\]$/g, ""));
+    for (const family of [4, 6] as const) {
+      const name = `Client IP (IPv${family})`;
+      if (literal && literal !== family) {
+        familyChecks.push({
+          name,
+          status: "skip",
+          detail: `not checked: the site's address is IPv${literal}.`,
+        });
+        continue;
+      }
+      const fetchImpl = io.fetchOver(family);
+      const attempt = await probe(fetchImpl, FORGED_FORWARDING);
+      familyChecks.push(
+        attempt.report
+          ? await clientIp(name, fetchImpl, attempt.report)
+          : unreachable(name, family, target, attempt),
+      );
+    }
+    // Both families failed to connect: the per-family fetch itself may not
+    // work here, so fall back to the single check below.
+    if (familyChecks.every((check) => check.status === "skip") && !literal) familyChecks = [];
   }
+  if (familyChecks.length > 0) checks.push(...familyChecks);
+  else checks.push(await clientIp("Client IP", io.fetch, report));
 
   // The host agents sign.
   const expectedHost = site.host.toLowerCase();
@@ -269,6 +292,25 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
         },
   );
 
+  // The policy the site loaded.
+  const policy = report.policy;
+  if (policy && policy.source !== "unknown") {
+    checks.push(
+      policy.source === "fallback"
+        ? {
+            name: "Policy",
+            status: "fail",
+            detail: `your policy was not loaded, so a built-in monitor policy without your rules is in use. The server said: ${(policy.problem ?? "no reason given").split("\n")[0]}`,
+            fix: policyFix(policy.problem ?? ""),
+          }
+        : {
+            name: "Policy",
+            status: "pass",
+            detail: `${policy.source === "file" ? "agents.yaml" : "the policy in the adapter options"} is in use${policy.hash ? ` (${policy.hash})` : ""}.`,
+          },
+    );
+  }
+
   // Directory freshness.
   const version = report.directory.directoryVersion;
   const age = version
@@ -304,7 +346,7 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
       status: "fail",
       detail:
         "enforcement is suspended: most requests seem to come from internal addresses (proxy guard).",
-      fix: `Set trustedProxies for your host. See ${GUIDE}#trusted-proxies`,
+      fix: `Set trustedProxies for your host. See ${PROXY_SETTINGS}`,
     });
   } else {
     const notes = [
@@ -332,4 +374,117 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
       : `${failed} check${failed === 1 ? "" : "s"} failed.`,
   );
   return failed === 0 ? 0 : 1;
+}
+
+/** The fix for a policy that fell back, from the reason the server gave. */
+function policyFix(problem: string): string {
+  if (problem.includes("Node 20.16"))
+    return "Run the server on Node.js 20.16 or later, or pass the policy text as `policy`.";
+  if (problem.startsWith("No policy file"))
+    return "Put agents.yaml in the folder the server starts in, or set POSTERNA_POLICY to its path. `posterna init` writes one.";
+  if (problem.includes("invalid"))
+    return "Run `posterna policy check` on agents.yaml and fix what it reports.";
+  return "Check the [posterna] lines in the server log.";
+}
+
+/** A family whose request to the debug route did not get a Posterna report. */
+function unreachable(
+  name: string,
+  family: 4 | 6,
+  target: URL,
+  attempt: { failure: string; error?: unknown },
+): Check {
+  const records = family === 4 ? "A" : "AAAA";
+  if (attempt.error === undefined) {
+    return {
+      name,
+      status: "fail",
+      detail: `over IPv${family}, ${target.href} ${attempt.failure.replace(/^it /, "")}, so IPv${family} visitors reach a different server.`,
+      fix: `Check the site's ${records} DNS records: they should point at the same host as the rest of the site.`,
+    };
+  }
+  const code = errorCode(attempt.error);
+  if (code && NO_ADDRESS.has(code))
+    return { name, status: "skip", detail: `not checked: the site has no IPv${family} address.` };
+  if (code && NO_ROUTE.has(code))
+    return {
+      name,
+      status: "skip",
+      detail: `not checked: this machine has no IPv${family} route. Run doctor from a network with IPv${family} to check it.`,
+    };
+  if (code && TIMED_OUT.has(code))
+    return {
+      name,
+      status: "skip",
+      detail: `not checked: the request over IPv${family} timed out, which usually means this machine's IPv${family} does not work.`,
+    };
+  return {
+    name,
+    status: "warn",
+    detail: `over IPv${family}, ${attempt.failure}.`,
+    fix: `If other sites work over IPv${family} from this machine, check the site's ${records} DNS records.`,
+  };
+}
+
+/** Compares the address the site saw with this machine's public address. */
+function clientIpCheck(
+  name: string,
+  report: DebugReport,
+  mine: Whoami,
+  forgedHeader: DebugReport | null,
+  cloudHost: string,
+): Check {
+  const seen = report.client.address;
+  const header = report.client.header;
+  if (header && forgedHeader?.client.address === FORGED_CLIENT) {
+    return {
+      name,
+      status: "fail",
+      detail: `the app believed a ${header} header that doctor forged (${FORGED_CLIENT}): your host does not overwrite it, so any client can claim any address.`,
+      fix: `Remove clientIpHeader and set trustedProxies for your host. See ${PROXY_SETTINGS}`,
+    };
+  }
+  if (seen === FORGED_CLIENT) {
+    return {
+      name,
+      status: "fail",
+      detail: `the app believed an X-Forwarded-For entry that doctor forged (${FORGED_CLIENT}), so any client can claim any address.`,
+      fix: `trustedProxies counts more proxies than there are in front of the app, or a listed range includes clients. See ${PROXY_SETTINGS}`,
+    };
+  }
+  if ("failure" in mine) {
+    return {
+      name,
+      status: "warn",
+      detail: `the site sees ${seen ?? "no address"} (from ${report.client.source}), but this machine's public address could not be learned: ${mine.failure}.`,
+      fix: `Compare it with your public address yourself. If this network's DNS still has an old address for ${cloudHost}, run doctor from another network, or pass --base-url.`,
+    };
+  }
+  const publicIp = mine.ip;
+  if (seen === publicIp) {
+    return {
+      name,
+      status: "pass",
+      detail: `the site sees ${seen}, this machine's public address.`,
+    };
+  }
+  if (seen && seen.includes(":") !== publicIp.includes(":")) {
+    return {
+      name,
+      status: "warn",
+      detail: `the site sees ${seen} and whoami saw ${publicIp}: one is IPv4 and the other IPv6, so they cannot be compared.`,
+      fix: "Run doctor from a machine with only IPv4 or only IPv6, or compare the addresses yourself.",
+    };
+  }
+  return {
+    name,
+    status: "fail",
+    detail: `the site sees ${seen ?? "no address"} (from ${report.client.source}), but this machine is ${publicIp}.`,
+    fix:
+      seen === null
+        ? `Set clientIpHeader or trustedProxies for your host (Next.js never sees the socket address). See ${PROXY_SETTINGS}`
+        : isPrivate(seen)
+          ? `The app sees its proxy's address. Set clientIpHeader or trustedProxies for your host. See ${PROXY_SETTINGS}`
+          : `Another proxy or CDN is in front of the app. Count it in trustedProxies, or list its address ranges. See ${PROXY_SETTINGS}`,
+  };
 }

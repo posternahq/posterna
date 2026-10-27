@@ -9,6 +9,7 @@ export {
   type DebugReport,
   debugReport,
   debugTokenMatches,
+  type PolicyLoad,
 } from "./adapters/debug";
 export {
   COUNTERS_DEFAULTS,

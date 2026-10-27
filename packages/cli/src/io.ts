@@ -8,6 +8,11 @@ export interface Io {
   cwd: string;
   env: Record<string, string | undefined>;
   fetch: typeof fetch;
+  /**
+   * A fetch over IPv4 or IPv6 only, so doctor can check both. Without it,
+   * doctor checks the client address once, over whichever family `fetch` uses.
+   */
+  fetchOver?: (family: 4 | 6) => typeof fetch;
   now: () => number;
   /** Null when there is no terminal to ask (CI, pipes, `--yes`). */
   prompts: Prompter | null;

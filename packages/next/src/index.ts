@@ -14,6 +14,7 @@ import {
   enforcementResponse,
   type Policy,
   type PolicyEngine,
+  type PolicyLoad,
   type ProxyOptions,
   stripInboundHeaders,
   type VerdictHeaderNames,
@@ -69,6 +70,8 @@ export interface Posterna {
   readonly verifier: Verifier;
   readonly engine: PolicyEngine;
   readonly counters: Counters | null;
+  /** Where the policy came from, as the debug route reports it. */
+  readonly policy: PolicyLoad;
   /** Labels a request. In Next.js there is no socket address; see `trustedProxies`. */
   verify(request: Request): Promise<VerdictResult>;
   /** Decides for a labeled request. `path` defaults to the request's path. */
@@ -120,8 +123,14 @@ function processEnv(): Record<string, string | undefined> {
   );
 }
 
-/** Reads agents.yaml through process.getBuiltinModule, which bundlers do not touch and the Edge runtime lacks. */
-function readPolicyFile(path: string | undefined, warn: (m: string) => void): string {
+/**
+ * Reads agents.yaml through process.getBuiltinModule, which bundlers do not
+ * touch and the Edge runtime lacks. On failure, warns and returns the reason.
+ */
+function readPolicyFile(
+  path: string | undefined,
+  warn: (m: string) => void,
+): { text: string; problem: string | null } {
   const process = (
     globalThis as {
       process?: { cwd?: () => string; getBuiltinModule?: (id: string) => unknown };
@@ -129,22 +138,22 @@ function readPolicyFile(path: string | undefined, warn: (m: string) => void): st
   ).process;
   const fs = process?.getBuiltinModule?.("node:fs") as typeof import("node:fs") | undefined;
   if (!fs || !process?.cwd) {
-    warn(
-      "This runtime cannot read agents.yaml. Pass the policy text as `policy`, or use the Node.js runtime (Node 20.16 or later). Every request is allowed and labeled.",
-    );
-    return FALLBACK_POLICY;
+    const problem =
+      "This runtime cannot read agents.yaml. Pass the policy text as `policy`, or use the Node.js runtime (Node 20.16 or later). Every request is allowed and labeled.";
+    warn(problem);
+    return { text: FALLBACK_POLICY, problem };
   }
   const file = path ?? "agents.yaml";
   const full = file.startsWith("/") ? file : `${process.cwd()}/${file}`;
   try {
-    return fs.readFileSync(full, "utf8");
+    return { text: fs.readFileSync(full, "utf8"), problem: null };
   } catch (error) {
-    warn(
+    const problem =
       (error as { code?: string }).code === "ENOENT"
         ? `No policy file at ${full}. Every request is allowed and labeled. Run \`npx posterna init\` to create one.`
-        : `Could not read ${full} (${message(error)}). Every request is allowed and labeled.`,
-    );
-    return FALLBACK_POLICY;
+        : `Could not read ${full} (${message(error)}). Every request is allowed and labeled.`;
+    warn(problem);
+    return { text: FALLBACK_POLICY, problem };
   }
 }
 
@@ -176,12 +185,22 @@ export function createPosterna(options: PosternaNextOptions = {}): Posterna {
     directory: directoryOptions(options, env),
   });
   let engine: PolicyEngine;
+  let policyLoad: PolicyLoad;
   try {
-    const policy =
-      options.policy ?? readPolicyFile(options.policyPath ?? env.POSTERNA_POLICY, warn);
-    engine = createPolicyEngine(policy, { verifier, env });
+    if (options.policy !== undefined) {
+      policyLoad = { source: "options", problem: null };
+      engine = createPolicyEngine(options.policy, { verifier, env });
+    } else {
+      const read = readPolicyFile(options.policyPath ?? env.POSTERNA_POLICY, warn);
+      policyLoad = read.problem
+        ? { source: "fallback", problem: read.problem }
+        : { source: "file", problem: null };
+      engine = createPolicyEngine(read.text, { verifier, env });
+    }
   } catch (error) {
-    warn(`agents.yaml is invalid, so every request is allowed and labeled:\n${message(error)}`);
+    const problem = `agents.yaml is invalid, so every request is allowed and labeled:\n${message(error)}`;
+    warn(problem);
+    policyLoad = { source: "fallback", problem };
     engine = createPolicyEngine(FALLBACK_POLICY, { verifier, env });
   }
   let counters: Counters | null = null;
@@ -204,6 +223,7 @@ export function createPosterna(options: PosternaNextOptions = {}): Posterna {
     verifier,
     engine,
     counters,
+    policy: policyLoad,
     verify: (request) => verifier.verify(request, { remoteAddress: null }),
     decide: (result, context) => engine.decide(result, context),
     close() {
@@ -325,6 +345,7 @@ export function withPosterna(
             verifier: posterna.verifier,
             engine: posterna.engine,
             counters: posterna.counters,
+            policy: posterna.policy,
           });
           return Response.json(report, { headers: { "Cache-Control": "no-store" } });
         }
