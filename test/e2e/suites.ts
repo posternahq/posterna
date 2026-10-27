@@ -130,6 +130,7 @@ export function basicAppChecks(context: {
       posterna: { adapter: context.sdk },
       client: { address: GOOGLEBOT_ADDRESS },
       verdict: { verdict: "verified_by_ip" },
+      policy: { source: "file", problem: null },
       mode: "enforce",
     });
     const denied = await get("/.well-known/posterna/debug", {

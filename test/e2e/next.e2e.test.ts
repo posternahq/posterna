@@ -1,6 +1,15 @@
 import { join } from "node:path";
 import { afterAll, beforeAll, describe } from "vitest";
-import { type App, appEnv, freePort, REPO, runToEnd, startApp, startIngest } from "./helpers";
+import {
+  type App,
+  appEnv,
+  freePort,
+  POLICY,
+  REPO,
+  runToEnd,
+  startApp,
+  startIngest,
+} from "./helpers";
 import { basicAppChecks, signupChecks } from "./suites";
 
 const nextBin = (example: string) =>
@@ -8,14 +17,21 @@ const nextBin = (example: string) =>
 
 async function startNext(example: string, ingestBaseUrl: string): Promise<App> {
   const cwd = join(REPO, "examples", example);
-  await runToEnd(nextBin(example), ["build"], cwd, { NEXT_TELEMETRY_DISABLED: "1" });
+  // The examples wrap next.config in withPosternaConfig, which builds the
+  // policy that POSTERNA_POLICY names into the proxy and route handlers.
+  await runToEnd(nextBin(example), ["build"], cwd, {
+    NEXT_TELEMETRY_DISABLED: "1",
+    POSTERNA_POLICY: POLICY,
+  });
   const port = await freePort();
   return startApp({
     cwd,
     command: nextBin(example),
     args: ["start", "-p", String(port)],
     port,
-    env: appEnv(ingestBaseUrl),
+    // No policy file at run time, as on Vercel: the enforcing policy can only
+    // come from the build.
+    env: { ...appEnv(ingestBaseUrl), POSTERNA_POLICY: join(cwd, "missing-agents.yaml") },
   });
 }
 

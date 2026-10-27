@@ -1,11 +1,13 @@
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { DirectoryFile, KeysFile } from "@posterna/core";
 import { type NextFetchEvent, NextRequest, NextResponse } from "next/server";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import pkg from "../package.json";
 import {
+  createPosterna,
   DEBUG_PATH,
   decideRequest,
   getPosterna,
@@ -300,5 +302,83 @@ describe("@posterna/next", () => {
     // No override: Next.js keeps the request headers as they were.
     expect(response.headers.get("x-middleware-override-headers")).toBeNull();
     expect(warnings.at(-1)).toContain("A request was let through after an internal error");
+  });
+});
+
+describe("the policy withPosternaConfig builds in", () => {
+  const MONITOR = "version: 1\nmode: monitor\n";
+  // Options without a policy, so the adapter looks for one itself.
+  const lookup = (extra: PosternaNextOptions = {}) => options({ policy: undefined, ...extra });
+  const modeOf = (extra: PosternaNextOptions) => {
+    const posterna = createPosterna(lookup(extra));
+    const mode = posterna.engine.state().configuredMode;
+    const policy = posterna.policy;
+    posterna.close();
+    return { mode, policy };
+  };
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("is used without reading any file, and reported as agents.yaml", async () => {
+    const proxy = withPosterna(
+      lookup({
+        debugToken: "s3cret",
+        // As on Vercel: the file a run-time lookup would read is not there.
+        env: { POSTERNA_POLICY_TEXT: POLICY, POSTERNA_POLICY: "/nonexistent/agents.yaml" },
+      }),
+    );
+    const response = (await proxy(
+      request(DEBUG_PATH, { ...BROWSER, "x-posterna-debug-token": "s3cret" }),
+      event(),
+    )) as Response;
+    expect(await response.json()).toMatchObject({
+      policy: { source: "file", problem: null },
+      mode: "enforce",
+    });
+  });
+
+  it("is read from process.env.POSTERNA_POLICY_TEXT, which Next.js replaces at build time", () => {
+    vi.stubEnv("POSTERNA_POLICY_TEXT", POLICY);
+    expect(modeOf({ env: {} })).toEqual({
+      mode: "enforce",
+      policy: { source: "file", problem: null },
+    });
+  });
+
+  it("gives way to policy and policyPath in the options", () => {
+    const env = { POSTERNA_POLICY_TEXT: POLICY };
+    expect(modeOf({ env, policy: MONITOR })).toEqual({
+      mode: "monitor",
+      policy: { source: "options", problem: null },
+    });
+    const file = join(mkdtempSync(join(tmpdir(), "posterna-next-")), "agents.yaml");
+    writeFileSync(file, MONITOR);
+    expect(modeOf({ env, policyPath: file })).toEqual({
+      mode: "monitor",
+      policy: { source: "file", problem: null },
+    });
+  });
+
+  it("falls back to the built-in monitor policy when the copy is invalid", () => {
+    const warnings: string[] = [];
+    const { mode, policy } = modeOf({
+      env: { POSTERNA_POLICY_TEXT: "version: 7\n" },
+      onError: (m) => warnings.push(m),
+    });
+    expect(mode).toBe("monitor");
+    expect(policy.source).toBe("fallback");
+    expect(warnings[0]).toContain("agents.yaml is invalid");
+  });
+
+  it("is suggested when no policy file is found at run time", () => {
+    const warnings: string[] = [];
+    const { policy } = modeOf({
+      policyPath: "/nonexistent/agents.yaml",
+      onError: (m) => warnings.push(m),
+    });
+    expect(policy.problem).toContain("Wrap next.config in withPosternaConfig");
+    expect(warnings[0]).toBe(policy.problem);
   });
 });

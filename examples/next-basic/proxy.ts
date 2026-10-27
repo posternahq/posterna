@@ -1,8 +1,8 @@
 import { withPosterna } from "@posterna/next";
 
-// Posterna labels every request, applies agents.yaml (read from this folder,
-// or POSTERNA_POLICY) and passes the verdict to your pages and routes as the
-// X-Agent-* request headers. A fresh agents.yaml is in monitor mode: nothing
+// Posterna labels every request, applies agents.yaml (built in by
+// withPosternaConfig in next.config.ts) and passes the verdict to your pages
+// and routes as the X-Agent-* request headers. A fresh agents.yaml is in monitor mode: nothing
 // is blocked until you change it to enforce.
 export const proxy = withPosterna({
   // Next.js never gives a proxy the client's socket address, so Posterna reads

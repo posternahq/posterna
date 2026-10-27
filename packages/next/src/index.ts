@@ -39,15 +39,17 @@ export const RECOMMENDED_MATCHER = "/((?!_next/static|_next/image|favicon.ico).*
 
 export interface PosternaNextOptions extends ProxyOptions {
   /**
-   * The policy, as agents.yaml text or a parsed policy. Required on the Edge
-   * runtime, which cannot read files. On the Node.js runtime it defaults to the
-   * file at `policyPath`.
+   * The policy, as agents.yaml text or a parsed policy. Without it, the policy
+   * is the agents.yaml that `withPosternaConfig` (from `@posterna/next/config`)
+   * built into the proxy, else the file at `policyPath`, read at run time.
    */
   policy?: Policy | string;
   /**
-   * Path to agents.yaml on the Node.js runtime. Defaults to `POSTERNA_POLICY`,
-   * else `agents.yaml` in the working directory. A missing or invalid file is
-   * reported through `onError`, and every request is allowed.
+   * Path to agents.yaml, read at run time on the Node.js runtime. Setting it
+   * here skips the copy built in by `withPosternaConfig`; to build in a file
+   * from elsewhere, pass `policyPath` to `withPosternaConfig` instead. Defaults
+   * to `POSTERNA_POLICY`, else `agents.yaml` in the working directory. A missing
+   * or invalid file is reported through `onError`, and every request is allowed.
    */
   policyPath?: string;
   headers?: Partial<VerdictHeaderNames>;
@@ -124,6 +126,19 @@ function processEnv(): Record<string, string | undefined> {
 }
 
 /**
+ * The agents.yaml text that withPosternaConfig built into this bundle, if any.
+ * `process.env.POSTERNA_POLICY_TEXT` is written out in full because Next.js
+ * replaces exactly that expression with the text at build time.
+ */
+function builtPolicyText(): string | undefined {
+  try {
+    return typeof process === "undefined" ? undefined : process.env.POSTERNA_POLICY_TEXT;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Reads agents.yaml through process.getBuiltinModule, which bundlers do not
  * touch and the Edge runtime lacks. On failure, warns and returns the reason.
  */
@@ -139,7 +154,7 @@ function readPolicyFile(
   const fs = process?.getBuiltinModule?.("node:fs") as typeof import("node:fs") | undefined;
   if (!fs || !process?.cwd) {
     const problem =
-      "This runtime cannot read agents.yaml. Pass the policy text as `policy`, or use the Node.js runtime (Node 20.16 or later). Every request is allowed and labeled.";
+      "This runtime cannot read agents.yaml (that needs the Node.js runtime on Node 20.16 or later). Wrap next.config in withPosternaConfig from @posterna/next/config to build it in, or pass the policy text as `policy`. Every request is allowed and labeled.";
     warn(problem);
     return { text: FALLBACK_POLICY, problem };
   }
@@ -150,7 +165,7 @@ function readPolicyFile(
   } catch (error) {
     const problem =
       (error as { code?: string }).code === "ENOENT"
-        ? `No policy file at ${full}. Every request is allowed and labeled. Run \`npx posterna init\` to create one.`
+        ? `No policy file at ${full}. Every request is allowed and labeled. Wrap next.config in withPosternaConfig from @posterna/next/config to build agents.yaml into the proxy, or run \`npx posterna init\` to create one.`
         : `Could not read ${full} (${message(error)}). Every request is allowed and labeled.`;
     warn(problem);
     return { text: FALLBACK_POLICY, problem };
@@ -187,9 +202,17 @@ export function createPosterna(options: PosternaNextOptions = {}): Posterna {
   let engine: PolicyEngine;
   let policyLoad: PolicyLoad;
   try {
+    const built =
+      options.policyPath === undefined
+        ? (env.POSTERNA_POLICY_TEXT ?? builtPolicyText())
+        : undefined;
     if (options.policy !== undefined) {
       policyLoad = { source: "options", problem: null };
       engine = createPolicyEngine(options.policy, { verifier, env });
+    } else if (built !== undefined) {
+      // agents.yaml, copied into the build by withPosternaConfig.
+      policyLoad = { source: "file", problem: null };
+      engine = createPolicyEngine(built, { verifier, env });
     } else {
       const read = readPolicyFile(options.policyPath ?? env.POSTERNA_POLICY, warn);
       policyLoad = read.problem
