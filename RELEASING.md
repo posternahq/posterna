@@ -13,7 +13,7 @@ Check these once:
 - Your npm account has two-factor authentication on, for authorization and writes (npmjs.com → your avatar → Account → Two-Factor Authentication).
 - You are an owner of the npm organization `posterna` (https://www.npmjs.com/settings/posterna/members). The scoped packages publish into it.
 - You maintain the unscoped `posterna` package. It exists already, holding the placeholder versions `0.0.0-stage` and `0.0.1`; 0.1.0 becomes its `latest`.
-- Mail to security@posterna.com reaches you. SECURITY.md and the README give that address.
+- Mail to hello@posterna.com reaches you. It is the one contact address: SECURITY.md, the README, CONTRIBUTING.md, the code of conduct and posterna.com all give it.
 
 ## 1. Publish 0.1.0 by hand
 

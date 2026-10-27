@@ -67,4 +67,4 @@ Until installs restart onto the patch release, a restarted install trusts genera
 
 ## Reporting
 
-If you think a Posterna signing key has leaked, email security@posterna.com (SECURITY.md).
+If you think a Posterna signing key has leaked, email hello@posterna.com (SECURITY.md).

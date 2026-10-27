@@ -68,7 +68,7 @@ Read [docs/SPEC.md](docs/SPEC.md) before changing code, and [CONTRIBUTING.md](CO
 
 ## Security
 
-Report vulnerabilities to security@posterna.com. See [SECURITY.md](SECURITY.md).
+Report vulnerabilities to hello@posterna.com. See [SECURITY.md](SECURITY.md).
 
 ## License
 

@@ -4,7 +4,7 @@ Posterna runs inside other people's request paths, so security reports matter to
 
 ## Reporting a vulnerability
 
-Email **security@posterna.com**. Please do not open a public issue, pull request or discussion for a suspected vulnerability.
+Email **hello@posterna.com** and put "Security" in the subject. Please do not open a public issue, pull request or discussion for a suspected vulnerability.
 
 Include what you can of:
 
