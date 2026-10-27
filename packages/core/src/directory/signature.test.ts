@@ -1,4 +1,7 @@
 import type { webcrypto } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   decodeBase64Url,
@@ -58,9 +61,19 @@ describe("verifyDirectorySignature", () => {
     );
   });
 
-  it("rejects everything while the embedded key list is empty", async () => {
+  it("trusts the embedded production key, and only that by default", async () => {
+    // keys.json and its .sig as the Posterna cloud published them on 26 October 2026.
+    const here = dirname(fileURLToPath(import.meta.url));
+    const release = join(here, "..", "..", "test", "fixtures", "production-release");
+    const published = new Uint8Array(readFileSync(join(release, "keys.json")));
+    const publishedSignature = readFileSync(join(release, "keys.json.sig"), "utf8");
+    expect(TRUSTED_DIRECTORY_KEYS.map((key) => key.kid)).toEqual(["2026-10"]);
+    expect(await verifyDirectorySignature(published, publishedSignature)).toBe(true);
+
+    const tampered = published.slice();
+    tampered[20] = (tampered[20] ?? 0) ^ 1;
+    expect(await verifyDirectorySignature(tampered, publishedSignature)).toBe(false);
     const { sign } = await throwawayKey();
-    expect(TRUSTED_DIRECTORY_KEYS).toEqual([]);
     expect(await verifyDirectorySignature(file, await sign(file))).toBe(false);
   });
 

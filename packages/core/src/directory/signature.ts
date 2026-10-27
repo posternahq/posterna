@@ -15,14 +15,20 @@ export interface TrustedDirectoryKey {
 }
 
 /**
- * Public keys that may sign directory.json and keys.json.
+ * Public keys that may sign directory.json and keys.json: the public part of
+ * the Posterna cloud's POSTERNA_DIRECTORY_SIGNING_KEY.
  *
- * TODO: add Posterna's production directory signing public key(s) here before
- * the first release, together with the key rotation plan. While this list is
- * empty, no downloaded directory file can verify, so core must keep using the
- * snapshot bundled with the package.
+ * Rotation: add the new key here next to the current one and release core;
+ * switch the cloud's jobs to the new private key at least 7 days later; remove
+ * the old entry in a later release.
  */
-export const TRUSTED_DIRECTORY_KEYS: readonly TrustedDirectoryKey[] = [];
+export const TRUSTED_DIRECTORY_KEYS: readonly TrustedDirectoryKey[] = [
+  // Added 26 October 2026.
+  {
+    kid: "2026-10",
+    jwk: { kty: "OKP", crv: "Ed25519", x: "PcUCBGLBJ4zjasNQKZJI5FupfvUDtyey6NeLpxwaJyk" },
+  },
+];
 
 const ED25519_SIGNATURE_BYTES = 64;
 const ED25519_PUBLIC_KEY_BYTES = 32;

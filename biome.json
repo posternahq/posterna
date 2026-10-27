@@ -16,7 +16,8 @@
       "!packages/directory/raw",
       "!packages/directory/sources",
       "!conformance/vectors",
-      "!conformance/fixtures"
+      "!conformance/fixtures",
+      "!packages/core/test/fixtures"
     ]
   },
   "formatter": {
