@@ -297,7 +297,7 @@ If doctor cannot reach `https://posterna.com/v1/whoami`, it names that step. A n
 
 - **A crawler's first request is labeled pending.** For operators checked by reverse DNS, the lookup runs in the background, so the first request from an address that claims to be, for example, Googlebot is `declared_unverifiable` with the reason `rdns_pending`. Later requests from that address get the result: `verified_by_ip`, or `claimed_failed` (`rdns_unconfirmed`) for a fake. The counts show some `rdns_pending` for this reason.
 - **No client address locally.** With `clientIpHeader` set, a request to your local server has no client address (`no_client_address`) unless you send that header yourself, for example `curl -H "X-Real-IP: 203.0.113.7" http://localhost:3000/`.
-- **curl looks like automation.** curl sends no `Accept-Language`, so a plain curl request is `unknown_automation` (`missing_accept_language`). Add `-H "Accept-Language: en"` to look like a browser.
+- **curl looks like automation.** A plain curl request is `unknown_automation`: its User-Agent is not a browser's (`non_browser_user_agent`), and with a browser User-Agent it still sends no `Accept-Language` (`missing_accept_language`). To look like a browser, send both, for example `-A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" -H "Accept: text/html" -H "Accept-Language: en"`.
 
 ## 5. Optional: send counters
 
