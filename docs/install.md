@@ -100,6 +100,8 @@ matcher: ["/((?!_next/static|_next/image|favicon.ico|api/webhooks|ingest).*)"],
 
 In Next.js 16, the proxy always runs on the Node.js runtime, so it reads `agents.yaml` from the project folder and can do reverse DNS. Reading the file needs Node 20.16 or later. On older Node, Posterna logs a `[posterna]` warning and runs a built-in monitor policy without your rules; `posterna doctor` reports it.
 
+**On Vercel, the proxy cannot read `agents.yaml`.** Vercel deploys the proxy with only the code it imports, so the file is not there, and Posterna runs the built-in monitor policy without your rules. `posterna doctor` reports `FAIL Policy` with "No policy file at /var/task/agents.yaml" (measured on 27 October 2026). On Vercel, pass the policy text as `policy` instead, for example from a module that exports it as a string, and check with doctor that the policy in the adapter options is in use.
+
 Pages and route handlers read the verdict from the request headers:
 
 ```ts
@@ -194,12 +196,12 @@ Next.js never gives middleware or a proxy the socket address. With `clientIpHead
 
 ### Settings by host
 
-These settings come from each host's documentation, checked on 26 October 2026, and from test requests where the documentation is silent. `clientIpHeader` is recommended only where the host's own documentation says it overwrites the header, or where we have confirmed that on a live site (Railway). Hosts change their proxies. Confirm yours with `posterna doctor` (step 4), which sends forged copies of these headers to make sure they are ignored.
+These settings come from each host's documentation, checked on 26 October 2026, and from test requests where the documentation is silent. `clientIpHeader` is recommended only where the host's own documentation says it overwrites the header, or where we have confirmed that on a live site (Railway and Vercel). Hosts change their proxies. Confirm yours with `posterna doctor` (step 4), which sends forged copies of these headers to make sure they are ignored.
 
 | Host | Client address | `publicHost` | Confidence |
 |---|---|---|---|
 | Railway, with or without Cloudflare in front | `clientIpHeader: "x-real-ip"` | recommended | high: confirmed on a live site |
-| Vercel | `clientIpHeader: "x-vercel-forwarded-for"` | recommended | high |
+| Vercel | `clientIpHeader: "x-vercel-forwarded-for"` | recommended | high: confirmed on a live site (IPv4) |
 | Fly.io | `trustedProxies: 2` (`3` with Cloudflare in front) | recommended | high |
 | Render | `trustedProxies: 3` | recommended | low: check with doctor |
 | AWS Application Load Balancer | `trustedProxies:` your load balancer subnets' CIDRs | recommended; **required** with CloudFront | high |
@@ -218,6 +220,8 @@ The same values work for Express and Next.js on each host.
 
 **Vercel.**
 - Vercel overwrites `X-Forwarded-For` with the client's address and does not forward external values, to prevent spoofing. `x-vercel-forwarded-for` is documented as identical to it, and unlike `X-Forwarded-For` it is not overwritten by a proxy you put in front of Vercel ([request headers](https://vercel.com/docs/headers/request-headers)). Use `clientIpHeader: "x-vercel-forwarded-for"`; `trustedProxies: 1` also works.
+- Confirmed on 27 October 2026 on a live `*.vercel.app` site (Next.js 16, `@posterna/next` 0.1.1), from a home connection and from a GitHub Actions runner: `x-vercel-forwarded-for` carried the real client address, a forged copy was ignored, and the signed host and signature headers passed `posterna doctor`. `*.vercel.app` has no IPv6 address, so IPv6 was not checked.
+- The proxy cannot read `agents.yaml` on Vercel; see the Next.js 16 section above.
 - `X-Forwarded-Host` matches `Host`, the custom domain.
 - Vercel advises against putting your own reverse proxy in front of a project, because the real client address can then no longer be identified ([reverse proxy](https://vercel.com/docs/security/reverse-proxy)).
 - For Express on Vercel, `express.static()` files are served by Vercel's CDN and never reach the middleware ([Express on Vercel](https://vercel.com/docs/frameworks/backend/express)).
