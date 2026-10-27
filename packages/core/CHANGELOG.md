@@ -1,5 +1,12 @@
 # @posterna/core
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [3a7999d]
+  - @posterna/directory@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

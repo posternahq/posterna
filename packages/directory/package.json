@@ -1,6 +1,6 @@
 {
   "name": "@posterna/directory",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The open Posterna directory of AI agent and crawler operators, with its build pipeline.",
   "keywords": [
     "ai-agents",

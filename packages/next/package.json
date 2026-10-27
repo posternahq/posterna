@@ -1,6 +1,6 @@
 {
   "name": "@posterna/next",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Next.js integration for Posterna: verify AI agents and crawlers and apply policy.",
   "keywords": [
     "ai-agents",
