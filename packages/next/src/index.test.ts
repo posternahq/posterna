@@ -218,7 +218,7 @@ describe("@posterna/next", () => {
       request(DEBUG_PATH, { ...BROWSER, "x-posterna-debug-token": "s3cret" }),
       event(),
     )) as Response;
-    expect((await fallback.json()).policy).toMatchObject({
+    expect(((await fallback.json()) as { policy: unknown }).policy).toMatchObject({
       source: "fallback",
       problem: expect.stringContaining("No policy file at /nonexistent/agents.yaml"),
     });
