@@ -95,22 +95,51 @@ Afterwards:
 
 ## 3. Set up trusted publishing
 
-Do this once, after 0.1.0 is on npm and the repository is public. npm adds provenance only for packages built in a public repository.
+Two settings on each package. Lock down publishing access right after 0.1.0 is on npm. Add the trusted publisher on the day you push the next release tag: npm expires a new trusted publisher that has not completed a publish within 2 days, and a workflow run that publishes nothing does not count. npm adds provenance only for packages built in a public repository.
 
-In GitHub, create the environment the workflow uses: Settings → Environments → New environment → `npm`. Optionally add yourself as a required reviewer, so that every release waits for your approval, and limit it to tags matching `v*`.
+The five packages' settings pages:
 
-On npmjs.com, for each of the five packages (`posterna`, `@posterna/core`, `@posterna/directory`, `@posterna/express`, `@posterna/next`):
+- https://www.npmjs.com/package/posterna/access
+- https://www.npmjs.com/package/@posterna/core/access
+- https://www.npmjs.com/package/@posterna/directory/access
+- https://www.npmjs.com/package/@posterna/express/access
+- https://www.npmjs.com/package/@posterna/next/access
 
-1. Open the package page, then **Settings**.
-2. Under **Trusted Publisher**, choose **GitHub Actions** and fill in:
-   - Organization or user: `posternahq`
-   - Repository: `posterna`
-   - Workflow filename: `release.yml`
-   - Environment name: `npm`
-3. Save. npm asks for your second factor.
-4. Under **Publishing access**, choose **Require two-factor authentication and disallow tokens**, and save. Trusted publishing keeps working; tokens stop.
+### Publishing access (right after 0.1.0)
+
+On each settings page:
+
+1. Under **Publishing access**, select **Require two-factor authentication and disallow tokens**.
+2. Click **Update Package Settings**, and confirm with your second factor.
+
+Access tokens can then no longer publish. Your own `npm publish` with your second factor still works, and so does trusted publishing, which does not use tokens.
+
+### The GitHub environment (once)
+
+The workflow publishes from the GitHub environment `npm`.
+
+1. Open https://github.com/posternahq/posterna/settings/environments and click **New environment**. Name it `npm` and click **Configure environment**.
+2. Optional: under **Required reviewers**, add yourself and click **Save protection rules**. Every release then waits for your approval in the Actions tab.
+3. Under **Deployment branches and tags**, choose **Selected branches and tags**, click **Add deployment branch or tag rule**, set the type to **Tag** and the pattern to `v*`, and click **Add rule**.
+
+### The trusted publisher (just before the next release)
+
+On each settings page:
+
+1. Under **Trusted Publisher**, in **Select your publisher**, click **GitHub Actions**.
+2. Fill in the form exactly; every field is case-sensitive:
+   - **Organization or user**: `posternahq`
+   - **Repository**: `posterna`
+   - **Workflow filename**: `release.yml` (the file name only, without `.github/workflows/`)
+   - **Environment name**: `npm`
+3. Under **Allowed actions**, turn on publishing directly with `npm publish`. The workflow publishes directly; staged publishing (`npm stage publish`) is always allowed but is not what it runs. Leave dist-tag changes off.
+4. Click **Add trusted publisher**, and confirm with your second factor.
+
+npm does not check the form when you save it; a mistake shows up as a failed publish. If a trusted publisher expires before its first publish, delete it and add it again. An existing one cannot be edited, only deleted and added again.
 
 ## 4. Later releases
+
+For the first release from the workflow, add the trusted publishers (section 3) on the same day, before you push the tag.
 
 1. Pull requests that change a published package include a changeset (`pnpm changeset`).
 2. To release, on an up-to-date `main`:
@@ -132,7 +161,7 @@ On npmjs.com, for each of the five packages (`posterna`, `@posterna/core`, `@pos
    git push origin vX.Y.Z
    ```
 
-4. In the Actions tab, approve the run if the `npm` environment requires it. The workflow checks that every package's version matches the tag, runs the checks and the tests, and publishes.
+4. In the Actions tab, approve the run if the `npm` environment requires it. The workflow checks that every package's version matches the tag, runs the checks and the tests, and publishes. The Publish step's log shows a provenance statement being signed and a `+ name@version` line for each package.
 5. Check that https://www.npmjs.com/package/@posterna/core shows the new version with a provenance badge.
 
-If the workflow fails partway, fix the cause and re-run it. Versions already on npm are skipped.
+If the workflow fails partway, fix the cause and re-run it. Versions already on npm are skipped. A failure in the Publish step that mentions authentication or OIDC usually means a trusted publisher field does not match (check each one, and the environment name) or the trusted publisher expired.
