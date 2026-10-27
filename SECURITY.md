@@ -22,6 +22,10 @@ Posterna is a small project, so response times are best effort.
 - We will confirm whether we can reproduce it, tell you what we plan to do, and keep you updated until it is resolved.
 - We prefer coordinated disclosure: we release a fix first, then publish an advisory on GitHub. We credit reporters who want credit.
 
+## Signing keys
+
+The keys that sign the published directory, who holds them, and the runbook for a leaked or lost key are in [docs/KEYS.md](docs/KEYS.md). If you think one of them has leaked, report it as above.
+
 ## Supported versions
 
 Posterna is pre-release. Fixes go to the `main` branch and, once packages are published, to the latest release of each package.
@@ -34,7 +38,7 @@ In scope:
 - Getting a verified verdict (`verified_by_signature` or `verified_by_ip`) without controlling the operator's keys or addresses, including through forwarding headers or inbound `X-Agent-*` and `X-Posterna-*` headers that survive stripping.
 - A crafted request that makes Posterna block, crash, throw into the application, or add significant latency, when it should fail open.
 - Posterna fetching a URL taken from an incoming request, or logging or sending client IPs, full URLs, header values or bodies.
-- Accepting a `directory.json` or `keys.json` whose signature does not verify against the embedded keys.
+- Accepting a `directory.json` or `keys.json` whose signature does not verify against the embedded keys, that a retired key generation signed, or that is older than the loaded copy.
 - Directory data errors that would let someone pass verification, such as a wrong key directory URL or IP list.
 - The build and release process in this repository: CI workflows, package contents and install-time behavior.
 

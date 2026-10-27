@@ -23,3 +23,7 @@ coverage/
 packages/directory/raw/*
 !packages/directory/raw/manifest.json
 !packages/directory/raw/findings.json
+
+# Private keys never enter the repository (docs/KEYS.md)
+*.jwk.json
+posterna-keys/

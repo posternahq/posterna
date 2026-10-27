@@ -10,7 +10,13 @@ function throwawayKey() {
   const pub = publicKey.export({ format: "jwk" });
   return {
     privateJwk: JSON.stringify(jwk),
-    trusted: { kid: "test", jwk: { kty: "OKP" as const, crv: "Ed25519" as const, x: pub.x ?? "" } },
+    trusted: {
+      kid: "test",
+      role: "primary" as const,
+      generation: 1,
+      added: "2026-10-26",
+      jwk: { kty: "OKP" as const, crv: "Ed25519" as const, x: pub.x ?? "" },
+    },
   };
 }
 

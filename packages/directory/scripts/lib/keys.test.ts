@@ -1,3 +1,4 @@
+import { generateKeyPairSync } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { checkPublicJwk, jwkThumbprint, kidConvention, parseKeyDirectory } from "./keys";
 
@@ -46,10 +47,9 @@ describe("checkPublicJwk", () => {
   });
 
   it("rejects a key that publishes private material", () => {
-    const result = checkPublicJwk({
-      ...RFC8037_PUBLIC,
-      d: "nWGxne_9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A",
-    });
+    // A throwaway private key made here, so no private key is ever committed.
+    const throwaway = generateKeyPairSync("ed25519").privateKey.export({ format: "jwk" });
+    const result = checkPublicJwk({ ...throwaway });
     expect(result).toEqual({
       ok: false,
       reason: expect.stringContaining("private key members (d)"),

@@ -14,7 +14,7 @@ conformance/
   fixtures/directory.json        operator directory used by every verify, decide and robots vector
   fixtures/keys.json             signing keys for the fixture operators
   fixtures/keys/*.json           throwaway Ed25519 private keys (test use only)
-  fixtures/directory-signer.json public key the runner trusts for refresh tests
+  fixtures/directory-signers.json trusted-key list the runner uses for refresh tests (generations 1 and 2)
   fixtures/key-directories/      snapshots of live operator key directories
 ```
 
@@ -43,7 +43,7 @@ The fixture directory holds synthetic operators under reserved names (`.example`
       "expected": { "verdict": "verified_by_ip", "reason": null, "operator": "rdns-crawler", "agent": "ExampleRdnsBot", "purpose": "training", "method": "rdns", "error": false }
     }
   ],
-  "expected_state": { "proxySuspect": false, "keys_refresh_requested": true, "fetches": 0, "errors_at_least": 1 }
+  "expected_state": { "proxySuspect": false, "keys_refresh_requested": true, "fetches": 0, "errors_at_least": 1, "directory_version": "2026-10-26", "directory_key_generation": 1 }
 }
 ```
 
@@ -51,10 +51,10 @@ The fixture directory holds synthetic operators under reserved names (`.example`
 - `config` holds verifier options. Absent means defaults (docs/SPEC.md section 12).
 - `dns` answers reverse and forward lookups. `null` means the runtime has no DNS (edge). Absent means every lookup finds nothing.
 - `inject` simulates failures: a `missing` or `malformed` snapshot, a DNS `timeout` or `error`, an `invalid` clock, or a signature library that `throws`.
-- `refresh`, when enabled, makes the runner trust `fixtures/directory-signer.json` and answer downloads from `responses` (keyed by file name under the base URL; anything else is 404). Without it, refresh is off.
-- Each step either has `"action": "refresh"` (refresh the directory now) or a `request` and its `expected` result. `headers` is an ordered list of name and value pairs because order and repeats matter. `settle_before` waits for background work (reverse DNS lookups, refreshes) before the step. `repeat` sends the same request that many times.
+- `refresh`, when enabled, makes the runner trust the keys in `fixtures/directory-signers.json` and answer downloads from `responses` (keyed by file name under the base URL; anything else is 404). Without it, refresh is off. Each vector starts with a fresh trusted list, so the generation ratchet (docs/SPEC.md section 3.1) never carries over from one vector to the next.
+- Each step either has `"action": "refresh"` (refresh directory.json and then keys.json now) or a `request` and its `expected` result. A refresh step may carry its own `responses`, which replace what the server answers from that step on. `headers` is an ordered list of name and value pairs because order and repeats matter. `settle_before` waits for background work (reverse DNS lookups, refreshes) before the step. `repeat` sends the same request that many times.
 - `expected` fields: `verdict` always; `reason` (the reason code, `null` when there must be none); `operator`, `agent`, `purpose` (`null` means absent); `method`; `error` (whether `error` is set, meaning a fail-open path was taken); optionally `stripped` (inbound headers removed), `client` (the resolved client address) and `verdict_headers`.
-- `expected_state` is checked after all steps: the proxy guard, whether an early keys refresh was requested, how many fetches happened, and a minimum error count.
+- `expected_state` is checked after all steps: the proxy guard, whether an early keys refresh was requested, how many fetches happened, a minimum (`errors_at_least`) or exact (`errors`) error count, the loaded `directory_version` and `keys_version`, and `directory_key_generation`, the lowest signing-key generation the install still accepts.
 
 ### `rfc9421`
 

@@ -1,6 +1,6 @@
 {
   "id": "key-directories/browserbase",
-  "description": "Snapshot of browserbase's live key directory, fetched 2026-10-26T21:37:52.095Z. Parsing, kid convention and RFC 7638 thumbprints (expected values computed by the directory pipeline with jose).",
+  "description": "Snapshot of browserbase's live key directory, fetched 2026-10-26T23:06:40.182Z. Parsing, kid convention and RFC 7638 thumbprints (expected values computed by the directory pipeline with jose).",
   "spec": [
     "3.2",
     "11"

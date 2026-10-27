@@ -25,6 +25,8 @@ export interface DebugReport {
     ready: boolean;
     directoryVersion: string | null;
     keysVersion: string | null;
+    /** The lowest directory signing-key generation accepted; null when refresh is off. */
+    keyGeneration: number | null;
     reverseDns: boolean;
   };
   mode: "monitor" | "enforce";
@@ -97,6 +99,7 @@ export function debugReport(input: {
       ready: verifierState.ready,
       directoryVersion: verifierState.directoryVersion,
       keysVersion: verifierState.keysVersion,
+      keyGeneration: verifierState.directoryKeyGeneration,
       reverseDns: verifierState.reverseDnsAvailable,
     },
     mode: policyState.mode,

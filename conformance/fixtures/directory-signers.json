@@ -1,0 +1,27 @@
+{
+  "note": "Throwaway trusted-key list the conformance runner uses for refresh vectors. The private halves are in keys/, named after each generation.",
+  "keys": [
+    {
+      "kid": "0jMSuhNwafcTpnO1Z5XzZNpGopujoE2FpJyZT2YrVdo",
+      "role": "primary",
+      "generation": 1,
+      "added": "2026-10-26",
+      "jwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "tKjNuvp3MDe8YdIpmg2gNZJKNWufHb5Dmn5a56uC8FQ"
+      }
+    },
+    {
+      "kid": "2JLxTGBkT5AYjZInRLk6__tu_RM3fdQtAm3ZBtXmsS4",
+      "role": "backup",
+      "generation": 2,
+      "added": "2026-10-26",
+      "jwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "QANtKviZgB2s1e4dhwk5j5nmbIFH3Lb1hkq1OhlXoYE"
+      }
+    }
+  ]
+}

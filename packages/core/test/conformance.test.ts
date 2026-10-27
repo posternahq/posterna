@@ -11,6 +11,7 @@ import { describe, expect, it } from "vitest";
 import { jwkToKeyID, verify as webBotAuthVerify } from "web-bot-auth";
 import { verifierFromJWK } from "web-bot-auth/crypto";
 import { buildIndex } from "../src/directory/index-builder";
+import type { TrustedDirectoryKey } from "../src/directory/signature";
 import type { DirectoryFile, KeysFile, OperatorRecord } from "../src/directory/types";
 import { emitRobots } from "../src/policy/emit";
 import { createPolicyEngine } from "../src/policy/engine";
@@ -49,8 +50,10 @@ interface Expected {
   client?: { address: string | null };
   verdict_headers?: Record<string, string>;
 }
+type Served = { status: number; body: string };
 interface Step {
   action?: "refresh";
+  responses?: Record<string, Served>;
   settle_before?: boolean;
   repeat?: number;
   request?: RequestSpec;
@@ -69,13 +72,17 @@ interface VerifyVector {
     clock?: "invalid";
     signature_library?: "throws";
   };
-  refresh?: { enabled: boolean; responses: Record<string, { status: number; body: string }> };
+  refresh?: { enabled: boolean; responses: Record<string, Served> };
   steps: Step[];
   expected_state?: {
     proxySuspect?: boolean;
     keys_refresh_requested?: boolean;
     fetches?: number;
     errors_at_least?: number;
+    errors?: number;
+    directory_version?: string | null;
+    keys_version?: string | null;
+    directory_key_generation?: number | null;
   };
 }
 interface Rfc9421Vector {
@@ -192,9 +199,9 @@ const fixtures = {
   directory: read("fixtures/directory.json") as DirectoryFile,
   keys: read("fixtures/keys.json") as KeysFile,
 };
-const directorySigner = (
-  read("fixtures/directory-signer.json") as { jwk: { kty: "OKP"; crv: "Ed25519"; x: string } }
-).jwk;
+const directorySigners = (
+  read("fixtures/directory-signers.json") as { keys: TrustedDirectoryKey[] }
+).keys;
 
 function fakeDns(vector: VerifyVector): DnsResolver | null {
   if (vector.dns === null) return null;
@@ -244,10 +251,11 @@ function buildRequest(spec: RequestSpec, api: "fetch" | "node"): Request | Incom
 
 async function runVerify(vector: VerifyVector, api: "fetch" | "node"): Promise<void> {
   const fetches: string[] = [];
+  let served = vector.refresh?.responses ?? {};
   const fakeFetch = (async (input: string | URL) => {
     const url = String(input);
     fetches.push(url);
-    const response = vector.refresh?.responses[url.slice(BASE_URL.length)];
+    const response = served[url.slice(BASE_URL.length)];
     return new Response(response?.body ?? "", { status: response?.status ?? 404 });
   }) as typeof fetch;
   const snapshot =
@@ -268,7 +276,8 @@ async function runVerify(vector: VerifyVector, api: "fetch" | "node"): Promise<v
       refresh,
       baseUrl: BASE_URL,
       fetch: fakeFetch,
-      trustedKeys: refresh ? [{ kid: "conformance", jwk: directorySigner }] : [],
+      // A fresh list per vector: the generation ratchet never carries over between vectors.
+      trustedKeys: refresh ? directorySigners.map((key) => ({ ...key })) : [],
     },
     ...(vector.inject?.signature_library === "throws"
       ? { signatureLibrary: THROWING_LIBRARY }
@@ -277,6 +286,7 @@ async function runVerify(vector: VerifyVector, api: "fetch" | "node"): Promise<v
   try {
     for (const [index, step] of vector.steps.entries()) {
       if (step.action === "refresh") {
+        if (step.responses) served = step.responses;
         await verifier.refresh();
         continue;
       }
@@ -331,6 +341,12 @@ async function runVerify(vector: VerifyVector, api: "fetch" | "node"): Promise<v
     if (want?.fetches !== undefined) expect(fetches).toHaveLength(want.fetches);
     if (want?.errors_at_least !== undefined)
       expect(state.errors).toBeGreaterThanOrEqual(want.errors_at_least);
+    if (want?.errors !== undefined) expect(state.errors, state.lastError ?? "").toBe(want.errors);
+    if (want?.directory_version !== undefined)
+      expect(state.directoryVersion).toBe(want.directory_version);
+    if (want?.keys_version !== undefined) expect(state.keysVersion).toBe(want.keys_version);
+    if (want?.directory_key_generation !== undefined)
+      expect(state.directoryKeyGeneration).toBe(want.directory_key_generation);
   } finally {
     verifier.close();
   }

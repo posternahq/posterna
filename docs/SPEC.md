@@ -35,7 +35,26 @@ Principles, in priority order:
 - `keys.json`: the current public keys fetched from each signing operator's key directory URL as listed in directory.json. Refreshed hourly by the Posterna cloud service without review, because the trust decision (which URL) was already reviewed and the key material comes from the operator's own HTTPS endpoint.
 - `agents.csv`, `summary.json`: flat export and counts.
 
-Both JSON files are published at `https://posterna.com/v1/directory.json` and `https://posterna.com/v1/keys.json`, each with a detached signature at the same URL plus `.sig`: Ed25519 over the exact file bytes, base64url. `@posterna/core` embeds the list of trusted Posterna directory public keys and rejects any file whose signature does not verify. Every package release also bundles a snapshot of both files as the fallback.
+Both JSON files are published at `https://posterna.com/v1/directory.json` and `https://posterna.com/v1/keys.json`, each with a detached signature at the same URL plus `.sig`: Ed25519 over the exact file bytes, base64url. Every package release also bundles a snapshot of both files as the fallback.
+
+Trusted keys. `@posterna/core` embeds `TRUSTED_DIRECTORY_KEYS`, a list of `{ kid, role, generation, added, jwk }`:
+
+- `kid`: the RFC 7638 SHA-256 thumbprint of `jwk`, base64url.
+- `role`: `primary` (its private half signs the published files and lives only in the cloud's environment) or `backup` (its private half is kept offline).
+- `generation`: a positive integer, one per key, that grows with each new key.
+- `added`: the date the key joined the list, `YYYY-MM-DD`.
+- `jwk`: `{ kty: "OKP", crv: "Ed25519", x }` and no other member.
+
+Every release from 0.1.0 trusts a primary and a backup, so the cloud can switch to the backup without every install upgrading first. `docs/KEYS.md` has the key table, who holds which private key, planned rotation and the emergency runbook.
+
+Accepting a downloaded file. This runs on refresh, never on the request path.
+
+1. Signature: the file is accepted only if its signature verifies under a trusted key at or above the install's minimum generation. Keys are tried from the highest generation down.
+2. Ratchet: the minimum generation starts at the lowest generation in the list. When a file verifies under generation N, the minimum rises to N, and files signed only by lower generations are rejected from then on. The minimum is kept in memory only and is shared by every directory store in the process that uses the same trusted list; a restart starts again from the lowest generation.
+3. Anti-rollback: a file signed at the same generation as the loaded copy must not carry an older `version` (`YYYY-MM-DD` for directory.json, `YYYY-MM-DDTHH` for keys.json) than the copy already loaded. The same version is accepted. The bundled snapshot counts as signed at the lowest generation. A file signed at a higher generation replaces the loaded copy whatever its version, so a far-future version signed with a leaked older key cannot block the switch to a newer one.
+4. Any rejection keeps the last good copy, increments the error counter and records a specific reason in the last error: `download_failed`, `signature_malformed`, `signature_untrusted`, `signature_retired` (verifies only under a generation below the minimum), `invalid_file`, `version_rollback` or `directory_missing`. It never throws and never blocks a request (4.8).
+
+The verifier state and the debug route report the current minimum generation (`directoryKeyGeneration`, `keyGeneration`).
 
 Build pipeline (in `packages/directory`):
 
@@ -255,7 +274,7 @@ Operator and purpose rules come before defaults, so they also apply to unverifie
 - Express: `app.use(posterna(options))`. Sets `req.posterna` (VerdictResult, Decision, and `decide(context)` for sign-up routes) and the verdict headers, applies enforced actions, records counters with response bytes from `Content-Length`. Policy from `policyPath`, `POSTERNA_POLICY` or `agents.yaml` in the working directory; a missing or invalid file is reported and every request is allowed.
 - Next.js: `withPosterna(options, handler?)` for proxy.ts (Next 16, Node.js runtime) and middleware.ts (Next 15; the Node.js runtime from 15.5, else Edge). It composes with an existing proxy or middleware function, which runs after it and reads the verdict with `getPosterna(request)`; the verdict headers reach the app through Next.js's request-header override, merged with any the function sets. Flushes counters through the event's `waitUntil`. On the Edge runtime there is no reverse DNS and no file access (pass the policy text). Route handlers verify and decide with `createPosterna()`; they run in another bundle, so they count nothing themselves.
 - Settings come from options, else `POSTERNA_POLICY`, `POSTERNA_SITE_KEY`, `POSTERNA_DEBUG_TOKEN`, `POSTERNA_MODE` and `POSTERNA_BASE_URL` (the cloud, for counters and directory refreshes). Install guide: `docs/install.md`.
-- Debug route `/.well-known/posterna/debug`: disabled unless `POSTERNA_DEBUG_TOKEN` is set, and then only answers requests carrying that token in `X-Posterna-Debug-Token`. Returns JSON: resolved client IP, which header or hop produced it, and the configured `clientIpHeader` when it was consulted, the host used for `@authority`, which signature headers arrived, the verdict for this request, directory version, mode and active suspensions. Used by `posterna doctor`.
+- Debug route `/.well-known/posterna/debug`: disabled unless `POSTERNA_DEBUG_TOKEN` is set, and then only answers requests carrying that token in `X-Posterna-Debug-Token`. Returns JSON: resolved client IP, which header or hop produced it, and the configured `clientIpHeader` when it was consulted, the host used for `@authority`, which signature headers arrived, the verdict for this request, directory version, the lowest directory signing-key generation it still accepts (3.1), mode and active suspensions. Used by `posterna doctor`.
 
 ## 7. Counters client
 
@@ -294,7 +313,7 @@ Response: `{ "accepted": <n>, "modeOverride": null | "monitor" }`. `modeOverride
 
 1. Strip inbound verdict headers (4.7).
 2. Never fetch a URL taken from a request (no SSRF from customer servers).
-3. Verify signatures on directory.json and keys.json against embedded keys; reject unsigned or invalid files.
+3. Verify signatures on directory.json and keys.json against embedded keys; reject unsigned or invalid files, files signed by a retired key generation, and older versions (3.1).
 4. Trusted-proxy handling as in 4.2; with no configuration, ignore forwarding headers.
 5. Never log or transmit IPs, full URLs, header values or bodies.
 6. Fail open everywhere (4.8).

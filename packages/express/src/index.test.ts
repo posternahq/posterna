@@ -290,6 +290,7 @@ paths:
         lastError: null,
         directoryVersion: null,
         keysVersion: null,
+        directoryKeyGeneration: null,
         reverseDnsAvailable: false,
       }),
       operator: () => undefined,

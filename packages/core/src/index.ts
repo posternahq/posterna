@@ -24,12 +24,23 @@ export {
   runtimeName,
 } from "./counters/counters";
 export {
+  checkDirectorySignature,
+  type DirectoryKeyRole,
+  type DirectoryPublicJwk,
+  type DirectorySignatureFailure,
+  type DirectorySignatureResult,
   decodeBase64Url,
+  directoryKeyThumbprint,
   TRUSTED_DIRECTORY_KEYS,
   type TrustedDirectoryKey,
   verifyDirectorySignature,
 } from "./directory/signature";
-export { DEFAULT_BASE_URL, type DirectoryOptions, type DirectorySnapshot } from "./directory/store";
+export {
+  DEFAULT_BASE_URL,
+  type DirectoryOptions,
+  type DirectoryRefreshFailure,
+  type DirectorySnapshot,
+} from "./directory/store";
 export type * from "./directory/types";
 export {
   contentSignalLines,

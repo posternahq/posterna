@@ -58,6 +58,11 @@ export interface VerifierState {
   lastError: string | null;
   directoryVersion: string | null;
   keysVersion: string | null;
+  /**
+   * The lowest directory signing-key generation this install still accepts
+   * (docs/KEYS.md). Null when directory refresh is off.
+   */
+  directoryKeyGeneration: number | null;
   reverseDnsAvailable: boolean;
 }
 
@@ -388,6 +393,7 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
         lastError: lastError ?? store.lastError ?? rdns.lastError,
         directoryVersion: index?.directoryVersion ?? null,
         keysVersion: index?.keysVersion ?? null,
+        directoryKeyGeneration: store.refreshEnabled ? store.minGeneration : null,
         reverseDnsAvailable: rdns.available,
       };
     },

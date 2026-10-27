@@ -9,7 +9,7 @@
 // deterministic, so running this again with the same keys gives the same files.
 
 import type { webcrypto } from "node:crypto";
-import { createHash, generateKeyPairSync } from "node:crypto";
+import { createHash, createPrivateKey, generateKeyPairSync, sign as signBytes } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -449,8 +449,15 @@ interface Expected {
   verdict_headers?: Record<string, string>;
 }
 
+interface Served {
+  status: number;
+  body: string;
+}
+
 interface Step {
   action?: "refresh";
+  /** On a refresh step: what the server answers from this step on. */
+  responses?: Record<string, Served>;
   settle_before?: boolean;
   repeat?: number;
   request?: RequestSpec;
@@ -2139,14 +2146,177 @@ async function failureVectors(): Promise<void> {
   );
 }
 
+// ---------------------------------------------------------------- directory refresh
+
+/** The trusted-key list the runner uses for refresh vectors: two throwaway generations. */
+const DIRECTORY_SIGNERS = [
+  { name: "directory-signer", role: "primary", generation: 1 },
+  { name: "directory-signer-gen2", role: "backup", generation: 2 },
+] as const;
+
+async function directorySigners() {
+  return Promise.all(
+    DIRECTORY_SIGNERS.map(async ({ name, role, generation }) => {
+      const jwk = publicJwk(fixtureKey(name));
+      return { kid: await thumbprint(jwk), role, generation, added: FIXTURE_DATE, jwk };
+    }),
+  );
+}
+
+/** A file and its detached signature (docs/SPEC.md section 3.1), signed by a fixture key. */
+function signedFile(name: string, value: unknown, key: string): Record<string, Served> {
+  const body = JSON.stringify(value);
+  const signature = signBytes(
+    null,
+    Buffer.from(body),
+    createPrivateKey({ key: { ...fixtureKey(key) }, format: "jwk" }),
+  ).toString("base64url");
+  return {
+    [name]: { status: 200, body },
+    [`${name}.sig`]: { status: 200, body: signature },
+  };
+}
+
+function refreshVectors(directory: DirectoryFile, keys: KeysFile): void {
+  const dir = (version: string, key: string) =>
+    signedFile("directory.json", { ...directory, version }, key);
+  const keysFile = (version: string, key: string) =>
+    signedFile("keys.json", { ...keys, version }, key);
+  const gen1 = "directory-signer";
+  const gen2 = "directory-signer-gen2";
+  const vector = (
+    id: string,
+    description: string,
+    steps: Step[],
+    expected: Record<string, unknown>,
+  ) =>
+    vectors.push({
+      id: `refresh/${id}`,
+      description,
+      spec: ["3.1", "3.4", "4.8"],
+      type: "verify",
+      now: NOW_ISO,
+      refresh: { enabled: true, responses: {} },
+      steps,
+      expected_state: expected,
+    });
+
+  vector(
+    "generation-1-accepted",
+    "directory.json and keys.json signed by the generation 1 key, with newer versions, replace the loaded copies. The minimum generation stays 1.",
+    [
+      {
+        action: "refresh",
+        responses: { ...dir("2026-10-27", gen1), ...keysFile("2026-10-26T13", gen1) },
+      },
+    ],
+    {
+      directory_version: "2026-10-27",
+      keys_version: "2026-10-26T13",
+      directory_key_generation: 1,
+      errors: 0,
+    },
+  );
+  vector(
+    "generation-2-accepted",
+    "Files signed by the generation 2 (backup) key are accepted, and the install ratchets: its minimum generation becomes 2.",
+    [
+      {
+        action: "refresh",
+        responses: { ...dir("2026-10-27", gen2), ...keysFile("2026-10-26T13", gen2) },
+      },
+    ],
+    {
+      directory_version: "2026-10-27",
+      keys_version: "2026-10-26T13",
+      directory_key_generation: 2,
+      errors: 0,
+    },
+  );
+  vector(
+    "retired-generation-rejected",
+    "After a generation 2 file is accepted, files signed only by generation 1 are rejected, even with newer versions. The generation 2 copy stays loaded.",
+    [
+      {
+        action: "refresh",
+        responses: { ...dir("2026-10-27", gen2), ...keysFile("2026-10-26T13", gen2) },
+      },
+      {
+        action: "refresh",
+        responses: { ...dir("2026-10-28", gen1), ...keysFile("2026-10-26T14", gen1) },
+      },
+    ],
+    {
+      directory_version: "2026-10-27",
+      keys_version: "2026-10-26T13",
+      directory_key_generation: 2,
+      errors: 2,
+    },
+  );
+  vector(
+    "rollback-rejected",
+    "Correctly signed files whose versions are older than the loaded copies are rejected; the loaded copies stay. The same version again is accepted.",
+    [
+      {
+        action: "refresh",
+        responses: { ...dir("2026-10-25", gen1), ...keysFile("2026-10-26T11", gen1) },
+      },
+      {
+        action: "refresh",
+        responses: { ...dir("2026-10-26", gen1), ...keysFile("2026-10-26T12", gen1) },
+      },
+    ],
+    {
+      directory_version: "2026-10-26",
+      keys_version: "2026-10-26T12",
+      directory_key_generation: 1,
+      errors: 2,
+    },
+  );
+  vector(
+    "higher-generation-replaces-any-version",
+    "A far-future version signed by generation 1 (as a leaked key could make) does not block the switch: a generation 2 file with an older version replaces it.",
+    [
+      {
+        action: "refresh",
+        responses: { ...dir("2099-12-31", gen1), ...keysFile("2099-12-31T00", gen1) },
+      },
+      {
+        action: "refresh",
+        responses: { ...dir("2026-10-27", gen2), ...keysFile("2026-10-26T13", gen2) },
+      },
+    ],
+    {
+      directory_version: "2026-10-27",
+      keys_version: "2026-10-26T13",
+      directory_key_generation: 2,
+      errors: 0,
+    },
+  );
+  const tampered = dir("2026-10-27", gen1);
+  const tamperedBody = tampered["directory.json"];
+  if (tamperedBody) tamperedBody.body = tamperedBody.body.replace("2026-10-27", "2026-10-28");
+  vector(
+    "tampered-or-unknown-signer-rejected",
+    "A directory.json changed after signing, and a keys.json validly signed by a key that is not in the trusted list, are both rejected; the loaded copies stay.",
+    [{ action: "refresh", responses: { ...tampered, ...keysFile("2026-10-26T13", "rogue") } }],
+    {
+      directory_version: "2026-10-26",
+      keys_version: "2026-10-26T12",
+      directory_key_generation: 1,
+      errors: 2,
+    },
+  );
+}
+
 async function main(): Promise<void> {
   const { directory, keys } = await buildFixtures();
   write(join(FIXTURES, "directory.json"), directory);
   write(join(FIXTURES, "keys.json"), keys);
   fixtureKey("rogue");
-  write(join(FIXTURES, "directory-signer.json"), {
-    note: "Throwaway key the conformance runner trusts for refresh tests. Its private half is in keys/directory-signer.json.",
-    jwk: publicJwk(fixtureKey("directory-signer")),
+  write(join(FIXTURES, "directory-signers.json"), {
+    note: "Throwaway trusted-key list the conformance runner uses for refresh vectors. The private halves are in keys/, named after each generation.",
+    keys: await directorySigners(),
   });
 
   rmSync(VECTORS, { recursive: true, force: true });
@@ -2159,6 +2329,7 @@ async function main(): Promise<void> {
   headerVectors();
   automationSignalVectors();
   await failureVectors();
+  refreshVectors(directory, keys);
   const templates = Object.fromEntries(
     ["monitor", "allow-list", "saas-signup"].map((name) => [
       name,

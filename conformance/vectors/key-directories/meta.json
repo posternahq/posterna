@@ -1,6 +1,6 @@
 {
   "id": "key-directories/meta",
-  "description": "Snapshot of meta's live key directory, fetched 2026-10-26T21:38:20.754Z. Parsing, kid convention and RFC 7638 thumbprints (expected values computed by the directory pipeline with jose).",
+  "description": "Snapshot of meta's live key directory, fetched 2026-10-26T23:07:09.952Z. Parsing, kid convention and RFC 7638 thumbprints (expected values computed by the directory pipeline with jose).",
   "spec": [
     "3.2",
     "11"
