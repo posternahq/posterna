@@ -78,14 +78,17 @@ describe("committed researched sources", () => {
     );
   });
 
-  it("lists Posterna itself with a pending key directory", () => {
+  it("lists Posterna itself, with its key directory left to the build", () => {
     const posterna = sources.find((op) => op.slug === "posterna");
     expect(posterna?.agents.map((agent) => [agent.name, agent.purpose])).toEqual([
       ["PosternaProbe", "other"],
+      ["PosternaDirectoryBuilder", "other"],
     ]);
+    // posterna.com serves its key directory, so the build fetches it like any other.
     expect(posterna?.signing).toMatchObject({
-      status: "pending",
+      status: null,
       directory_url: "https://posterna.com/.well-known/http-message-signatures-directory",
+      covers: ["PosternaProbe"],
     });
   });
 

@@ -1,25 +1,3 @@
 {
-  "findings": [
-    {
-      "operator": "posterna",
-      "kind": "evidence",
-      "value": "key directory host: posterna.com",
-      "source": "https://github.com/posternahq/posterna/blob/main/docs/SPEC.md",
-      "detail": "page_unavailable (http_error: HTTP 404)"
-    },
-    {
-      "operator": "posterna",
-      "kind": "evidence",
-      "value": "PosternaProbe purpose_quote: send a request signed with an ephemeral key to the site's debug route",
-      "source": "https://github.com/posternahq/posterna/blob/main/docs/SPEC.md",
-      "detail": "page_unavailable (http_error: HTTP 404)"
-    },
-    {
-      "operator": "posterna",
-      "kind": "evidence",
-      "value": "PosternaProbe token: PosternaProbe",
-      "source": "https://github.com/posternahq/posterna/blob/main/docs/SPEC.md",
-      "detail": "page_unavailable (none of the operator's pages could be fetched)"
-    }
-  ]
+  "findings": []
 }

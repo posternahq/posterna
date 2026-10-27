@@ -96,6 +96,6 @@ They are listed in `raw/findings.json` and in the "Needs review" section of `doc
 | The directory URL was documented or reported, but returned 404 or no valid keys | `none_found` |
 | The directory URL was documented or reported, but could not be fetched (robots.txt, timeout, error) | `reported` |
 | Nothing documented or reported | `none_found` |
-| `status: pending` in this file (Posterna's own probe, not live yet) | `pending` |
+| `status: pending` in this file (a key directory that is announced but not served yet) | `pending` |
 
 Community operators that have no file here are `not_probed`.

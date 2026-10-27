@@ -17,8 +17,10 @@ describe("extractLinks", () => {
     const html = `<a href="/static/ipranges/bots.json">list</a>
       <a href='https://example.com/docs#verify'>docs</a>
       <a href="http://insecure.example.com/x.json">old</a>
-      See https://example.com/keys.json, or mailto:someone.`;
+      See https://example.com/keys.json, or mailto:someone.
+      In Markdown: \`https://example.com/.well-known/http-message-signatures-directory\`.`;
     expect(extractLinks(html, "https://example.com/docs/bots")).toEqual([
+      "https://example.com/.well-known/http-message-signatures-directory",
       "https://example.com/docs",
       "https://example.com/keys.json",
       "https://example.com/static/ipranges/bots.json",

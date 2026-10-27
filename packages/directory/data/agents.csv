@@ -147,7 +147,7 @@ naget-inc,Naget Inc,community,NagetBot,community,training,false,NagetBot,NagetBo
 nbot,NBot,community,nbot,community,search,false,nbot,nbot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 netestate,netEstate,community,netEstate Imprint Crawler,community,training,false,netEstate Imprint Crawler,netEstate Imprint Crawler,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 nict,NICT,community,ICC-Crawler,community,training,false,ICC-Crawler,ICC-Crawler,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-openai,OpenAI,researched,ChatGPT-User,researched,user_fetch,false,ChatGPT-User,,may_ignore,false,reported,https://openai.com/chatgpt-user.json,234,,https://developers.openai.com/api/docs/bots
+openai,OpenAI,researched,ChatGPT-User,researched,user_fetch,false,ChatGPT-User,,may_ignore,false,reported,https://openai.com/chatgpt-user.json,235,,https://developers.openai.com/api/docs/bots
 openai,OpenAI,researched,GPTBot,researched,training,false,GPTBot,GPTBot,honors,false,reported,https://openai.com/gptbot.json,18,,https://developers.openai.com/api/docs/bots
 openai,OpenAI,researched,OAI-AdsBot,researched,ads,false,OAI-AdsBot,,unstated,false,reported,https://openai.com/adsbot.json,2,,https://developers.openai.com/api/docs/bots
 openai,OpenAI,researched,OAI-SearchBot,researched,search,false,OAI-SearchBot,OAI-SearchBot,honors,false,reported,https://openai.com/searchbot.json,39,,https://developers.openai.com/api/docs/bots
@@ -166,7 +166,8 @@ perplexity,Perplexity,researched,PerplexityBot,researched,search,false,Perplexit
 phind,phind,community,PhindBot,community,user_fetch,false,PhindBot,PhindBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 poggio,Poggio,community,Poggio-Citations,community,user_fetch,false,Poggio-Citations,Poggio-Citations,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 poseidon-research,Poseidon Research,community,Poseidon Research Crawler,community,search,false,Poseidon Research Crawler,Poseidon Research Crawler,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-posterna,Posterna,researched,PosternaProbe,researched,other,false,PosternaProbe,,unstated,false,pending,,,,https://github.com/posternahq/posterna/blob/main/docs/SPEC.md
+posterna,Posterna,researched,PosternaDirectoryBuilder,researched,other,false,PosternaDirectoryBuilder,PosternaDirectoryBuilder,honors,false,live,,,,https://github.com/posternahq/posterna/blob/main/docs/SPEC.md
+posterna,Posterna,researched,PosternaProbe,researched,other,false,PosternaProbe,,unstated,true,live,,,,https://github.com/posternahq/posterna/blob/main/docs/SPEC.md
 qoder,Qoder,community,qodercli,community,agent,false,qodercli,qodercli,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 qualified,Qualified,community,QualifiedBot,community,user_fetch,false,QualifiedBot,QualifiedBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 quantumcloud,QuantumCloud,community,wpbot,community,other,false,wpbot,wpbot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json

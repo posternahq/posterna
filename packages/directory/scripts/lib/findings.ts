@@ -89,7 +89,8 @@ export function extractLinks(html: string, base: string): string[] {
     }
   };
   for (const match of html.matchAll(/\bhref\s*=\s*["']([^"'#][^"']*)["']/gi)) add(match[1] ?? "");
-  for (const match of html.matchAll(/https:\/\/[^\s"'<>()\\]+/g)) {
+  // A backtick cannot appear in a URL; in Markdown it closes inline code.
+  for (const match of html.matchAll(/https:\/\/[^\s"'<>()\\`]+/g)) {
     add((match[0] ?? "").replace(/[.,;:]+$/, ""));
   }
   return [...found].sort();

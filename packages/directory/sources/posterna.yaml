@@ -1,11 +1,12 @@
-# Posterna lists itself (docs/SPEC.md section 3.3). The probe and its key
-# directory are not live yet, so signing is pending and is not fetched.
+# Posterna lists itself (docs/SPEC.md section 3.3). posterna.com has served
+# its key directory since 27 October 2026, so the build fetches it and decides
+# the signing status as for any other operator.
 slug: posterna
 name: Posterna
 website: https://posterna.com/
 docs_url: https://github.com/posternahq/posterna/blob/main/docs/SPEC.md
-checked_on: "2026-10-26"
-note: The specification is the only documentation so far. Its repository is private until launch, so the page may not be fetchable yet.
+checked_on: "2026-10-27"
+note: The specification is the documentation. The hosted probe at posterna.com signs its requests with the key in posterna.com's key directory; `posterna doctor` signs with a throwaway key that no directory lists.
 community_agents: []
 
 sources:
@@ -27,7 +28,22 @@ agents:
     ip_list: null
     aliases: []
     aliases_source: null
-    note: Sent only by `posterna doctor`, which a site owner runs against their own site.
+    note: Sent by the hosted probe at posterna.com/probe, signed with the key in Posterna's key directory, and by `posterna doctor`, which a site owner runs against their own site with a throwaway key.
+
+  - name: PosternaDirectoryBuilder
+    user_agent_tokens: [PosternaDirectoryBuilder]
+    robots_token: PosternaDirectoryBuilder
+    purpose: other
+    purpose_quote: downloads robots.json, every cited page, IP list and key directory
+    purpose_source: spec
+    search_engine: false
+    robots_policy: honors
+    robots_quote: honors robots.txt (RFC 9309)
+    robots_source: spec
+    ip_list: null
+    aliases: []
+    aliases_source: null
+    note: Builds this directory once a day from GitHub Actions. It fetches only the pages, IP lists and key directories that operators publish and this directory cites, and does not sign its requests.
 
 ip_lists: []
 reverse_dns: null
@@ -36,7 +52,7 @@ asn: []
 signing:
   directory_url: https://posterna.com/.well-known/http-message-signatures-directory
   basis: documented
-  status: pending
+  status: null
   covers: [PosternaProbe]
-  note: Not live yet.
+  note: Requests from the hosted probe are signed with this key. Requests from `posterna doctor` are signed with a throwaway key and do not verify against it.
   sources: [spec]

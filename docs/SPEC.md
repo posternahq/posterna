@@ -84,7 +84,7 @@ Additions to the record above, used by the build:
 - Agent: `coverage` (`researched` when the facts come from the operator's own documentation, `community` when they come only from ai.robots.txt; a researched operator can have community agents), `aliases` (other names the operator's docs or ai.robots.txt use), and `purpose_quote` (the short quote behind `purpose`; null for community agents). `user_agent_tokens` may be empty for robots-only control tokens (such as Google-Extended) and for agents identified only by signature.
 - `verification.ip_lists[]`: also `prefixes` (normalized: strict dotted-quad IPv4 or RFC 5952 IPv6, host bits cleared, deduplicated, IPv4 first then numeric order), `note` and `sources` (the page that documents the list URL). `prefix_count` counts normalized prefixes; `sha256` is of the fetched file bytes.
 - `verification.reverse_dns` and each `verification.asn` entry: also `note` and `sources`.
-- Signing `status`: `live` when the key directory was fetched in the build and held at least one valid public key; `none_found` when nothing is documented or reported, or the URL returned 404 or no valid keys; `reported` when a documented or reported directory could not be fetched (robots.txt, timeout, error) or no URL is known; `pending` only for Posterna's own probe; `not_probed` for community operators. `kid_convention` is derived from the fetched keys.
+- Signing `status`: `live` when the key directory was fetched in the build and held at least one valid public key; `none_found` when nothing is documented or reported, or the URL returned 404 or no valid keys; `reported` when a documented or reported directory could not be fetched (robots.txt, timeout, error) or no URL is known; `pending` only when set by hand in a source file, for a key directory that is announced but not served yet (Posterna's own until 27 October 2026); `not_probed` for community operators. `kid_convention` is derived from the fetched keys.
 
 keys.json: `{version, generated_at, operators: {<slug>: {directory_url, fetched_at, status, keys: [{jwk, thumbprint, kid, first_seen, last_seen}]}}}`. `version` is the build hour, `YYYY-MM-DDTHH`. Every key carries an RFC 7638 thumbprint computed by Posterna, whatever kid convention the operator uses. Only public JWK members are stored; a key published with private members is rejected.
 
@@ -94,7 +94,7 @@ keys.json: `{version, generated_at, operators: {<slug>: {directory_url, fetched_
 - `signs: true` and signing `status: live` only when a key directory was fetched and parsed. Third-party sightings are `reported`.
 - Purposes come from the operator's own documentation with a short quote; otherwise from ai.robots.txt, labeled `community`.
 - Breadth comes from ai.robots.txt (MIT, credited in NOTICE). The directory does not try to catalog every SEO or monitoring bot.
-- Posterna lists itself as operator `posterna` with agent `PosternaProbe` (purpose `other`), signing through `https://posterna.com/.well-known/http-message-signatures-directory`.
+- Posterna lists itself as operator `posterna` with agents `PosternaProbe` (purpose `other`), signing through `https://posterna.com/.well-known/http-message-signatures-directory`, and `PosternaDirectoryBuilder` (purpose `other`, unsigned). The build fetches Posterna's key directory like any other operator's; it has been `live` since 27 October 2026.
 
 ### 3.4 Distribution to installs
 
