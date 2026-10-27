@@ -118,11 +118,12 @@ describe("posterna init", () => {
     expect(result.out).toContain("Create src/proxy.ts");
     expect(result.out).toContain("export const proxy = withPosterna({");
     expect(result.out).not.toContain('runtime: "nodejs"');
+    // No next.config yet: the whole file.
     expect(result.out).toContain(
-      "3. Wrap the export in next.config.ts, so agents.yaml is built into the proxy",
+      "3. Create next.config.ts, so agents.yaml is built into the proxy (hosts such as Vercel deploy it without the file):",
     );
     expect(result.out).toContain('import { withPosternaConfig } from "@posterna/next/config";');
-    expect(result.out).toContain("export default withPosternaConfig(nextConfig);");
+    expect(result.out).toContain("export default withPosternaConfig({});");
     expect(readFileSync(join(cwd, ".env.local"), "utf8")).toBe(`POSTERNA_SITE_KEY=${key}\n`);
     expect(statSync(join(cwd, ".env.local")).mode & 0o777).toBe(0o600);
     expect(result.out).not.toContain(key);
@@ -167,28 +168,41 @@ describe("posterna init", () => {
       "export const middleware = withPosterna({ /* options as in https://posterna.com/docs/install */ }, yourMiddleware);",
     );
 
-    // A CommonJS next.config gets the require form.
-    const commonJs = await cli(["init"], {
-      cwd: project({
-        "package.json": JSON.stringify({ dependencies: { next: "15.5.28" } }),
-        "next.config.js": "module.exports = {};",
-      }),
+    // The exact change to next.config, worked out from the file.
+    const next16 = JSON.stringify({ dependencies: { next: "16.4.3" } });
+    const nextConfigStep = async (files: Record<string, string>) =>
+      (await cli(["init"], { cwd: project({ "package.json": next16, ...files }) })).out;
+    const created = await nextConfigStep({
+      "next.config.ts":
+        'import type { NextConfig } from "next";\n\nconst nextConfig: NextConfig = {};\n\nexport default nextConfig;\n',
     });
-    expect(commonJs.out).toContain(
-      "3. Wrap the export in next.config.js, so agents.yaml is built into the middleware",
+    expect(created).toContain(
+      "3. In next.config.ts, so agents.yaml is built into the proxy (hosts such as Vercel deploy it without the file), add:",
     );
-    expect(commonJs.out).toContain(
-      'const { withPosternaConfig } = require("@posterna/next/config");',
-    );
-    expect(commonJs.out).toContain("module.exports = withPosternaConfig(nextConfig);");
-    const esm = await cli(["init"], {
-      cwd: project({
-        "package.json": JSON.stringify({ type: "module", dependencies: { next: "16.4.3" } }),
-        "next.config.js": "export default {};",
-      }),
+    expect(created).toContain('   import { withPosternaConfig } from "@posterna/next/config";');
+    expect(created).toContain("   and change `export default nextConfig;` to:");
+    expect(created).toContain("   export default withPosternaConfig(nextConfig);");
+
+    const commonJs = await nextConfigStep({
+      "next.config.js": "const config = { reactStrictMode: true };\nmodule.exports = config\n",
     });
-    expect(esm.out).toContain("3. Wrap the export in next.config.js");
-    expect(esm.out).toContain("export default withPosternaConfig(nextConfig);");
+    expect(commonJs).toContain(
+      '   const { withPosternaConfig } = require("@posterna/next/config");',
+    );
+    expect(commonJs).toContain("   and change `module.exports = config` to:");
+    expect(commonJs).toContain("   module.exports = withPosternaConfig(config);");
+
+    const inline = await nextConfigStep({
+      "next.config.mjs": "export default { output: 'standalone' };\n",
+    });
+    expect(inline).toContain(
+      "   and wrap what the file exports: export default withPosternaConfig(<your config>);",
+    );
+
+    const done = await nextConfigStep({
+      "next.config.ts": "export default withPosternaConfig({});\n",
+    });
+    expect(done).toContain("3. next.config.ts already uses withPosternaConfig");
 
     const old = await cli(["init"], {
       cwd: project({ "package.json": JSON.stringify({ dependencies: { next: "14.2.18" } }) }),

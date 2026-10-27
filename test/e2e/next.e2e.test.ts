@@ -1,8 +1,10 @@
 import { join } from "node:path";
-import { afterAll, beforeAll, describe } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   type App,
   appEnv,
+  BROWSER,
+  DEBUG_TOKEN,
   freePort,
   POLICY,
   REPO,
@@ -35,6 +37,27 @@ async function startNext(example: string, ingestBaseUrl: string): Promise<App> {
   });
 }
 
+/**
+ * Fails when a production build left the policy out. The app starts with
+ * POSTERNA_POLICY naming a missing file, as on Vercel, where the proxy has no
+ * agents.yaml next to it: the enforcing policy can only come from the build,
+ * and without it the debug report says "fallback" and the mode is monitor.
+ */
+function policyFromBuild(app: () => App) {
+  it("loads the policy from the production build, with no policy file at run time", async () => {
+    const response = await fetch(`${app().url}/.well-known/posterna/debug`, {
+      headers: { ...BROWSER, "x-posterna-debug-token": DEBUG_TOKEN },
+    });
+    expect(response.status).toBe(200);
+    const report = (await response.json()) as {
+      policy: { source: string; problem: string | null };
+      configuredMode: string;
+    };
+    expect(report.policy).toMatchObject({ source: "file", problem: null });
+    expect(report.configuredMode).toBe("enforce");
+  });
+}
+
 describe("examples/next-basic (Next.js 16, proxy.ts)", () => {
   let app: App;
   let ingest: Awaited<ReturnType<typeof startIngest>>;
@@ -54,6 +77,7 @@ describe("examples/next-basic (Next.js 16, proxy.ts)", () => {
     agentPath: "/api/agent",
     hasRequestState: false,
   });
+  policyFromBuild(() => app);
 });
 
 describe("examples/next-signup (Next.js 15, middleware.ts on Node.js)", () => {
@@ -69,4 +93,5 @@ describe("examples/next-signup (Next.js 15, middleware.ts on Node.js)", () => {
   });
 
   signupChecks({ app: () => app, path: "/api/signup" });
+  policyFromBuild(() => app);
 });

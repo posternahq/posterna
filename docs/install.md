@@ -84,7 +84,7 @@ export const config = {
 };
 ```
 
-Then wrap your Next.js config, so that `agents.yaml` is built into the proxy:
+Then wrap your Next.js config, so that `agents.yaml` is built into the proxy. `posterna init` prints the exact change for your own `next.config`:
 
 ```ts
 // next.config.ts

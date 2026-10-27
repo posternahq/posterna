@@ -133,18 +133,68 @@ function packageManager(cwd: string): string {
   return "npm install";
 }
 
-/** next.config's file name (next.config.ts when there is none yet), and whether it is CommonJS. */
-function nextConfigFile(cwd: string): { file: string; commonJs: boolean } {
-  const file =
-    [
-      "next.config.ts",
-      "next.config.mts",
-      "next.config.mjs",
-      "next.config.js",
-      "next.config.cjs",
-    ].find((name) => existsSync(join(cwd, name))) ?? "next.config.ts";
+const NEXT_CONFIG_FILES = [
+  "next.config.ts",
+  "next.config.mts",
+  "next.config.mjs",
+  "next.config.js",
+  "next.config.cjs",
+];
+
+/**
+ * Step 3 for Next.js: the exact change to next.config that builds agents.yaml
+ * into the proxy, worked out from the file as it is. Hosts such as Vercel
+ * deploy the proxy without agents.yaml, so it needs this to load the policy.
+ */
+function nextConfigStep(cwd: string, exportName: string): string[] {
+  const file = NEXT_CONFIG_FILES.find((name) => existsSync(join(cwd, name)));
+  const intro = `so agents.yaml is built into the ${exportName} (hosts such as Vercel deploy it without the file)`;
+  if (!file) {
+    return [
+      `3. Create next.config.ts, ${intro}:`,
+      "",
+      '   import { withPosternaConfig } from "@posterna/next/config";',
+      "",
+      "   export default withPosternaConfig({});",
+    ];
+  }
+  let source = "";
+  try {
+    source = readFileSync(join(cwd, file), "utf8");
+  } catch {
+    // Unreadable: print the general form below.
+  }
+  if (source.includes("withPosternaConfig")) {
+    return [`3. ${file} already uses withPosternaConfig, ${intro}. Nothing to change.`];
+  }
   const type = readJson(join(cwd, "package.json"))?.type;
-  return { file, commonJs: file.endsWith(".cjs") || (file.endsWith(".js") && type !== "module") };
+  const commonJs = file.endsWith(".cjs") || (file.endsWith(".js") && type !== "module");
+  const importLine = commonJs
+    ? 'const { withPosternaConfig } = require("@posterna/next/config");'
+    : 'import { withPosternaConfig } from "@posterna/next/config";';
+  const exportPattern = commonJs
+    ? /^module\.exports\s*=\s*([A-Za-z_$][\w$]*)\s*;?\s*$/m
+    : /^export\s+default\s+([A-Za-z_$][\w$]*)\s*;?\s*$/m;
+  const exported = exportPattern.exec(source);
+  const prefix = commonJs ? "module.exports =" : "export default";
+  if (exported) {
+    return [
+      `3. In ${file}, ${intro}, add:`,
+      "",
+      `   ${importLine}`,
+      "",
+      `   and change \`${exported[0].trim()}\` to:`,
+      "",
+      `   ${prefix} withPosternaConfig(${exported[1]});`,
+    ];
+  }
+  return [
+    `3. In ${file}, ${intro}, add:`,
+    "",
+    `   ${importLine}`,
+    "",
+    `   and wrap what the file exports: ${prefix} withPosternaConfig(<your config>);`,
+  ];
 }
 
 /** The code to add, printed for the person to paste. `posterna init` never edits code. */
@@ -214,24 +264,7 @@ export function codeToAdd(framework: Framework, cwd: string): string[] {
         "   Upgrade to 15.5 or later where you can.",
       );
     }
-    const config = nextConfigFile(cwd);
-    lines.push(
-      "",
-      `3. Wrap the export in ${config.file}, so agents.yaml is built into the ${exportName}`,
-      "   (hosts such as Vercel deploy it without the file):",
-      "",
-      ...(config.commonJs
-        ? [
-            '   const { withPosternaConfig } = require("@posterna/next/config");',
-            "",
-            "   module.exports = withPosternaConfig(nextConfig);",
-          ]
-        : [
-            '   import { withPosternaConfig } from "@posterna/next/config";',
-            "",
-            "   export default withPosternaConfig(nextConfig);",
-          ]),
-    );
+    lines.push("", ...nextConfigStep(cwd, exportName));
     return lines;
   }
   return [
