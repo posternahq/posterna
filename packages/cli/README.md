@@ -1,6 +1,6 @@
 # posterna
 
-**Pre-release, not yet published.**
+**An early release (0.1).** The API may change before 1.0, and every change is in the changelog.
 
 The [Posterna](https://posterna.com) command line.
 

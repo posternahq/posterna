@@ -194,9 +194,7 @@ describe("posterna init", () => {
     for (const result of [railway, fly, unknown]) {
       expect(result.out).not.toContain("trustedProxies: 1");
       expect(result.out).not.toContain("github.com");
-      expect(result.out).toContain(
-        "Before the first release the packages are not on npm: see https://posterna.com/docs/install#pre-release",
-      );
+      expect(result.out).not.toContain("not on npm");
     }
   });
 

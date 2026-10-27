@@ -1,6 +1,6 @@
 # @posterna/express
 
-**Pre-release, not yet published.**
+**An early release (0.1).** The API may change before 1.0, and every change is in the changelog.
 
 Express middleware for [Posterna](https://posterna.com). It verifies which AI agents and crawlers are calling your app, applies your `agents.yaml` policy, and tells your routes what it found. It starts in monitor mode and fails open on every error.
 
@@ -9,7 +9,12 @@ import express from "express";
 import { posterna } from "@posterna/express";
 
 const app = express();
-app.use(posterna({ trustedProxies: 1, publicHost: "www.example.com" }));
+app.use(
+  posterna({
+    trustedProxies: 1, // the setting for your host: https://posterna.com/docs/install#trusted-proxies
+    publicHost: "www.example.com",
+  }),
+);
 
 app.get("/", (req, res) => {
   // req.posterna.result: { verdict: "verified_by_ip", operator: "google", ... }

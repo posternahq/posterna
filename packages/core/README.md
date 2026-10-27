@@ -1,6 +1,6 @@
 # @posterna/core
 
-**Pre-release, not yet published.**
+**An early release (0.1).** The API may change before 1.0, and every change is in the changelog.
 
 The core of [Posterna](https://posterna.com): the verifier behind `verify()` and the policy engine behind `decide()`. It checks which AI agents and crawlers are calling your site, using HTTP message signatures (RFC 9421, Web Bot Auth), published IP ranges and forward-confirmed reverse DNS, and gives every request one of six verdicts. It runs in your own process, never sends request data anywhere, and fails open on every error.
 

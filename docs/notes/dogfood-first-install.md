@@ -1,6 +1,6 @@
 # Dogfood: first real install (Next.js 16 on Railway behind Cloudflare)
 
-27 October 2026. The first install of Posterna on a live site, done by following docs/install.md as a new user would, in monitor mode only.
+27 October 2026. The first install of Posterna on a live site, done by following docs/install.md as a new user would, in monitor mode only. Everything listed under "Recommended fixes" for the packages and the guide was fixed before 0.1.0 (commits `f31eb92` and `c5d25cc`).
 
 - Packages: `@posterna/core`, `@posterna/directory` and `@posterna/next` 0.1.0-alpha.0, packed from commit `4e269a0`. CLI run from the same build (`node packages/cli/dist/bin.js`).
 - App: Next.js 16.3 App Router, every route server-rendered with `next start`, npm with `package-lock.json`, `src/` folder, Auth.js v5. No existing proxy or middleware.
@@ -10,7 +10,7 @@
 ## Time
 
 - Hands-on: about 40 minutes from start to an install tested against a baseline build, plus about 10 minutes for the counters check, commit and pull request.
-- Elapsed: about 12 hours, almost all of it waiting for a site key, because dashboard sign-in failed (see "Cloud and hosting").
+- Elapsed: about 12 hours, almost all of it waiting for a site key because of a hosted-service sign-in problem (since fixed).
 - Merge to live: about 3 minutes on Railway; doctor passed on the first run.
 
 ## docs/install.md: unclear, wrong or slow steps
@@ -57,18 +57,9 @@
    - None of it appeared in the payload; the email path became `/:id/*`.
    - Outbound request headers were Node's defaults plus `Authorization`.
 
-## Cloud and hosting
+## Hosted service
 
-1. **Dashboard sign-in sent users to `https://localhost:8080`.** The cloud's `src/auth.ts` sets `trustHost: true` and no `AUTH_URL`, and its comment assumes Auth.js uses the `Host` header.
-   - `@auth/core` 0.41 builds its URLs from `new URL(req.url)`, and under `next start` Next.js 16 gives route handlers its internal URL (`https://localhost:8080/...`) whatever `Host` says. `Host` itself was correct: `/v1/echo` reported the public host.
-   - Result: `/api/auth/providers` listed localhost URLs, GitHub's `redirect_uri` was localhost, and sign-in ended at `localhost:8080/api/auth/error?error=Configuration`.
-   - `AUTH_URL=https://posterna.com` set in Railway fixed it. It is **not yet in `.railway/railway.ts`**, so the next `railway config apply` would delete it.
-2. **Google Safe Browsing flags posterna.com.** The Transparency Report API returned status 1 (clean) at 15:36 UTC and status 3 ("some pages on this site are unsafe") at 16:12 UTC on 27 October, for the domain, `/signin` and `/api/auth/callback/github`. Chrome shows its red "Dangerous site" page on sign-in. Every new user is blocked from the dashboard until Google reviews it (Search Console → Security issues → Request review).
-3. **The "Add a site" page tells users to run `npx posterna init`**, which fails before release.
-4. **Stale DNS on the tester's network.** A DNS-filtering resolver on the tester's network intercepted all plain DNS (even queries addressed to 1.1.1.1, 8.8.8.8 and the zone's own Cloudflare nameservers). It kept serving posterna.com's old Squarespace A records for many hours; DNS over HTTPS showed the correct Cloudflare answers.
-   - Doctor and the counters client depend on posterna.com, so on a network like that, doctor's `whoami` reaches the wrong site.
-   - Doctor should say which step failed and suggest `--base-url`.
-   - The workspace note that "Cloudflare's own nameservers still answered with a cached copy" was most likely this interception, not Cloudflare.
+The hosted service's findings (dashboard sign-in, the add-site page, a stale-DNS network) are kept with that service. The one that affects the packages: on a network whose DNS still had an old address for posterna.com, doctor's `whoami` reached the wrong site, so doctor should say which step failed and suggest `--base-url`.
 
 ## Doctor results
 
@@ -105,7 +96,7 @@ Rough edges:
 2. Install guide: Railway behind Cloudflare. Recommend `clientIpHeader: "x-real-ip"` for Railway, now verified both ways.
 3. Install guide: a Server Actions sign-up example using `getPosterna(request).decide({ kind: "signup" })` in the composed proxy function.
 4. Install guide: matcher caveats for Next.js 16 (10 MB body buffering, raw-body webhooks, rewrites to external hosts).
-5. Cloud: add `AUTH_URL` to `.railway/railway.ts` and fix the `trustHost` comment; get the Safe Browsing flag reviewed.
+5. Hosted service: the sign-in and add-site fixes (kept with that service).
 6. CLI: fix the `#trusted-proxies` links and the help column; stop printing `trustedProxies: 1`; print env var reminders when there is no terminal.
 7. Install guide: `rdns_pending` on first requests, local testing tips, Node 20.16+ for Next.js, what `emit` does.
 8. Counters and dashboard: `bytes` for Next.js, path groups for root files.

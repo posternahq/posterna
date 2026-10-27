@@ -28,7 +28,7 @@ The keys that sign the published directory, who holds them, and the runbook for 
 
 ## Supported versions
 
-Posterna is pre-release. Fixes go to the `main` branch and, once packages are published, to the latest release of each package.
+Before 1.0, only the latest release of each package gets security fixes. Fixes land on the `main` branch first.
 
 ## Scope
 

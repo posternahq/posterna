@@ -1,6 +1,6 @@
 {
   "name": "posterna",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0",
   "description": "The Posterna command line: set up agent verification, diagnose deployments and check policy.",
   "keywords": [
     "ai-agents",
@@ -45,10 +45,14 @@
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsup",

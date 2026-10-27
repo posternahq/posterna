@@ -2,7 +2,7 @@
 
 Verify which AI agents and crawlers are calling your site, and decide what each may do.
 
-**Status: pre-release, not yet published.** Nothing is on npm yet, and every API may change.
+**Status: early release (0.1).** The API may change before 1.0; every change is in each package's changelog.
 
 Posterna lets a website or API verify which AI agents and crawlers are calling it, decide what each may do, and see the result. It runs inside your app as a library: no proxy, no CDN, no DNS change. It checks each agent's claimed identity against an open directory of operators, using HTTP message signatures (RFC 9421), published IP ranges and reverse DNS.
 
@@ -23,15 +23,21 @@ Every request gets exactly one verdict.
 
 Posterna labels; it does not score. There is no behavioral detection and no fingerprinting.
 
-## Install (preview)
+## Install
 
-Not published yet. Once it is, setup starts with:
+In your project:
 
 ```bash
 npx posterna init
 ```
 
-`init` detects Express or Next.js, writes an `agents.yaml` in monitor mode, and prints the code to add. See [docs/install.md](docs/install.md).
+`init` detects Express or Next.js, writes an `agents.yaml` in monitor mode, and prints the code to add, including the proxy setting for your host. Then install the adapter:
+
+```bash
+npm install @posterna/express   # or: npm install @posterna/next
+```
+
+The full guide, with the settings for each host and how to check a deployment with `posterna doctor`, is [docs/install.md](docs/install.md).
 
 ## Packages
 

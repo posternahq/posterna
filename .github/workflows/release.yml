@@ -1,0 +1,92 @@
+# Publishes the packages to npm when a version tag (v0.1.1, for example) is
+# pushed. It uses npm trusted publishing: GitHub's OIDC token proves the run
+# comes from this workflow in this repository, so there is no npm token
+# anywhere, and npm attaches a provenance statement to every package.
+#
+# Each package must name this workflow as its trusted publisher on npmjs.com
+# first (RELEASING.md). Versions already on npm are skipped, so a re-run is
+# safe.
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Add required reviewers to this environment in the repository settings
+    # to approve each release by hand. Its name must match the one entered on
+    # npmjs.com for each package.
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # Trusted publishing needs npm 11.5.1 or later.
+      - name: Update npm
+        run: npm install --global npm@11.6.2
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Check the tag against the package versions
+        run: |
+          node -e '
+            const { readdirSync, readFileSync } = require("node:fs");
+            const tag = process.env.GITHUB_REF_NAME;
+            const wanted = tag.replace(/^v/, "");
+            let ok = true;
+            for (const dir of readdirSync("packages")) {
+              const pkg = JSON.parse(readFileSync(`packages/${dir}/package.json`, "utf8"));
+              if (pkg.private) continue;
+              if (pkg.version !== wanted) {
+                console.error(`${pkg.name} is ${pkg.version}, but the tag is ${tag}.`);
+                ok = false;
+              }
+            }
+            if (!ok) process.exit(1);
+            console.log(`Every package is ${wanted}.`);
+          '
+
+      - name: Check (Biome)
+        run: pnpm check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      # pnpm packs each package (turning workspace:* into real versions),
+      # dependencies first, and hands each tarball to npm, which authenticates
+      # with the OIDC token. In recursive mode pnpm skips versions already on
+      # npm, and forwards only a few flags to npm, so provenance is set through
+      # npm's environment rather than --provenance.
+      # --no-git-checks: a tag checkout is not on the main branch.
+      - name: Publish
+        env:
+          NPM_CONFIG_PROVENANCE: "true"
+        run: pnpm -r publish --access public --no-git-checks

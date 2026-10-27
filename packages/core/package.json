@@ -1,6 +1,6 @@
 {
   "name": "@posterna/core",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0",
   "description": "Verify AI agents and crawlers inside your own process: verifier, policy engine and counters client.",
   "keywords": [
     "ai-agents",
@@ -48,6 +48,7 @@
     "templates",
     "src/schema",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "engines": {

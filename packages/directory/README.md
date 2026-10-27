@@ -1,6 +1,6 @@
 # @posterna/directory
 
-**Pre-release, not yet published.**
+**An early release (0.1).** The API may change before 1.0, and every change is in the changelog.
 
 The open directory of AI agent and crawler operators that [Posterna](https://posterna.com) verifies against: who runs each agent, its user-agent tokens and purpose, whether it honors robots.txt, and how to verify it (key directory, published IP lists, reverse DNS). Every fact carries its source and fetch date.
 

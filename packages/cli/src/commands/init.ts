@@ -85,8 +85,6 @@ function addressLines(host: Host | null, indent: string): string[] {
   ];
 }
 
-const PRE_RELEASE = `   Before the first release the packages are not on npm: see ${INSTALL_GUIDE}#pre-release`;
-
 function readJson(path: string): Record<string, unknown> | null {
   try {
     return JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
@@ -145,8 +143,6 @@ export function codeToAdd(framework: Framework, cwd: string): string[] {
       "",
       `   ${install} @posterna/express`,
       "",
-      PRE_RELEASE,
-      "",
       "2. Add it before your routes:",
       "",
       '   import { posterna } from "@posterna/express";',
@@ -169,14 +165,7 @@ export function codeToAdd(framework: Framework, cwd: string): string[] {
     const dir = framework.srcDir ? "src/" : "";
     const file = framework.major >= 16 ? "proxy.ts" : "middleware.ts";
     const exportName = framework.major >= 16 ? "proxy" : "middleware";
-    const lines = [
-      `1. Install the integration:`,
-      "",
-      `   ${install} @posterna/next`,
-      "",
-      PRE_RELEASE,
-      "",
-    ];
+    const lines = [`1. Install the integration:`, "", `   ${install} @posterna/next`, ""];
     if (framework.existing) {
       lines.push(
         `2. You already have ${dir}${framework.existing}. Wrap your function instead of replacing it:`,
