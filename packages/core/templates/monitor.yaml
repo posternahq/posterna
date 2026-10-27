@@ -19,4 +19,6 @@ defaults:
 guards:
   search_engines: protect
 
+# What `posterna robots` prints, for you to copy into your own robots.txt.
+# Posterna never serves robots.txt itself.
 emit: [robots.txt, content-signals]

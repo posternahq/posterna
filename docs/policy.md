@@ -30,7 +30,7 @@ signup:                    # recommendations returned by decide(); the applicati
     verified: lift
     claimed_failed: challenge
     unknown_automation: challenge
-emit: [robots.txt, content-signals]
+emit: [robots.txt, content-signals]  # what `posterna robots` prints; Posterna never serves robots.txt
 ```
 
 ## Keys
@@ -45,7 +45,7 @@ emit: [robots.txt, content-signals]
 | `operators` | no | none | Directory slug, then an action per purpose, for that operator only. A slug not in the operator directory gets a warning from `posterna policy check`. |
 | `paths` | no | none | Path pattern, then an action per verdict class or purpose, plus `monitor: true` to record the rule's actions without enforcing them. |
 | `signup` | no | none | Path pattern, then a sign-up recommendation per verdict class. |
-| `emit` | no | nothing | What `posterna robots` writes: `robots.txt` (groups for crawlers) and `content-signals`. |
+| `emit` | no | nothing | What `posterna robots` prints: `robots.txt` (groups for crawlers) and `content-signals`. Posterna never serves robots.txt itself; copy the output into your own file. |
 
 An empty section (`paths:` with nothing under it) is the same as leaving it out.
 

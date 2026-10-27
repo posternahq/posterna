@@ -2,7 +2,63 @@
 
 Posterna runs inside your app. In about five minutes you can have it labeling every request, without blocking anything. This guide covers Express and Next.js, the proxy settings for common hosts, how to check the setup with `posterna doctor`, and how to switch to enforcement safely.
 
-> Posterna is pre-release. The packages are not on npm yet.
+> Posterna is pre-release. The packages are not on npm yet, so `npx posterna` and `npm install @posterna/...` fail for now. Follow [Before the first release](#pre-release) first, then the steps below.
+
+<a id="pre-release"></a>
+
+## Before the first release
+
+Until the packages are published, install them from a local build of this repository. These steps were tested with npm 11 on 27 October 2026.
+
+1. Build the packages (Node 20 or later, pnpm 10):
+
+   ```bash
+   git clone https://github.com/posternahq/posterna.git
+   cd posterna
+   pnpm install
+   pnpm build
+   ```
+
+2. Pack core, the directory and your adapter (`express` or `next`) into a `vendor` folder in your app:
+
+   ```bash
+   for p in core directory next; do
+     pnpm --filter @posterna/$p pack --pack-destination /path/to/your-app/vendor
+   done
+   ```
+
+3. In your app's `package.json`, depend on the adapter's tarball, and override core and the directory with theirs:
+
+   ```json
+   {
+     "dependencies": {
+       "@posterna/next": "file:vendor/posterna-next-0.1.0-alpha.0.tgz"
+     },
+     "overrides": {
+       "@posterna/core": "file:vendor/posterna-core-0.1.0-alpha.0.tgz",
+       "@posterna/directory": "file:vendor/posterna-directory-0.1.0-alpha.0.tgz"
+     }
+   }
+   ```
+
+   You need both overrides: packing turns the packages' dependencies on each other into version numbers that are not on npm yet. With pnpm, put the same two entries under `pnpm.overrides`; with Yarn, under `resolutions`. Commit the `vendor` folder, so your host's build can install from it.
+
+4. Install, then check that a clean install works the way your host builds:
+
+   ```bash
+   npm install
+   rm -rf node_modules && npm ci
+   ```
+
+   `npm install` can write a lockfile that `npm ci` rejects (for example `Missing: @emnapi/core from lock file`), and hosts such as Railway build with `npm ci`. If the check fails, restore your previous `package-lock.json` from git, run `npm install` again so that only the new entries are added, and repeat the check.
+
+5. Wherever this guide says `npx posterna`, run the CLI from the same build instead, from your app's folder:
+
+   ```bash
+   node /path/to/posterna/packages/cli/dist/bin.js init
+   ```
+
+   Skip the `npm install` line that `init` prints: you have installed the packages already.
 
 ## 1. Create agents.yaml
 
@@ -88,7 +144,19 @@ export const config = {
 
 If you already have a proxy function, pass it as the second argument: `withPosterna(options, yourProxy)`. Posterna runs first; your function runs after it and can read the verdict with `getPosterna(request)`. Next.js reads `config` at build time, so write it out in your own file; it cannot be imported. Make sure the matcher covers every page you want labeled, including your sign-up route.
 
-In Next.js 16, the proxy always runs on the Node.js runtime, so it reads `agents.yaml` from the project folder and can do reverse DNS.
+Before you settle on the matcher, leave out these routes:
+
+- **Large uploads.** With a proxy, Next.js holds each matched request's body in memory and keeps only the first 10 MB (`experimental.proxyClientMaxBodySize` in `next.config`; Next.js 15 calls it `middlewareClientMaxBodySize`). Anything past that is cut off, with only a warning in the server log. Exclude routes that take larger uploads, or raise the limit.
+- **Webhooks** that check a signature over the raw request body. They are safest left out.
+- **Paths rewritten to another site**, such as an analytics proxy set up in `next.config` rewrites. The proxy runs before rewrites, so the verdict request headers would be passed on to that site.
+
+For example, with webhooks under `/api/webhooks` and an analytics rewrite under `/ingest`:
+
+```ts
+matcher: ["/((?!_next/static|_next/image|favicon.ico|api/webhooks|ingest).*)"],
+```
+
+In Next.js 16, the proxy always runs on the Node.js runtime, so it reads `agents.yaml` from the project folder and can do reverse DNS. Reading the file needs Node 20.16 or later. On older Node, Posterna logs a `[posterna]` warning and runs a built-in monitor policy without your rules; `posterna doctor` reports it.
 
 Pages and route handlers read the verdict from the request headers:
 
@@ -112,6 +180,27 @@ export async function POST(request: Request) {
 }
 ```
 
+A sign-up form built as a Server Action posts to the page's own path, not to a route handler. Ask for the recommendation in your proxy function and hand it to the action in a request header:
+
+```ts
+import { getPosterna, withPosterna } from "@posterna/next";
+import { type NextRequest, NextResponse } from "next/server";
+
+export const proxy = withPosterna(
+  { clientIpHeader: "x-real-ip", publicHost: "www.example.com" },
+  (request: NextRequest) => {
+    if (request.method !== "POST" || request.nextUrl.pathname !== "/signup") return;
+    const decision = getPosterna(request)?.decide({ kind: "signup" });
+    const headers = new Headers(request.headers);
+    // Always set it, so a value the client sent is never passed on.
+    headers.set("x-signup-recommendation", decision?.enforced ? decision.action : "allow");
+    return NextResponse.next({ request: { headers } });
+  },
+);
+```
+
+In the action, read it with `(await headers()).get("x-signup-recommendation")`. Your own header names cannot start with `x-agent-` or `x-posterna-`, because Posterna removes those. A matcher that excludes a page also skips its Server Actions.
+
 See [examples/next-basic](../examples/next-basic) and [examples/next-signup](../examples/next-signup).
 
 ### Next.js 15 (middleware.ts)
@@ -129,6 +218,8 @@ export const config = {
 };
 ```
 
+The routes to leave out of the matcher are the same as for Next.js 16, above.
+
 ### The Edge runtime
 
 Next.js before 15.5 runs middleware only on the Edge runtime, and Next.js 16 still allows `middleware.ts` there. Posterna avoids Node.js built-ins so that it can run there, with these limits (the end-to-end tests cover the Node.js runtime only):
@@ -138,6 +229,8 @@ Next.js before 15.5 runs middleware only on the Edge runtime, and Next.js 16 sti
 - **Bundle size.** The operator directory (about 650 KB of JSON) is bundled into the middleware.
 
 Prefer the Node.js runtime wherever you can.
+
+<a id="trusted-proxies"></a>
 
 ## 3. Tell Posterna about your proxies
 
@@ -159,11 +252,11 @@ Next.js never gives middleware or a proxy the socket address. With `clientIpHead
 
 ### Settings by host
 
-These settings come from each host's documentation, checked on 26 October 2026, and from test requests where the documentation is silent. `clientIpHeader` is recommended only where the host's own documentation says it overwrites the header. Hosts change their proxies. Confirm yours with `posterna doctor` (step 4), which sends forged copies of these headers to make sure they are ignored.
+These settings come from each host's documentation, checked on 26 October 2026, and from test requests where the documentation is silent. `clientIpHeader` is recommended only where the host's own documentation says it overwrites the header, or where we have confirmed that on a live site (Railway). Hosts change their proxies. Confirm yours with `posterna doctor` (step 4), which sends forged copies of these headers to make sure they are ignored.
 
 | Host | Client address | `publicHost` | Confidence |
 |---|---|---|---|
-| Railway | `trustedProxies: 2` | recommended | medium |
+| Railway, with or without Cloudflare in front | `clientIpHeader: "x-real-ip"` | recommended | high: confirmed on a live site |
 | Vercel | `clientIpHeader: "x-vercel-forwarded-for"` | recommended | high |
 | Fly.io | `trustedProxies: 2` (`3` with Cloudflare in front) | recommended | high |
 | Render | `trustedProxies: 3` | recommended | low: check with doctor |
@@ -175,9 +268,9 @@ Leave `trustForwardedHost` off on all of them.
 The same values work for Express and Next.js on each host.
 
 **Railway.**
-- Railway's documentation names `X-Real-IP` for the client address and `X-Forwarded-Host` for the original host; it does not document `X-Forwarded-For` ([specs and limits](https://docs.railway.com/networking/public-networking/specs-and-limits)). It does not say that `X-Real-IP` replaces a client's own value, so the guide does not recommend `clientIpHeader` here yet, although Railway staff say it does (next point).
-- Railway staff state that the edge replaces `X-Forwarded-For`, `X-Real-IP`, `X-Forwarded-Proto` and `X-Forwarded-Host` on every request, rather than appending to them ([Railway Station thread, October 2026](https://station.railway.com/questions/need-authoritative-client-ip-proxy-tru-090eac86)).
-- A test request on 26 October 2026 arrived with `X-Forwarded-For: <client>, <edge address>`, so the client is two hops from your app. Railway publishes no proxy address ranges, so use the hop count.
+- Use `clientIpHeader: "x-real-ip"`. Railway's documentation names `X-Real-IP` for the client address and `X-Forwarded-Host` for the original host ([specs and limits](https://docs.railway.com/networking/public-networking/specs-and-limits)), and Railway staff state that the edge replaces `X-Forwarded-For`, `X-Real-IP`, `X-Forwarded-Proto` and `X-Forwarded-Host` on every request rather than appending to them ([Railway Station thread, October 2026](https://station.railway.com/questions/need-authoritative-client-ip-proxy-tru-090eac86)).
+- Confirmed on 27 October 2026 on a live site, both on its `*.up.railway.app` address and with Cloudflare proxying a custom domain in front: `X-Real-IP` carried the real client address over IPv4 and IPv6, forged `X-Real-IP` and `X-Forwarded-For` values were ignored, and `posterna doctor` passed.
+- Avoid a hop count here. A test request on 26 October 2026 arrived with `X-Forwarded-For: <client>, <edge address>` (two hops), but with Cloudflare in front the chain was not measured, and Railway publishes no proxy address ranges.
 - Traffic over Railway's private network (`*.railway.internal`) skips the edge and its header cleaning.
 - With Railway's CDN turned on, cached responses never reach your app ([CDN](https://docs.railway.com/networking/cdn)).
 
@@ -228,7 +321,7 @@ The same values work for Express and Next.js on each host.
 - `proxy_set_header` lines are inherited from an outer block only when the inner block has none of its own.
 - If a CDN sits in front of nginx, use nginx's [realip module](https://nginx.org/en/docs/http/ngx_http_realip_module.html) with the CDN's ranges, so that `$remote_addr`, and with it `X-Real-IP`, is the real client.
 
-**Cloudflare in front of any host.** Prefer a hop count to listing Cloudflare's address ranges: Cloudflare Workers send requests from those same ranges, so a list would let a Worker write entries you then trust.
+**Cloudflare in front of any host.** Prefer a hop count to listing Cloudflare's address ranges: Cloudflare Workers send requests from those same ranges, so a list would let a Worker write entries you then trust. On Railway, keep `clientIpHeader: "x-real-ip"`: it already carries the real client behind Cloudflare.
 
 ## 4. Check the setup with doctor
 
@@ -249,19 +342,29 @@ The checks:
 | Check | Passes when |
 |---|---|
 | Debug route | `/.well-known/posterna/debug` answers with a Posterna report. With Next.js, the matcher must cover it. |
-| Client IP | The site sees your machine's public address, as `https://posterna.com/v1/whoami` reports it, and ignores an `X-Forwarded-For` entry doctor forges. With `clientIpHeader`, doctor also forges that header, which fails if your host does not overwrite it. |
+| Client IP | The site sees your machine's public address, as `https://posterna.com/v1/whoami` reports it, and ignores an `X-Forwarded-For` entry doctor forges. With `clientIpHeader`, doctor also forges that header, which fails if your host does not overwrite it. Doctor checks IPv4 and IPv6 separately, and says when one cannot be checked from your machine. |
 | Signed host | Signatures are checked against your site's hostname, not an `X-Forwarded-Host` doctor forges. |
 | Signature headers | `Signature`, `Signature-Input` and `Signature-Agent` reach your app. Some proxies, CDNs and firewalls strip them. |
+| Policy | `agents.yaml` (or the `policy` option) was loaded. If it was not, Posterna runs a built-in monitor policy without your rules, and doctor shows why. |
 | Directory | The operator directory is loaded and less than a week old. |
 | Mode | The mode and anything suspending enforcement (the proxy guard, either kill switch, a tripped breaker). |
+
+If doctor cannot reach `https://posterna.com/v1/whoami`, it names that step. A network whose DNS still has an old address for posterna.com is one cause: try another network, or pass `--base-url`.
+
+### Testing by hand
+
+- **A crawler's first request is labeled pending.** For operators checked by reverse DNS, the lookup runs in the background, so the first request from an address that claims to be, for example, Googlebot is `declared_unverifiable` with the reason `rdns_pending`. Later requests from that address get the result: `verified_by_ip`, or `claimed_failed` (`rdns_unconfirmed`) for a fake. The counts show some `rdns_pending` for this reason.
+- **No client address locally.** With `clientIpHeader` set, a request to your local server has no client address (`no_client_address`) unless you send that header yourself, for example `curl -H "X-Real-IP: 203.0.113.7" http://localhost:3000/`.
+- **curl looks like automation.** curl sends no `Accept-Language`, so a plain curl request is `unknown_automation` (`missing_accept_language`). Add `-H "Accept-Language: en"` to look like a browser.
 
 ## 5. Optional: send counters
 
 With a site key from the dashboard in `POSTERNA_SITE_KEY`, Posterna sends aggregate counts every 60 seconds. They cover:
 
 - verdict, reason code, operator, agent and purpose;
-- a path group: the matched policy pattern, or the first path segment with identifier-like segments masked;
-- the action taken and whether it was enforced.
+- a path group: the matched policy pattern, else the first path segment (`/docs/*`, or `/robots.txt` for a file at the root), with identifier-like segments masked;
+- the action taken and whether it was enforced;
+- bytes served, with Express only: the Next.js proxy runs before the page and cannot see response sizes, so the dashboard shows bytes as not available for Next.js sites.
 
 No address, URL, header value or body ever leaves your server. Without a site key nothing is sent. Counters are flushed on shutdown too. If your app handles `SIGTERM` itself, call `await middleware.flush()` (Express) in your handler.
 
