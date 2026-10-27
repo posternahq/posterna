@@ -1,5 +1,11 @@
 # @posterna/directory
 
+## 0.1.1
+
+### Patch Changes
+
+- No code changes. The first release published from GitHub Actions with npm trusted publishing, so every package carries a provenance statement linking it to the commit and workflow that built it.
+
 ## 0.1.0
 
 ### Patch Changes
