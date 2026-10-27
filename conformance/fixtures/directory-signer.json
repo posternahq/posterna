@@ -1,8 +1,0 @@
-{
-  "note": "Throwaway key the conformance runner trusts for refresh tests. Its private half is in keys/directory-signer.json.",
-  "jwk": {
-    "kty": "OKP",
-    "crv": "Ed25519",
-    "x": "tKjNuvp3MDe8YdIpmg2gNZJKNWufHb5Dmn5a56uC8FQ"
-  }
-}
