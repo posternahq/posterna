@@ -432,6 +432,7 @@ export async function verify(
     proxy.forwardedHeader ?? null,
     proxy.publicHost ?? null,
     proxy.trustForwardedHost === true,
+    proxy.clientIpHeader ?? null,
   ]);
   let verifier = defaultVerifiers.get(key);
   if (!verifier) {

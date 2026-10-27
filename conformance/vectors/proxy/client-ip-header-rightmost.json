@@ -1,0 +1,120 @@
+{
+  "id": "proxy/client-ip-header-rightmost",
+  "description": "A client-ip header with several values, or repeated, means something appended to it: the rightmost value, written by the nearest proxy, is the client.",
+  "spec": [
+    "4.2"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "clientIpHeader": "x-real-ip"
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-real-ip",
+            "203.0.113.9, 192.0.2.77"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "reason": null,
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "192.0.2.77"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-real-ip",
+            "203.0.113.9"
+          ],
+          [
+            "x-real-ip",
+            "192.0.2.77"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "reason": null,
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "192.0.2.77"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-real-ip",
+            "192.0.2.77:46532"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "reason": null,
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "192.0.2.77"
+        }
+      }
+    }
+  ]
+}

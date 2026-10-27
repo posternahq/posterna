@@ -120,34 +120,43 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
     publicIp = null;
   }
 
-  // 2. A signed request to the debug route.
+  // 2. A signed request to the debug route, with forged forwarding headers a
+  // correct setup ignores.
   const target = new URL(DEBUG_PATH, site);
-  let report: DebugReport | null = null;
-  let failure = "";
-  try {
-    const response = await io.fetch(target, {
-      headers: {
-        "user-agent": `posterna-doctor/${VERSION}`,
-        accept: "application/json",
-        [DEBUG_TOKEN_HEADER]: token,
-        "x-forwarded-for": FORGED_CLIENT,
-        "x-forwarded-host": FORGED_HOST,
-        ...(await signedHeaders(target, io.now())),
-      },
-      redirect: "manual",
-      signal: AbortSignal.timeout(15_000),
-    });
-    const text = await response.text();
+  const probe = async (
+    forged: Record<string, string>,
+  ): Promise<{ report: DebugReport | null; failure: string }> => {
     try {
-      const parsed = JSON.parse(text) as DebugReport;
-      if (response.ok && parsed?.posterna?.adapter) report = parsed;
-      else failure = `it answered ${response.status} without a Posterna report`;
-    } catch {
-      failure = `it answered ${response.status} without a Posterna report`;
+      const response = await io.fetch(target, {
+        headers: {
+          "user-agent": `posterna-doctor/${VERSION}`,
+          accept: "application/json",
+          [DEBUG_TOKEN_HEADER]: token,
+          ...forged,
+          ...(await signedHeaders(target, io.now())),
+        },
+        redirect: "manual",
+        signal: AbortSignal.timeout(15_000),
+      });
+      const text = await response.text();
+      try {
+        const parsed = JSON.parse(text) as DebugReport;
+        if (response.ok && parsed?.posterna?.adapter) return { report: parsed, failure: "" };
+      } catch {
+        // Not a Posterna report.
+      }
+      return { report: null, failure: `it answered ${response.status} without a Posterna report` };
+    } catch (error) {
+      return {
+        report: null,
+        failure: `the request failed (${error instanceof Error ? error.message : String(error)})`,
+      };
     }
-  } catch (error) {
-    failure = `the request failed (${error instanceof Error ? error.message : String(error)})`;
-  }
+  };
+  const { report, failure } = await probe({
+    "x-forwarded-for": FORGED_CLIENT,
+    "x-forwarded-host": FORGED_HOST,
+  });
 
   if (!report) {
     print(io, {
@@ -166,7 +175,17 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
 
   // Client IP resolution.
   const seen = report.client.address;
-  if (seen === FORGED_CLIENT) {
+  // With clientIpHeader, forge that header too: it is safe only if the host overwrites it.
+  const header = report.client.header;
+  const forgedHeader = header ? (await probe({ [header]: FORGED_CLIENT })).report : null;
+  if (header && forgedHeader?.client.address === FORGED_CLIENT) {
+    checks.push({
+      name: "Client IP",
+      status: "fail",
+      detail: `the app believed a ${header} header that doctor forged (${FORGED_CLIENT}): your host does not overwrite it, so any client can claim any address.`,
+      fix: `Remove clientIpHeader and set trustedProxies for your host. See ${GUIDE}#trusted-proxies`,
+    });
+  } else if (seen === FORGED_CLIENT) {
     checks.push({
       name: "Client IP",
       status: "fail",
@@ -200,9 +219,9 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
       detail: `the site sees ${seen ?? "no address"} (from ${report.client.source}), but this machine is ${publicIp}.`,
       fix:
         seen === null
-          ? `Set trustedProxies for your host (Next.js never sees the socket address). See ${GUIDE}#trusted-proxies`
+          ? `Set clientIpHeader or trustedProxies for your host (Next.js never sees the socket address). See ${GUIDE}#trusted-proxies`
           : isPrivate(seen)
-            ? `The app sees its proxy's address. Set trustedProxies for your host. See ${GUIDE}#trusted-proxies`
+            ? `The app sees its proxy's address. Set clientIpHeader or trustedProxies for your host. See ${GUIDE}#trusted-proxies`
             : `Another proxy or CDN is in front of the app. Count it in trustedProxies, or list its address ranges. See ${GUIDE}#trusted-proxies`,
     });
   }

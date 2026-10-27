@@ -1,0 +1,86 @@
+{
+  "id": "proxy/client-ip-header",
+  "description": "clientIpHeader names the header the host overwrites with the client address: it is read instead of X-Forwarded-For, so a forged X-Forwarded-For changes nothing.",
+  "spec": [
+    "4.2"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "clientIpHeader": "X-Vercel-Forwarded-For"
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-forwarded-for",
+            "203.0.113.9"
+          ],
+          [
+            "x-vercel-forwarded-for",
+            "192.0.2.77"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "reason": null,
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "192.0.2.77"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-vercel-forwarded-for",
+            "203.0.113.9"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "reason": "outside_ip_list",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "203.0.113.9"
+        }
+      }
+    }
+  ]
+}

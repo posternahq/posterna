@@ -170,6 +170,7 @@ export function createPosterna(options: PosternaNextOptions = {}): Posterna {
   const verifier = createVerifier({
     trustedProxies: options.trustedProxies,
     forwardedHeader: options.forwardedHeader,
+    clientIpHeader: options.clientIpHeader,
     publicHost: options.publicHost,
     trustForwardedHost: options.trustForwardedHost,
     directory: directoryOptions(options, env),

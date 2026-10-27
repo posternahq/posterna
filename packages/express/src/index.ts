@@ -189,6 +189,7 @@ export function posterna(options: PosternaOptions = {}): PosternaMiddleware {
     createVerifier({
       trustedProxies: options.trustedProxies,
       forwardedHeader: options.forwardedHeader,
+      clientIpHeader: options.clientIpHeader,
       publicHost: options.publicHost,
       trustForwardedHost: options.trustForwardedHost,
       directory: directoryOptions(options, env),

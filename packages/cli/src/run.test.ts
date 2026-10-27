@@ -233,7 +233,7 @@ describe("posterna doctor", () => {
       servers.push(server);
     });
 
-  async function site(options: PosternaOptions) {
+  async function site(options: PosternaOptions, before?: express.RequestHandler) {
     const mw = posterna({
       directory: {
         snapshot: () => ({
@@ -255,6 +255,7 @@ describe("posterna doctor", () => {
       ...options,
     });
     const app = express();
+    if (before) app.use(before);
     app.use(mw);
     app.get(/.*/, (_req, res) => {
       res.send("the app");
@@ -326,6 +327,46 @@ describe("posterna doctor", () => {
     expect(result.out).toContain("1 check failed.");
   });
 
+  it("passes a clientIpHeader the host overwrites, and fails one it does not", async () => {
+    // A stand-in for a host that overwrites X-Real-IP with the address it sees.
+    // A real host rewrites the header before Node parses the request, so rewrite the raw list too.
+    const overwriting: express.RequestHandler = (req, _res, next) => {
+      const address = req.socket.remoteAddress ?? "";
+      const raw: string[] = [];
+      for (let i = 0; i + 1 < req.rawHeaders.length; i += 2) {
+        if ((req.rawHeaders[i] as string).toLowerCase() !== "x-real-ip") {
+          raw.push(req.rawHeaders[i] as string, req.rawHeaders[i + 1] as string);
+        }
+      }
+      req.rawHeaders.splice(0, req.rawHeaders.length, ...raw, "X-Real-IP", address);
+      req.headers["x-real-ip"] = address;
+      next();
+    };
+    const good = await site({ clientIpHeader: "x-real-ip" }, overwriting);
+    const passed = await cli(
+      ["doctor", "--url", good.url, "--base-url", await cloud("127.0.0.1")],
+      {
+        env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+      },
+    );
+    good.close();
+    expect(passed.out).toContain("PASS  Client IP: the site sees 127.0.0.1");
+    expect(passed.code).toBe(0);
+
+    const bad = await site({ clientIpHeader: "x-real-ip" });
+    const failed = await cli(["doctor", "--url", bad.url, "--base-url", await cloud("127.0.0.1")], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+    });
+    bad.close();
+    expect(failed.out).toContain(
+      `FAIL  Client IP: the app believed a x-real-ip header that doctor forged (${FORGED_CLIENT}): your host does not overwrite it`,
+    );
+    expect(failed.out).toContain(
+      "Fix: Remove clientIpHeader and set trustedProxies for your host.",
+    );
+    expect(failed.code).toBe(1);
+  });
+
   it("reports a wrong client address with the fix", async () => {
     const app = await site({ env: { POSTERNA_MODE: "monitor" } });
     const result = await cli(["doctor", app.url, "--base-url", await cloud("198.51.100.7")], {
@@ -336,7 +377,7 @@ describe("posterna doctor", () => {
       "FAIL  Client IP: the site sees 127.0.0.1 (from socket), but this machine is 198.51.100.7.",
     );
     expect(result.out).toContain(
-      "The app sees its proxy's address. Set trustedProxies for your host.",
+      "The app sees its proxy's address. Set clientIpHeader or trustedProxies for your host.",
     );
     expect(result.out).toContain(
       "WARN  Mode: monitor (agents.yaml says enforce); POSTERNA_MODE=monitor is set.",

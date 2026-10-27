@@ -116,6 +116,12 @@ describe("@posterna/express", () => {
     });
   });
 
+  it("reads the client address from clientIpHeader when set", async () => {
+    const { get, seen } = await start({ clientIpHeader: "x-real-ip" });
+    await get("/docs", { ...EXAMPLE_BOT, "x-real-ip": "192.0.2.77" }, "203.0.113.9");
+    expect(seen[0]).toMatchObject({ verdict: "verified_by_ip", operator: "ip-crawler" });
+  });
+
   it("verifies by IP behind a trusted proxy and passes the operator on", async () => {
     const { get, seen } = await start();
     const response = await get("/docs", EXAMPLE_BOT, "192.0.2.77");

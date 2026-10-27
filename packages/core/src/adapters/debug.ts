@@ -14,7 +14,8 @@ const SIGNATURE_HEADERS = ["signature", "signature-input", "signature-agent"] as
 /** What the debug route returns. It is sent only to a caller holding the debug token. */
 export interface DebugReport {
   posterna: { adapter: string; version: string };
-  client: { address: string | null; source: string };
+  /** `header` is the configured `clientIpHeader` when it was consulted. */
+  client: { address: string | null; source: string; header: string | null };
   authority: { host: string | null; source: string; scheme: "http" | "https" };
   viaTrustedProxy: boolean;
   /** Which of Signature, Signature-Input and Signature-Agent arrived (names only). */
@@ -83,7 +84,11 @@ export function debugReport(input: {
   const names = headerNames(input.request);
   return {
     posterna: { adapter: input.adapter, version: input.version },
-    client: { address: resolved.address?.text ?? null, source: resolved.addressSource },
+    client: {
+      address: resolved.address?.text ?? null,
+      source: resolved.addressSource,
+      header: resolved.clientIpHeader,
+    },
     authority: { host: resolved.host, source: resolved.hostSource, scheme: resolved.scheme },
     viaTrustedProxy: resolved.viaTrustedProxy,
     signatureHeaders: SIGNATURE_HEADERS.filter((name) => names.has(name)),

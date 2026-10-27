@@ -12,6 +12,15 @@ export interface ProxyOptions {
   /** The forwarding header the trusted proxies append to. Defaults to `x-forwarded-for`. */
   forwardedHeader?: "x-forwarded-for" | "forwarded";
   /**
+   * A request header the proxy in front of the app always overwrites with the
+   * client's address, for example `x-vercel-forwarded-for` on Vercel. When set,
+   * it is read instead of the forwarding header, with no hop counting. Use it
+   * only for a header your host documents overwriting: any other header can be
+   * set by the client. With CIDRs in `trustedProxies`, it is read only from
+   * those proxies. A missing or unreadable value leaves the client unknown.
+   */
+  clientIpHeader?: string;
+  /**
    * The hostname agents sign as `@authority`. Overrides Host and
    * X-Forwarded-Host. A list is for sites served on several names (the apex
    * and www): the request's host is used when it is in the list, else the
@@ -28,6 +37,7 @@ export interface ProxyOptions {
 }
 
 export interface Trust {
+  clientIpHeader: string | null;
   cidrs: PrefixMatcher | null;
   hops: number;
   header: "x-forwarded-for" | "forwarded";
@@ -38,6 +48,7 @@ export interface Trust {
 export function compileTrust(options: ProxyOptions): Trust {
   const proxies = options.trustedProxies;
   return {
+    clientIpHeader: options.clientIpHeader?.trim().toLowerCase() || null,
     cidrs: Array.isArray(proxies) ? PrefixMatcher.compile(proxies) : null,
     hops: typeof proxies === "number" && Number.isInteger(proxies) && proxies > 0 ? proxies : 0,
     header: options.forwardedHeader ?? "x-forwarded-for",
@@ -55,6 +66,8 @@ export interface ResolvedClient {
   address: Address | null;
   /** Which input produced the address: `socket`, or the header and hop. */
   addressSource: string;
+  /** The configured `clientIpHeader` when it was consulted for this request, else null. */
+  clientIpHeader: string | null;
   /** The authority agents sign, lowercase, with a port only when non-default. */
   host: string | null;
   hostSource: string;
@@ -122,8 +135,22 @@ export function resolveClient(request: NormalizedRequest, trust: Trust): Resolve
   let address: Address | null = socket;
   let addressSource = socket ? "socket" : "none";
   let viaTrustedProxy = false;
+  let clientIpHeader: string | null = null;
 
-  if (socket && trust.cidrs?.has(socket.parsed)) {
+  if (trust.clientIpHeader && (!socket || !trust.cidrs || trust.cidrs.has(socket.parsed))) {
+    // One header the host overwrites: no hop counting. Repeated or comma-separated
+    // values mean something appended to it; the rightmost is the nearest proxy's.
+    viaTrustedProxy = true;
+    clientIpHeader = trust.clientIpHeader;
+    const picked = parseAddress(lastValue(fieldValue(request, trust.clientIpHeader)));
+    address = picked;
+    addressSource = picked
+      ? `${trust.clientIpHeader} header`
+      : `${trust.clientIpHeader} header (missing or unreadable)`;
+  } else if (trust.clientIpHeader) {
+    // Configured, but this request did not come from a listed proxy: the socket
+    // address is the client, as without configuration.
+  } else if (socket && trust.cidrs?.has(socket.parsed)) {
     viaTrustedProxy = true;
     const chain = forwardingChain(request, trust.header);
     for (let i = chain.length - 1; i >= 0; i--) {
@@ -200,7 +227,7 @@ export function resolveClient(request: NormalizedRequest, trust: Trust): Resolve
     if (proto === "http" || proto === "https") scheme = proto;
   }
 
-  return { address, addressSource, host, hostSource, scheme, viaTrustedProxy };
+  return { address, addressSource, clientIpHeader, host, hostSource, scheme, viaTrustedProxy };
 }
 
 /**

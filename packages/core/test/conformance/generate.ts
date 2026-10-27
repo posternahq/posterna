@@ -1778,6 +1778,108 @@ async function proxyVectors(): Promise<void> {
     ],
   );
 
+  // One header the host documents overwriting with the client address.
+  const viaHeader = (headers: Pair[], remote: string | null = "10.0.0.5") =>
+    request(site([["user-agent", ua.exampleBot], ...headers]), { remote_address: remote });
+  verifyVector(
+    "proxy/client-ip-header",
+    "clientIpHeader names the header the host overwrites with the client address: it is read instead of X-Forwarded-For, so a forged X-Forwarded-For changes nothing.",
+    ["4.2"],
+    [
+      {
+        request: viaHeader([
+          ["x-forwarded-for", "203.0.113.9"],
+          ["x-vercel-forwarded-for", "192.0.2.77"],
+        ]),
+        expected: { ...ok, client: { address: "192.0.2.77" } },
+      },
+      {
+        request: viaHeader([["x-vercel-forwarded-for", "203.0.113.9"]]),
+        expected: { ...failed, client: { address: "203.0.113.9" } },
+      },
+    ],
+    { config: { clientIpHeader: "X-Vercel-Forwarded-For" } },
+  );
+  verifyVector(
+    "proxy/client-ip-header-rightmost",
+    "A client-ip header with several values, or repeated, means something appended to it: the rightmost value, written by the nearest proxy, is the client.",
+    ["4.2"],
+    [
+      {
+        request: viaHeader([["x-real-ip", "203.0.113.9, 192.0.2.77"]]),
+        expected: { ...ok, client: { address: "192.0.2.77" } },
+      },
+      {
+        request: viaHeader([
+          ["x-real-ip", "203.0.113.9"],
+          ["x-real-ip", "192.0.2.77"],
+        ]),
+        expected: { ...ok, client: { address: "192.0.2.77" } },
+      },
+      {
+        request: viaHeader([["x-real-ip", "192.0.2.77:46532"]]),
+        expected: { ...ok, client: { address: "192.0.2.77" } },
+      },
+    ],
+    { config: { clientIpHeader: "x-real-ip" } },
+  );
+  verifyVector(
+    "proxy/client-ip-header-missing",
+    "When the client-ip header is missing or unreadable, the client is unknown: there is no fallback to X-Forwarded-For, and an IP claim cannot be checked.",
+    ["4.2", "4.8"],
+    [
+      {
+        request: viaHeader([["x-forwarded-for", "192.0.2.77"]]),
+        expected: {
+          ...ok,
+          verdict: "declared_unverifiable",
+          reason: "no_client_address",
+          method: "none",
+          client: { address: null },
+        },
+      },
+      {
+        request: viaHeader([["x-real-ip", "unknown"]]),
+        expected: {
+          ...ok,
+          verdict: "declared_unverifiable",
+          reason: "no_client_address",
+          method: "none",
+          client: { address: null },
+        },
+      },
+    ],
+    { config: { clientIpHeader: "x-real-ip" } },
+  );
+  verifyVector(
+    "proxy/client-ip-header-untrusted-peer",
+    "With trustedProxies CIDRs, the client-ip header is read only from those proxies. A request straight from the internet is judged by its socket address.",
+    ["4.2", "9"],
+    [
+      {
+        request: viaHeader([["x-real-ip", "192.0.2.77"]], "203.0.113.50"),
+        expected: { ...failed, client: { address: "203.0.113.50" } },
+      },
+      {
+        request: viaHeader([["x-real-ip", "192.0.2.77"]], "10.0.0.5"),
+        expected: { ...ok, client: { address: "192.0.2.77" } },
+      },
+    ],
+    { config: { clientIpHeader: "x-real-ip", trustedProxies: ["10.0.0.0/8"] } },
+  );
+  verifyVector(
+    "proxy/client-ip-header-no-socket",
+    "Without a socket address (Next.js middleware and proxy), the client-ip header is read directly.",
+    ["4.2"],
+    [
+      {
+        request: viaHeader([["x-vercel-forwarded-for", "192.0.2.77"]], null),
+        expected: { ...ok, client: { address: "192.0.2.77" } },
+      },
+    ],
+    { config: { clientIpHeader: "x-vercel-forwarded-for" } },
+  );
+
   vectors.push({
     id: "proxy/guard-trips",
     description:

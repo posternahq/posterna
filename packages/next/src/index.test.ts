@@ -92,6 +92,21 @@ describe("@posterna/next", () => {
     expect(Object.keys(app).filter((name) => name.startsWith("x-posterna"))).toEqual([]);
   });
 
+  it("reads the client address from clientIpHeader when set", async () => {
+    const proxy = withPosterna(
+      options({ trustedProxies: undefined, clientIpHeader: "x-vercel-forwarded-for" }),
+    );
+    const response = (await proxy(
+      request("/docs", {
+        ...EXAMPLE_BOT,
+        "x-forwarded-for": "203.0.113.9",
+        "x-vercel-forwarded-for": "192.0.2.77",
+      }),
+      event(),
+    )) as Response;
+    expect(forwarded(response)["x-agent-verdict"]).toBe("verified_by_ip");
+  });
+
   it("reads the client address from X-Forwarded-For only when trustedProxies is set", async () => {
     const trusting = withPosterna(options());
     const blocked = (await trusting(
