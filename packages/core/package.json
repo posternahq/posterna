@@ -40,11 +40,13 @@
       }
     },
     "./templates/*": "./templates/*",
+    "./schema/*": "./src/schema/*",
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "templates",
+    "src/schema",
     "README.md",
     "LICENSE"
   ],

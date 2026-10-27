@@ -47,4 +47,6 @@ The full reference is [docs/policy.md](https://github.com/posternahq/posterna/bl
 
 Signatures are verified with Cloudflare's [web-bot-auth](https://github.com/cloudflare/web-bot-auth) packages. The operator directory snapshot comes from [`@posterna/directory`](https://www.npmjs.com/package/@posterna/directory) and is refreshed in the background from posterna.com when signed directory files are available.
 
+The JSON Schemas for directory.json, keys.json and agents.yaml ship with the package: `@posterna/core/schema/directory.schema.json`, `keys.schema.json` and `agents.schema.json`.
+
 See the [specification](https://github.com/posternahq/posterna/blob/main/docs/SPEC.md), sections 4 and 5. MIT licensed.
