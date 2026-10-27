@@ -1,3 +1,4 @@
+import type { LookupAddress } from "node:dns";
 import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -10,7 +11,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { type PosternaOptions, posterna } from "../../express/src/index";
 import pkg from "../package.json";
 import { FORGED_CLIENT, FORGED_HOST } from "./commands/doctor";
-import { familyFetch } from "./family-fetch";
+import { familyFetch, familyLookup, type Resolve } from "./family-fetch";
 import { VERSION } from "./index";
 import type { Io, Prompter } from "./io";
 import { run } from "./run";
@@ -371,6 +372,27 @@ describe("posterna doctor", () => {
     expect(result.code).toBe(0);
   });
 
+  it("skips IPv6 for a site with no IPv6 address, even when the lookup returns IPv4-mapped ones", async () => {
+    const app = await site({});
+    // What macOS answers for a host with only an A record: a connection to
+    // ::ffff:127.0.0.1 would reach the IPv4 server.
+    const macosLookup: Resolve = async (_hostname, family) =>
+      family === 4
+        ? [{ address: "127.0.0.1", family: 4 }]
+        : [{ address: "::ffff:127.0.0.1", family: 6 }];
+    const url = app.url.replace("127.0.0.1", "localhost");
+    const result = await cli(["doctor", "--url", url, "--base-url", await cloud("127.0.0.1")], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+      fetchOver: (family) => familyFetch(family, macosLookup),
+    });
+    app.close();
+    expect(result.out).toContain("PASS  Client IP (IPv4): the site sees 127.0.0.1");
+    expect(result.out).toContain(
+      "SKIP  Client IP (IPv6): not checked: the site has no IPv6 address.",
+    );
+    expect(result.code).toBe(0);
+  });
+
   it("fails a family that reaches a different server, as stale DNS records would", async () => {
     const app = await site({});
     const elsewhere = (async () =>
@@ -546,8 +568,55 @@ describe("familyFetch", () => {
       expect(await response.json()).toEqual({ path: "/hello", token: "yes" });
       // Nothing listens on IPv6, so the same URL over IPv6 cannot reach this server.
       await expect(familyFetch(6)(`http://localhost:${port}/hello`)).rejects.toThrow();
+      // Nor through an IPv4-mapped address, which would connect over IPv4.
+      const mapped: Resolve = async () => [{ address: "::ffff:127.0.0.1", family: 6 }];
+      await expect(familyFetch(6, mapped)(`http://localhost:${port}/hello`)).rejects.toMatchObject({
+        code: "ENODATA",
+      });
     } finally {
       await new Promise((resolve) => server.close(resolve));
     }
+  });
+});
+
+describe("familyLookup", () => {
+  const lookup = (family: 4 | 6, found: LookupAddress[] | Error, all = false) =>
+    new Promise((resolve) => {
+      const resolver: Resolve = async () => {
+        if (found instanceof Error) throw found;
+        return found;
+      };
+      familyLookup(family, resolver)("site.example", { family, all }, (error, address, kind) =>
+        resolve({ error: error?.code ?? null, address, family: kind }),
+      );
+    });
+
+  it("drops IPv4-mapped addresses from an IPv6 lookup", async () => {
+    const mapped = [
+      { address: "::ffff:64.29.17.131", family: 6 },
+      { address: "::ffff:401d:1183", family: 6 },
+      { address: "0:0:0:0:0:ffff:4.4.4.4", family: 6 },
+    ];
+    expect(await lookup(6, mapped)).toEqual({ error: "ENODATA", address: "", family: undefined });
+    const mixed = [...mapped, { address: "2001:db8::1", family: 6 }];
+    expect(await lookup(6, mixed)).toEqual({ error: null, address: "2001:db8::1", family: 6 });
+    expect(await lookup(6, mixed, true)).toMatchObject({
+      address: [{ address: "2001:db8::1", family: 6 }],
+    });
+  });
+
+  it("keeps IPv4 answers and passes lookup errors through", async () => {
+    expect(await lookup(4, [{ address: "192.0.2.10", family: 4 }])).toEqual({
+      error: null,
+      address: "192.0.2.10",
+      family: 4,
+    });
+    expect(await lookup(6, [{ address: "192.0.2.10", family: 4 }])).toMatchObject({
+      error: "ENODATA",
+    });
+    const notFound = Object.assign(new Error("getaddrinfo ENOTFOUND site.example"), {
+      code: "ENOTFOUND",
+    });
+    expect(await lookup(6, notFound)).toMatchObject({ error: "ENOTFOUND" });
   });
 });
