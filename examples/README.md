@@ -9,7 +9,7 @@ Small apps that use Posterna, one folder each. They are private workspace packag
 | `next-basic` | Next.js 16 with `proxy.ts`. Pages and route handlers read the verdict from the `X-Agent-*` request headers. |
 | `next-signup` | Next.js 15 with `middleware.ts` on the Node.js runtime, and a sign-up route handler that verifies and decides itself. |
 
-Every example starts in monitor mode, like every real install: its `agents.yaml` comes from a template. The end-to-end tests point `POSTERNA_POLICY` at an enforcing policy to exercise blocks, throttles and recommendations.
+Every example starts in monitor mode, like every real install: its `agents.yaml` comes from a template. The end-to-end tests point `POSTERNA_POLICY` at an enforcing policy to exercise blocks, throttles and recommendations. The Next.js examples wrap `next.config.ts` in `withPosternaConfig`, so for them the tests set it when building, and the policy reaches the app only through the build.
 
 Run one from the repository root after `pnpm install` and `pnpm build`:
 

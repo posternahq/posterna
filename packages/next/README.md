@@ -18,10 +18,20 @@ export const config = {
 };
 ```
 
+```ts
+// next.config.ts: builds agents.yaml into the proxy, so it works where the
+// proxy cannot read files at run time, such as on Vercel.
+import { withPosternaConfig } from "@posterna/next/config";
+
+export default withPosternaConfig({
+  // your existing settings
+});
+```
+
 - Wraps an existing proxy or middleware: `withPosterna(options, yourProxy)`. Your function runs after Posterna and reads the verdict with `getPosterna(request)`.
 - Pages and route handlers read `X-Agent-Verdict`, `X-Agent-Operator`, `X-Agent-Purpose` and `X-Agent-Method` from `headers()`. Client-sent copies are removed.
 - Route handlers that need a sign-up recommendation use `createPosterna()` to verify and decide.
 - Next.js never gives middleware the socket address: set `clientIpHeader` or `trustedProxies` for your host, or IP checks stay off.
-- Reading `agents.yaml` needs Node 20.16 or later. On the Edge runtime there is no reverse DNS and no file access; pass the policy text as `policy`.
+- `withPosternaConfig` copies `agents.yaml` into each build; without it, the proxy reads the file at run time, which needs Node 20.16 or later and does not work on Vercel. On the Edge runtime there is no reverse DNS.
 
 See the [install guide](https://github.com/posternahq/posterna/blob/main/docs/install.md). Next.js 15 and 16 are supported. MIT licensed.

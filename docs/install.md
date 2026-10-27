@@ -84,6 +84,22 @@ export const config = {
 };
 ```
 
+Then wrap your Next.js config, so that `agents.yaml` is built into the proxy:
+
+```ts
+// next.config.ts
+import { withPosternaConfig } from "@posterna/next/config";
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  // your existing settings
+};
+
+export default withPosternaConfig(nextConfig);
+```
+
+`withPosternaConfig` reads `agents.yaml` when Next.js loads the config and builds its text into the proxy, so the proxy never has to read the file at run time. Hosts such as Vercel deploy the proxy with only the code it imports, so without the wrapper the file is not there and Posterna runs a built-in monitor policy without your rules: on a live Vercel site, `posterna doctor` reported `FAIL Policy` with "No policy file at /var/task/agents.yaml", and with the wrapper (from a source build) the same site passed (27 October 2026). `agents.yaml` stays the one place your policy lives: every build copies it again, `posterna policy check` and `posterna robots` read it as before, and `next dev` picks up a change when you restart it. In `next.config.mjs` the import is the same; in CommonJS, use `require("@posterna/next/config")`. For a file somewhere else, pass its path: `withPosternaConfig(nextConfig, { policyPath: "config/agents.yaml" })`. The proxy uses the built-in copy unless you pass `policy` or `policyPath` in its own options.
+
 If you already have a proxy function, pass it as the second argument: `withPosterna(options, yourProxy)`. Posterna runs first; your function runs after it and can read the verdict with `getPosterna(request)`. Next.js reads `config` at build time, so write it out in your own file; it cannot be imported. Make sure the matcher covers every page you want labeled, including your sign-up route.
 
 Before you settle on the matcher, leave out these routes:
@@ -98,9 +114,7 @@ For example, with webhooks under `/api/webhooks` and an analytics rewrite under 
 matcher: ["/((?!_next/static|_next/image|favicon.ico|api/webhooks|ingest).*)"],
 ```
 
-In Next.js 16, the proxy always runs on the Node.js runtime, so it reads `agents.yaml` from the project folder and can do reverse DNS. Reading the file needs Node 20.16 or later. On older Node, Posterna logs a `[posterna]` warning and runs a built-in monitor policy without your rules; `posterna doctor` reports it.
-
-**On Vercel, the proxy cannot read `agents.yaml`.** Vercel deploys the proxy with only the code it imports, so the file is not there, and Posterna runs the built-in monitor policy without your rules. `posterna doctor` reports `FAIL Policy` with "No policy file at /var/task/agents.yaml" (measured on 27 October 2026). On Vercel, pass the policy text as `policy` instead, for example from a module that exports it as a string, and check with doctor that the policy in the adapter options is in use.
+In Next.js 16, the proxy always runs on the Node.js runtime, so it can do reverse DNS. Without `withPosternaConfig`, it reads `agents.yaml` from the project folder at run time. That works with `next start` in the project folder, but needs Node 20.16 or later; on older Node, Posterna logs a `[posterna]` warning and runs a built-in monitor policy without your rules, and `posterna doctor` reports it.
 
 Pages and route handlers read the verdict from the request headers:
 
@@ -110,7 +124,7 @@ import { headers } from "next/headers";
 const verdict = (await headers()).get("x-agent-verdict");
 ```
 
-A route handler that needs a sign-up recommendation verifies and decides itself, because it runs in a different bundle from the proxy. Turn counting off there, since the proxy already counted the request:
+A route handler that needs a sign-up recommendation verifies and decides itself, because it runs in a different bundle from the proxy. It gets the same built-in copy of `agents.yaml`. Turn counting off there, since the proxy already counted the request:
 
 ```ts
 import { createPosterna } from "@posterna/next";
@@ -162,14 +176,14 @@ export const config = {
 };
 ```
 
-The routes to leave out of the matcher are the same as for Next.js 16, above.
+Wrap your Next.js config in `withPosternaConfig`, and leave the same routes out of the matcher, as for Next.js 16 above.
 
 ### The Edge runtime
 
 Next.js before 15.5 runs middleware only on the Edge runtime, and Next.js 16 still allows `middleware.ts` there. Posterna avoids Node.js built-ins so that it can run there, with these limits (the end-to-end tests cover the Node.js runtime only):
 
 - **No reverse DNS.** There is no DNS resolver, so operators that are checked by reverse DNS (Googlebot outside its IP lists, for example) stay `declared_unverifiable`.
-- **No files.** The Edge runtime cannot read `agents.yaml`. Pass the policy text as `policy` instead.
+- **No files.** The Edge runtime cannot read files, so wrap your Next.js config in `withPosternaConfig` to build `agents.yaml` in (checked with Next.js 15.5 middleware on the Edge runtime), or pass the policy text as `policy`.
 - **Bundle size.** The operator directory (about 650 KB of JSON) is bundled into the middleware.
 
 Prefer the Node.js runtime wherever you can.
@@ -221,7 +235,7 @@ The same values work for Express and Next.js on each host.
 **Vercel.**
 - Vercel overwrites `X-Forwarded-For` with the client's address and does not forward external values, to prevent spoofing. `x-vercel-forwarded-for` is documented as identical to it, and unlike `X-Forwarded-For` it is not overwritten by a proxy you put in front of Vercel ([request headers](https://vercel.com/docs/headers/request-headers)). Use `clientIpHeader: "x-vercel-forwarded-for"`; `trustedProxies: 1` also works.
 - Confirmed on 27 October 2026 on a live `*.vercel.app` site (Next.js 16, `@posterna/next` 0.1.1), from a home connection and from a GitHub Actions runner: `x-vercel-forwarded-for` carried the real client address, a forged copy was ignored, and the signed host and signature headers passed `posterna doctor`. `*.vercel.app` has no IPv6 address, so IPv6 was not checked.
-- The proxy cannot read `agents.yaml` on Vercel; see the Next.js 16 section above.
+- The proxy cannot read files on Vercel, so wrap your Next.js config in `withPosternaConfig`; see the Next.js 16 section above.
 - `X-Forwarded-Host` matches `Host`, the custom domain.
 - Vercel advises against putting your own reverse proxy in front of a project, because the real client address can then no longer be identified ([reverse proxy](https://vercel.com/docs/security/reverse-proxy)).
 - For Express on Vercel, `express.static()` files are served by Vercel's CDN and never reach the middleware ([Express on Vercel](https://vercel.com/docs/frameworks/backend/express)).
@@ -334,7 +348,8 @@ No address, URL, header value or body ever leaves your server. Without a site ke
 
 | Environment variable | Meaning |
 |---|---|
-| `POSTERNA_POLICY` | Path to agents.yaml. Default: `agents.yaml` in the working directory. |
+| `POSTERNA_POLICY` | Path to agents.yaml. Default: `agents.yaml` in the working directory. With Next.js, `withPosternaConfig` reads it at build time. |
+| `POSTERNA_POLICY_TEXT` | Next.js only: the agents.yaml text, which `withPosternaConfig` builds in. Set it yourself only where neither the wrapper nor a file can be used. |
 | `POSTERNA_MODE` | `monitor` turns enforcement off at start. No value turns it on. |
 | `POSTERNA_SITE_KEY` | Site key for counters. Without it nothing is sent. |
 | `POSTERNA_DEBUG_TOKEN` | Enables the debug route for `posterna doctor`. |
@@ -387,7 +402,7 @@ To try changes that are not on npm yet, install the packages from a local build 
    }
    ```
 
-   You need both overrides: packing turns the packages' dependencies on each other into plain version numbers, which npm would otherwise fetch from the registry. With pnpm, put the same two entries under `pnpm.overrides`; with Yarn, under `resolutions`. Commit the `vendor` folder, so your host's build can install from it.
+   You need both overrides: packing turns the packages' dependencies on each other into plain version numbers, which npm would otherwise fetch from the registry. With pnpm, put the same two entries under `pnpm.overrides`; with Yarn, under `resolutions`. Commit the `vendor` folder, so your host's build can install from it. Vercel keeps `node_modules` between builds, so a new tarball with an unchanged version number is not installed there: redeploy with `vercel deploy --force`, which skips the build cache (seen on 27 October 2026).
 
 4. Install, then check that a clean install works the way your host builds:
 
