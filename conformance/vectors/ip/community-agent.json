@@ -26,6 +26,7 @@
       },
       "expected": {
         "verdict": "declared_unverifiable",
+        "reason": "nothing_published",
         "operator": "community-operator",
         "agent": "CommunityBot",
         "purpose": "training",

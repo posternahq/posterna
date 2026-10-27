@@ -11,15 +11,20 @@ export interface ProxyOptions {
   trustedProxies?: readonly string[] | number;
   /** The forwarding header the trusted proxies append to. Defaults to `x-forwarded-for`. */
   forwardedHeader?: "x-forwarded-for" | "forwarded";
-  /** The hostname agents sign as `@authority`. Overrides Host and X-Forwarded-Host. */
-  publicHost?: string;
+  /**
+   * The hostname agents sign as `@authority`. Overrides Host and
+   * X-Forwarded-Host. A list is for sites served on several names (the apex
+   * and www): the request's host is used when it is in the list, else the
+   * first entry.
+   */
+  publicHost?: string | readonly string[];
 }
 
 export interface Trust {
   cidrs: PrefixMatcher | null;
   hops: number;
   header: "x-forwarded-for" | "forwarded";
-  publicHost: string | null;
+  publicHosts: string[];
 }
 
 export function compileTrust(options: ProxyOptions): Trust {
@@ -28,7 +33,12 @@ export function compileTrust(options: ProxyOptions): Trust {
     cidrs: Array.isArray(proxies) ? PrefixMatcher.compile(proxies) : null,
     hops: typeof proxies === "number" && Number.isInteger(proxies) && proxies > 0 ? proxies : 0,
     header: options.forwardedHeader ?? "x-forwarded-for",
-    publicHost: options.publicHost?.trim().toLowerCase() || null,
+    publicHosts: (typeof options.publicHost === "string"
+      ? [options.publicHost]
+      : (options.publicHost ?? [])
+    )
+      .map((host) => host.trim().toLowerCase())
+      .filter((host) => host.length > 0),
   };
 }
 
@@ -118,6 +128,32 @@ export function resolveClient(request: NormalizedRequest, trust: Trust): Resolve
       addressSource = `${trust.header} entry ${chain.length - i} from the right`;
       if (!trust.cidrs.has(hop.parsed)) break;
     }
+  } else if (!socket && (trust.cidrs || trust.hops > 0)) {
+    // No socket address (Next.js middleware and proxy never see it): the
+    // configured proxies are trusted to have written the forwarding header,
+    // so read it from its right end. Without trustedProxies it is ignored.
+    viaTrustedProxy = true;
+    const chain = forwardingChain(request, trust.header);
+    if (trust.cidrs) {
+      for (let i = chain.length - 1; i >= 0; i--) {
+        const hop = parseAddress(chain[i]);
+        if (!hop) {
+          addressSource = `${trust.header} (unreadable entry)`;
+          break;
+        }
+        address = hop;
+        addressSource = `${trust.header} entry ${chain.length - i} from the right (no socket address)`;
+        if (!trust.cidrs.has(hop.parsed)) break;
+      }
+    } else {
+      // Fewer entries than hops: take the leftmost, as with a socket address.
+      const index = Math.max(0, chain.length - trust.hops);
+      const picked = chain.length > 0 ? parseAddress(chain[index]) : null;
+      if (picked) {
+        address = picked;
+        addressSource = `${trust.header} with ${trust.hops} trusted hops (no socket address)`;
+      } else addressSource = `${trust.header} (too few or unreadable entries)`;
+    }
   } else if (socket && trust.hops > 0) {
     viaTrustedProxy = true;
     const chain = [...forwardingChain(request, trust.header), socket.text];
@@ -132,24 +168,23 @@ export function resolveClient(request: NormalizedRequest, trust: Trust): Resolve
 
   let host: string | null;
   let hostSource: string;
-  if (trust.publicHost) {
-    host = trust.publicHost;
-    hostSource = "publicHost";
+  const forwardedHost = viaTrustedProxy
+    ? lastValue(fieldValue(request, "x-forwarded-host"))
+    : undefined;
+  if (forwardedHost) {
+    host = forwardedHost.toLowerCase();
+    hostSource = "x-forwarded-host";
   } else {
-    const forwardedHost = viaTrustedProxy
-      ? lastValue(fieldValue(request, "x-forwarded-host"))
-      : undefined;
-    if (forwardedHost) {
-      host = forwardedHost.toLowerCase();
-      hostSource = "x-forwarded-host";
-    } else {
-      host = (fieldValue(request, "host") ?? request.urlHost)?.toLowerCase() ?? null;
-      hostSource = host ? "host" : "none";
-    }
+    host = (fieldValue(request, "host") ?? request.urlHost)?.toLowerCase() ?? null;
+    hostSource = host ? "host" : "none";
+  }
+  if (trust.publicHosts.length > 0) {
+    if (!host || !trust.publicHosts.includes(host)) host = trust.publicHosts[0] as string;
+    hostSource = "publicHost";
   }
 
   let scheme: "http" | "https" = request.urlScheme ?? "https";
-  if (trust.publicHost) scheme = "https";
+  if (trust.publicHosts.length > 0) scheme = "https";
   else if (viaTrustedProxy) {
     const proto = lastValue(fieldValue(request, "x-forwarded-proto"))?.toLowerCase();
     if (proto === "http" || proto === "https") scheme = proto;

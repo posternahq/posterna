@@ -1,0 +1,46 @@
+{
+  "id": "proxy/no-socket-no-config",
+  "description": "Without a socket address and without trustedProxies, X-Forwarded-For is still ignored: the client is unknown and an IP claim cannot be checked.",
+  "spec": [
+    "4.2",
+    "9"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": null,
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-forwarded-for",
+            "192.0.2.77"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "declared_unverifiable",
+        "reason": "no_client_address",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "none",
+        "error": false,
+        "client": {
+          "address": null
+        }
+      }
+    }
+  ]
+}

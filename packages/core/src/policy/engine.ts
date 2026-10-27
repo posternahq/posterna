@@ -85,6 +85,13 @@ export interface PolicyEngine {
    */
   setRemoteOverride(mode: unknown): boolean;
   state(): PolicyState;
+  /**
+   * The counters path group for a request path (docs/SPEC.md section 7): the
+   * most specific matching `paths` pattern, else the first path segment as
+   * `/<segment>/*`. Segments that look like identifiers become `/:id/*`, so
+   * no user name, number or token in a URL is ever reported.
+   */
+  pathGroup(path: string): string;
   /** Resolves to the policy hash once computed. */
   hash(): Promise<string | null>;
 }
@@ -107,6 +114,27 @@ function defaultEnv(): Record<string, string | undefined> {
   const process = (globalThis as { process?: { env?: Record<string, string | undefined> } })
     .process;
   return process?.env ?? {};
+}
+
+/** `/docs/intro` is `/docs/*`; `/` is `/`; identifier-like segments are masked. */
+export function firstSegmentGroup(path: string): string {
+  const raw = path.split("/").find((part) => part.length > 0);
+  if (raw === undefined) return "/";
+  let segment = raw;
+  try {
+    segment = decodeURIComponent(raw);
+  } catch {
+    segment = raw;
+  }
+  const looksLikeId =
+    segment.length > 32 ||
+    /[@%\s]/.test(segment) ||
+    /^\d[\d_.-]*$/.test(segment) ||
+    /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test(segment) ||
+    /^[0-9a-f]{12,}$/i.test(segment) ||
+    (/\d/.test(segment) && /^[A-Za-z0-9_-]{16,}$/.test(segment)) ||
+    !/^[A-Za-z0-9._~-]+$/.test(segment);
+  return looksLikeId ? "/:id/*" : `/${segment}/*`;
 }
 
 function message(error: unknown): string {
@@ -373,6 +401,15 @@ export function createPolicyEngine(
         keysVersion: verifierState?.keysVersion ?? null,
         policyHash: hash,
       };
+    },
+    pathGroup(path) {
+      try {
+        const clean = path.replace(/[?#].*$/s, "") || "/";
+        const match = paths.find((entry) => entry.regex.test(clean));
+        return match ? match.pattern : firstSegmentGroup(clean);
+      } catch {
+        return "other";
+      }
     },
     hash() {
       return hashing;

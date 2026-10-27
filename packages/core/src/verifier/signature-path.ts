@@ -19,6 +19,7 @@ import type { DirectoryIndex, KeyVerifier } from "../directory/index-builder";
 import type { OperatorRecord } from "../directory/types";
 import { signatureAgentOrigin } from "./claim";
 import type { Lru } from "./lru";
+import type { ReasonCode } from "./types";
 
 /**
  * The Cloudflare functions the signature path calls. Tests replace them to
@@ -36,7 +37,7 @@ export const CLOUDFLARE_LIBRARY: SignatureLibrary = Object.freeze({
 
 export type SignatureOutcome =
   | { kind: "verified"; operator: OperatorRecord; keyid: string }
-  | { kind: "invalid"; operator: OperatorRecord; reason: string }
+  | { kind: "invalid"; operator: OperatorRecord; reason: string; code: ReasonCode }
   /** The kid matches no key this install holds: an early keys refresh is due. */
   | { kind: "unknown_key"; operator: OperatorRecord }
   /** The operator is listed but this install holds none of its keys. */
@@ -44,7 +45,7 @@ export type SignatureOutcome =
   /** No Web Bot Auth signature names a listed operator. */
   | { kind: "unsigned" }
   /** The library failed or does not support what the signer used: fail open. */
-  | { kind: "error"; operator: OperatorRecord; error: string };
+  | { kind: "error"; operator: OperatorRecord; error: string; code: ReasonCode };
 
 export interface SignatureContext {
   index: DirectoryIndex;
@@ -182,6 +183,7 @@ export async function verifySignatures(context: SignatureContext): Promise<Signa
       kind: "invalid",
       operator: context.claimed,
       reason: "Signature-Input could not be parsed",
+      code: "malformed_signature",
     };
   }
   if (labels.length === 0) return { kind: "unsigned" };
@@ -214,6 +216,7 @@ async function verifyLabel(
   const { index, request, now, clockSkew, maxValidity, nonces, library } = context;
   let operator: OperatorRecord | null = null;
   let rejection: string | null = null;
+  let rejectionCode: ReasonCode | null = null;
   let verifiedKeyid = "";
 
   const resolve = (keyid: string, agent: SignatureAgentEntry | undefined): WebBotVerifier => {
@@ -253,12 +256,14 @@ async function verifyLabel(
   ): boolean => {
     if (expires - created > maxValidity) {
       rejection = `validity window of ${expires - created} seconds is longer than ${maxValidity}`;
+      rejectionCode = "validity_too_long";
       return false;
     }
     if (nonce !== undefined) {
       const key = `${operator?.slug ?? ""}\u0000${keyid}\u0000${nonce}`;
       if (nonces.has(key)) {
         rejection = "nonce already used (replay)";
+        rejectionCode = "nonce_replayed";
         return false;
       }
       nonces.set(key, true);
@@ -319,14 +324,38 @@ async function verifyLabel(
         error.code === SignatureErrorCode.UnsupportedFeature ||
         error.code === SignatureErrorCode.ResolverFailed
       ) {
-        return { kind: "error", operator: subject, error: `signature library: ${error.message}` };
+        return {
+          kind: "error",
+          operator: subject,
+          error: `signature library: ${error.message}`,
+          code: "library_unsupported",
+        };
       }
-      return { kind: "invalid", operator: subject, reason: rejection ?? error.message };
+      return {
+        kind: "invalid",
+        operator: subject,
+        reason: rejection ?? error.message,
+        code: rejectionCode ?? rejectionReason(error.code, error.message),
+      };
     }
     return {
       kind: "error",
       operator: subject,
       error: `signature library: ${error instanceof Error ? error.message : String(error)}`,
+      code: "library_error",
     };
   }
+}
+
+/** A stable reason code for a signature the library rejected. */
+export function rejectionReason(code: string, message: string): ReasonCode {
+  if (code === SignatureErrorCode.VerificationFailed) return "signature_invalid";
+  if (code === SignatureErrorCode.PolicyViolation) {
+    if (/expired|too old/i.test(message)) return "expired";
+    if (/in the future/i.test(message)) return "created_in_future";
+    if (/nonce/i.test(message)) return "nonce_rejected";
+    return "profile_rejected";
+  }
+  if (code === SignatureErrorCode.AlgorithmMismatch) return "profile_rejected";
+  return "malformed_signature";
 }

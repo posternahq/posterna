@@ -1,0 +1,37 @@
+# Posterna policy: the saas-signup template, plus `cap` for claims that cannot be verified.
+#
+# The allow-list template, plus recommendations for the sign-up page:
+# verified agents can skip a friction step, and failed claims and unknown
+# automation get your own challenge. Your application acts on these
+# recommendations; Posterna never shows a challenge itself. It starts in
+# monitor mode, so nothing is blocked or recommended until you change mode
+# to enforce. The reference for every key is docs/policy.md in the
+# posternahq/posterna repository.
+
+version: 1
+mode: monitor
+
+# By verdict class. People are always allowed and are not configured here.
+defaults:
+  verified: allow
+  declared_unverifiable: allow
+  claimed_failed: allow
+  unknown_automation: allow
+
+# Verified search engines are never blocked or throttled.
+guards:
+  search_engines: protect
+
+# Applies to every operator.
+purposes:
+  training: block
+
+# Returned by decide(result, { path, kind: "signup" }) for your application to act on.
+signup:
+  "/signup":
+    verified: lift
+    declared_unverifiable: cap
+    claimed_failed: challenge
+    unknown_automation: challenge
+
+emit: [robots.txt, content-signals]

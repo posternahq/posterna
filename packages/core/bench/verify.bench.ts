@@ -3,121 +3,22 @@
 // verify(), decide() and enforcementResponse(), as the middleware does.
 // Method: docs/benchmark.md.
 
-import type { webcrypto } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { availableParallelism, cpus, platform, release } from "node:os";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { sign } from "web-bot-auth";
-import { signerFromJWK } from "web-bot-auth/crypto";
-import type { DirectoryFile, KeysFile } from "../src/directory/types";
 import { createPolicyEngine, type PolicyEngine } from "../src/policy/engine";
 import { enforcementResponse } from "../src/policy/respond";
 import { createVerifier } from "../src/verifier/verifier";
-
-const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-const json = <T>(...path: string[]) => JSON.parse(readFileSync(join(REPO, ...path), "utf8")) as T;
-
-const BUDGET_MS = 5;
-const WARMUP = 500;
-const SAMPLES = 5_000;
-
-// The real snapshot, plus the conformance suite's signing operator and its keys.
-const realDirectory = json<DirectoryFile>("packages", "directory", "data", "directory.json");
-const realKeys = json<KeysFile>("packages", "directory", "data", "keys.json");
-const fixtureDirectory = json<DirectoryFile>("conformance", "fixtures", "directory.json");
-const fixtureKeys = json<KeysFile>("conformance", "fixtures", "keys.json");
-const signerOperator = fixtureDirectory.operators.find((op) => op.slug === "example-signer");
-const signerKeys = fixtureKeys.operators["example-signer"];
-if (!signerOperator || !signerKeys)
-  throw new Error("conformance fixtures are missing example-signer");
-const directory: DirectoryFile = {
-  ...realDirectory,
-  operators: [...realDirectory.operators, signerOperator],
-};
-const keys: KeysFile = {
-  ...realKeys,
-  operators: { ...realKeys.operators, "example-signer": signerKeys },
-};
-
-const google = realDirectory.operators.find((op) => op.slug === "google");
-const crawlerPrefix = google?.verification.ip_lists.find((list) => list.agent === "common-crawlers")
-  ?.prefixes[0];
-if (!crawlerPrefix) throw new Error("the snapshot has no Google common-crawlers prefix");
-const crawlerAddress = crawlerPrefix.replace(/\.0\/\d+$/, ".1").replace(/\/\d+$/, "");
-
-const SITE = "www.site.example";
-
-// An enforcing policy with a rule at every evaluation step and 40 path rules to scan.
-const POLICY = `version: 1
-mode: enforce
-defaults:
-  claimed_failed: block
-purposes:
-  training: block
-operators:
-  example-signer:
-    agent: { action: throttle, rate: 1000000/sec }
-paths:
-${Array.from({ length: 36 }, (_, i) => `  "/section-${i}/*":\n    claimed_failed: block\n    training: allow`).join("\n")}
-  "/api/*":
-    claimed_failed: block
-    monitor: true
-  "/api/public/*":
-    verified: allow
-  "/docs/*":
-    verified: allow
-  "/admin/*":
-    unknown_automation: block
-signup:
-  "/signup":
-    verified: lift
-    claimed_failed: challenge
-`;
-const BROWSER = {
-  "user-agent":
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-  accept: "text/html",
-  "accept-language": "en-US",
-};
-
-async function signedRequests(count: number, now: number): Promise<Request[]> {
-  const jwk = json<{ jwk: webcrypto.JsonWebKey }>(
-    "conformance",
-    "fixtures",
-    "keys",
-    "signer-a.json",
-  ).jwk;
-  const signer = await signerFromJWK(jwk);
-  const requests: Request[] = [];
-  for (let i = 0; i < count; i++) {
-    const headers: [string, string][] = [
-      ["host", SITE],
-      ["user-agent", "Mozilla/5.0 (compatible; ExampleAgent/1.0)"],
-      ["signature-agent", 'sig1="https://signer.example"'],
-    ];
-    const nonce = Buffer.alloc(64);
-    nonce.writeUInt32BE(i, 0);
-    const fields = await sign(
-      {
-        kind: "request",
-        method: "GET",
-        targetUri: `https://${SITE}/page/${i}`,
-        fields: headers.map(([name, value]) => ({ name, value })),
-      },
-      {
-        signer,
-        created: new Date((now - 5) * 1000),
-        expires: new Date((now + 60) * 1000),
-        nonce: nonce.toString("base64"),
-        additionalComponents: ["@method", "@path"],
-      },
-    );
-    headers.push(["signature", fields.signature], ["signature-input", fields.signatureInput]);
-    requests.push(new Request(`https://${SITE}/page/${i}`, { headers }));
-  }
-  return requests;
-}
+import {
+  BROWSER,
+  BUDGET_MS,
+  crawlerAddress,
+  directory,
+  keys,
+  machine,
+  POLICY,
+  SAMPLES,
+  SITE,
+  signedRequests,
+  WARMUP,
+} from "./fixtures";
 
 interface Result {
   scenario: string;
@@ -210,10 +111,7 @@ async function main(): Promise<void> {
   ];
   verifier.close();
 
-  const cpu = cpus()[0]?.model ?? "unknown CPU";
-  console.log(
-    `Node ${process.version} on ${platform()} ${release()}, ${availableParallelism()} CPUs (${cpu})`,
-  );
+  console.log(machine());
   console.log(
     `Directory: ${directory.operators.length} operators, ${keys.operators ? Object.keys(keys.operators).length : 0} key sets. Policy: ${engine.policy.paths.length} path rules, enforce mode. ${SAMPLES} samples after ${WARMUP} warm-up requests.\n`,
   );

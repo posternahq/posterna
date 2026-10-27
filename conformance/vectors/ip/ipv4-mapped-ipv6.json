@@ -27,6 +27,7 @@
       },
       "expected": {
         "verdict": "verified_by_ip",
+        "reason": null,
         "operator": "ip-crawler",
         "agent": "ExampleBot",
         "purpose": "search",

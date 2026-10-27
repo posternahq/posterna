@@ -27,6 +27,7 @@
       },
       "expected": {
         "verdict": "declared_unverifiable",
+        "reason": "no_dns",
         "operator": "rdns-crawler",
         "agent": "ExampleRdnsBot",
         "purpose": "training",

@@ -43,6 +43,7 @@
       },
       "expected": {
         "verdict": "declared_unverifiable",
+        "reason": "unknown_kid",
         "operator": "label-signer",
         "agent": "LabelAgent",
         "purpose": "agent",

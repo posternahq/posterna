@@ -27,6 +27,7 @@
       },
       "expected": {
         "verdict": "claimed_failed",
+        "reason": "outside_ip_list",
         "operator": "anthropic",
         "agent": "ClaudeBot",
         "purpose": "training",

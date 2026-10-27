@@ -45,8 +45,8 @@ jobs:
       - name: Build
         run: pnpm build
 
-  # The hot path benchmark: fails when p99 for the signature or IP path is
-  # 5 ms or more (docs/SPEC.md section 10, method in docs/benchmark.md).
+  # The hot path benchmarks, in core and through the Express middleware: fail
+  # when any p99 is 5 ms or more (docs/SPEC.md section 10, docs/benchmark.md).
   bench:
     name: Bench
     runs-on: ubuntu-latest
@@ -66,3 +66,31 @@ jobs:
 
       - name: Bench
         run: pnpm bench
+
+  # Starts each example app from the built packages (two Express apps, a
+  # Next.js 16 app and a Next.js 15 app) and checks verdict headers, enforced
+  # responses and counters against a mock ingest server.
+  e2e:
+    name: End-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: End-to-end tests
+        run: pnpm test:e2e
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"

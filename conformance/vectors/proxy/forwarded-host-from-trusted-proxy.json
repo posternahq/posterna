@@ -48,6 +48,7 @@
       },
       "expected": {
         "verdict": "verified_by_signature",
+        "reason": null,
         "operator": "example-signer",
         "agent": "ExampleAgent",
         "purpose": "agent",

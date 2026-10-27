@@ -38,6 +38,7 @@
       },
       "expected": {
         "verdict": "declared_unverifiable",
+        "reason": "rdns_pending",
         "operator": "rdns-crawler",
         "agent": "ExampleRdnsBot",
         "purpose": "training",
@@ -65,6 +66,7 @@
       },
       "expected": {
         "verdict": "verified_by_ip",
+        "reason": null,
         "operator": "rdns-crawler",
         "agent": "ExampleRdnsBot",
         "purpose": "training",

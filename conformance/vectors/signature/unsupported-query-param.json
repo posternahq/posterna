@@ -39,6 +39,7 @@
       },
       "expected": {
         "verdict": "unknown_automation",
+        "reason": "library_unsupported",
         "operator": null,
         "agent": null,
         "purpose": null,

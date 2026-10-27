@@ -1,0 +1,14 @@
+{
+  "name": "@posterna/example-express-basic",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Posterna in an Express app.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@posterna/express": "workspace:*",
+    "express": "5.3.0"
+  }
+}

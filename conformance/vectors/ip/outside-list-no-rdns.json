@@ -26,6 +26,7 @@
       },
       "expected": {
         "verdict": "claimed_failed",
+        "reason": "outside_ip_list",
         "operator": "ip-crawler",
         "agent": "ExampleBot",
         "purpose": "search",

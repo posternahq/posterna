@@ -1,4 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["src", "tsup.config.ts"]
+  "compilerOptions": {
+    // Type-check against core's source, so this works before core is built.
+    "paths": { "@posterna/core": ["../core/src/index.ts"] }
+  },
+  "include": ["src", "bench", "tsup.config.ts"]
 }

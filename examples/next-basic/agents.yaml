@@ -1,0 +1,26 @@
+# Posterna policy: the allow-list template.
+#
+# Agents that fetch pages to train AI models are blocked; everything else is
+# allowed. It starts in monitor mode, so nothing is blocked until you change
+# mode to enforce. The reference for every key is docs/policy.md in the
+# posternahq/posterna repository.
+
+version: 1
+mode: monitor
+
+# By verdict class. People are always allowed and are not configured here.
+defaults:
+  verified: allow
+  declared_unverifiable: allow
+  claimed_failed: allow
+  unknown_automation: allow
+
+# Verified search engines are never blocked or throttled.
+guards:
+  search_engines: protect
+
+# Applies to every operator.
+purposes:
+  training: block
+
+emit: [robots.txt, content-signals]

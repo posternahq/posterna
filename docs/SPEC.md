@@ -91,7 +91,8 @@ A Fetch API `Request` or a Node `IncomingMessage`, plus configuration: `trustedP
 
 - `trustedProxies`: a list of CIDRs (or a hop count) for the proxies in front of the app. The client IP is the rightmost address in `X-Forwarded-For` (or `Forwarded`) that is not a trusted proxy. With no configuration, the socket address is used and `X-Forwarded-For` is ignored.
 - `forwardedHeader` (`x-forwarded-for` by default, or `forwarded`) names the one header the trusted proxies maintain. The other is never read, so a client cannot inject it. Forwarding headers are read only when the socket peer is a trusted proxy. With a hop count N, the client is the address N hops to the left of the socket. An unreadable entry ends the walk at the nearest trusted hop.
-- `publicHost`: the hostname agents sign (`@authority`). If set, it is used. Otherwise `X-Forwarded-Host` is honored only from a trusted proxy, else `Host`.
+- No socket address (Next.js middleware and proxy never see it): with `trustedProxies` set, the forwarding header is read from its right end, as if the socket peer were a trusted proxy. With CIDRs, trusted entries are skipped from the right; with a hop count N, the client is the Nth entry from the right, or the leftmost when there are fewer. Without `trustedProxies`, forwarding headers are still ignored and the client address is unknown.
+- `publicHost`: the hostname agents sign (`@authority`), or a list of them for a site served on several names. If set, it is used: the request's own host when it is in the list, else the first entry. Otherwise `X-Forwarded-Host` is honored only from a trusted proxy, else `Host`. Several hosting proxies pass a client's `X-Forwarded-Host` through, so `docs/install.md` tells every install to set `publicHost`, and `posterna doctor` checks that a forged one is ignored.
 - Runtime proxy guard: if 80 percent or more of the last 200 requests resolve to private, loopback, link-local or carrier-grade NAT addresses, the install marks itself `proxySuspect`, suspends all enforcement, and reports the state. This is the misconfiguration that would make real Googlebot look spoofed. Requests with no address at all are not counted.
 
 ### 4.3 Identifying the claim
@@ -135,6 +136,7 @@ type VerdictResult = {
   agent?: string;
   purpose?: Purpose;
   method?: "signature" | "ip" | "rdns" | "none";
+  reason?: ReasonCode;    // why; set on every verdict except verified and human, and on fail-open results
   note?: string;          // human-readable reason
   error?: string;         // set when a fail-open path was taken
 };
@@ -151,6 +153,8 @@ type Decision = {
   error?: string;         // set when a fail-open path was taken
 };
 ```
+
+Reason codes, a closed list (`REASON_CODES` in `@posterna/core`), so counters can say why without carrying request data: signature path `signature_invalid`, `expired`, `created_in_future`, `validity_too_long`, `nonce_replayed`, `nonce_rejected`, `profile_rejected`, `malformed_signature`, `unknown_kid`, `no_keys`, `unsigned`, `unlisted_signature_agent`; IP and rDNS path `outside_ip_list`, `rdns_mismatch`, `rdns_unconfirmed`, `rdns_pending`, `no_dns`, `no_client_address`, `nothing_published`, `community_token_on_browser`; automation signals `no_user_agent`, `non_browser_user_agent`, `automation_token`, `missing_accept`, `missing_accept_language`; fail-open paths `directory_unavailable`, `clock_invalid`, `rdns_error`, `library_unsupported`, `library_error`, `unexpected_error`. A signature over another host's authority cannot be told apart from any other bad signature, so it is `signature_invalid`.
 
 `decide()` is a method of the policy engine, which holds the per-instance state the safety rails need (throttle buckets, breaker, guard history). It never throws.
 
@@ -246,15 +250,16 @@ Operator and purpose rules come before defaults, so they also apply to unverifie
 
 ## 6. Adapters
 
-- Express: `app.use(posterna(options))`. Sets `req.posterna` (VerdictResult and Decision) and the verdict headers, applies enforced actions, records counters.
-- Next.js: a wrapper for middleware.ts (Next 15, Node runtime where available) and proxy.ts (Next 16). Route handlers can call `verify()` and `decide()` directly.
+- Express: `app.use(posterna(options))`. Sets `req.posterna` (VerdictResult, Decision, and `decide(context)` for sign-up routes) and the verdict headers, applies enforced actions, records counters with response bytes from `Content-Length`. Policy from `policyPath`, `POSTERNA_POLICY` or `agents.yaml` in the working directory; a missing or invalid file is reported and every request is allowed.
+- Next.js: `withPosterna(options, handler?)` for proxy.ts (Next 16, Node.js runtime) and middleware.ts (Next 15; the Node.js runtime from 15.5, else Edge). It composes with an existing proxy or middleware function, which runs after it and reads the verdict with `getPosterna(request)`; the verdict headers reach the app through Next.js's request-header override, merged with any the function sets. Flushes counters through the event's `waitUntil`. On the Edge runtime there is no reverse DNS and no file access (pass the policy text). Route handlers verify and decide with `createPosterna()`; they run in another bundle, so they count nothing themselves.
+- Settings come from options, else `POSTERNA_POLICY`, `POSTERNA_SITE_KEY`, `POSTERNA_DEBUG_TOKEN`, `POSTERNA_MODE` and `POSTERNA_BASE_URL` (the cloud, for counters and directory refreshes). Install guide: `docs/install.md`.
 - Debug route `/.well-known/posterna/debug`: disabled unless `POSTERNA_DEBUG_TOKEN` is set, and then only answers requests carrying that token in `X-Posterna-Debug-Token`. Returns JSON: resolved client IP and which header or hop produced it, the host used for `@authority`, which signature headers arrived, the verdict for this request, directory version, mode and active suspensions. Used by `posterna doctor`.
 
 ## 7. Counters client
 
-- Aggregates in memory per key `(hour, verdict, operator, agent, purpose, pathGroup, action, enforced)` with `count` and `bytes` (response bytes when known).
-- `pathGroup` is the matched policy path pattern, else the first path segment (`/docs/*`), capped at 50 distinct groups per flush with the rest in `other`.
-- Flushes every 60 seconds, on process exit, and through `waitUntil` where the platform offers it. Exponential backoff; data older than 10 minutes is dropped. Never blocks a request.
+- Aggregates in memory per key `(hour, verdict, reason, operator, agent, purpose, pathGroup, action, enforced)` with `count` and `bytes` (response bytes when known). Recording is synchronous and constant time.
+- `pathGroup` is the matched policy path pattern, else the first path segment (`/docs/*`), capped at 50 distinct groups per flush with the rest in `other`. A first segment that looks like an identifier (digits, a UUID, long hex or token-like strings, anything with `@`, `%` or spaces, or over 32 characters) becomes `/:id/*`, so no user name or number in a URL is ever sent.
+- Flushes every 60 seconds on a timer that never keeps the process alive, on exit (`beforeExit`, and `SIGTERM` and `SIGINT`: if the application handles the signal itself the client only starts a flush; otherwise it flushes for up to 2 seconds and then lets the signal end the process), and through `waitUntil` where the platform offers it. After a failure, retries back off from 15 seconds, doubling to 5 minutes. A batch is dropped once it has waited 10 minutes since it was first queued, and when the cloud refuses it (any 4xx except 408 and 429). Never blocks a request.
 - Without a site key it runs local-only and sends nothing.
 - `state` comes from the policy engine's `state()` (`docs/policy.md`). `mode` is `enforce` only when agents.yaml says so and neither kill switch is on; `guarded` counts guard downgrades since the process started.
 
@@ -268,17 +273,18 @@ Payload, `POST https://posterna.com/v1/ingest`, `Authorization: Bearer <site key
   "mode": "monitor",
   "state": { "proxySuspect": false, "breakerTripped": [], "guarded": 0, "errors": 0, "directoryVersion": "2026-10-27", "keysVersion": "2026-10-27T18", "policyHash": "sha256-prefix" },
   "buckets": [
-    { "hour": "2026-10-28T17:00:00Z", "verdict": "verified_by_ip", "operator": "google", "agent": "Googlebot", "purpose": "search", "pathGroup": "/docs/*", "action": "allow", "enforced": false, "count": 12, "bytes": 345678 }
+    { "hour": "2026-10-28T17:00:00Z", "verdict": "verified_by_ip", "reason": null, "operator": "google", "agent": "Googlebot", "purpose": "search", "pathGroup": "/docs/*", "action": "allow", "enforced": false, "count": 12, "bytes": 345678 }
   ]
 }
 ```
 
-Response: `{ "accepted": <n>, "modeOverride": null | "monitor" }`.
+Response: `{ "accepted": <n>, "modeOverride": null | "monitor" }`. `modeOverride` goes to the engine's remote override setter (5.4); any other value is ignored.
 
 ## 8. CLI
 
-- `posterna init`: detect Express or Next.js from package.json, choose a template (default `monitor`), write agents.yaml, print the exact code to add (v1 makes no automatic code edits), optionally take a site key from the dashboard and add `POSTERNA_SITE_KEY` to the env file after confirmation.
-- `posterna doctor --url <site>`: learn this machine's public IP from `https://posterna.com/v1/whoami`, send a request signed with an ephemeral key to the site's debug route, and report pass or fail with the fix for: client IP resolution, `@authority` host, signature headers surviving proxies, directory freshness, mode and suspensions.
+- `posterna init`: detect Express or Next.js (and its major version and runtime) from package.json, choose a template (default `monitor`; asked on a terminal, `--template` otherwise), write agents.yaml (an existing one only with confirmation or `--force`), print the exact code to add (v1 makes no automatic code edits), optionally take a site key from the dashboard and add `POSTERNA_SITE_KEY` to the env file (`.env.local` for Next.js, `.env` otherwise, created with mode 600) after confirmation, warning when the file is not in `.gitignore`.
+- `posterna doctor --url <site>`: learn this machine's public IP from `https://posterna.com/v1/whoami`, send a request signed with an ephemeral key to the site's debug route (with `POSTERNA_DEBUG_TOKEN` from the environment, plus a forged `X-Forwarded-For` and `X-Forwarded-Host` that a correct setup ignores), and report pass, warn or fail with the fix for: client IP resolution, `@authority` host, signature headers surviving proxies, directory freshness, mode and suspensions. Exit code 1 on any failure.
+- `--base-url` or `POSTERNA_BASE_URL` points the CLI at another cloud, for tests. Prompts use @clack/prompts and are skipped without a terminal or with `--yes`.
 - `posterna robots`: print robots.txt and Content Signals from agents.yaml.
 - `posterna policy check`: validate agents.yaml with clear errors.
 
@@ -294,7 +300,7 @@ Response: `{ "accepted": <n>, "modeOverride": null | "monitor" }`.
 
 ## 10. Performance
 
-p99 under 5 ms per request on a warm cache for the signature and IP paths, measured by a benchmark that CI runs. rDNS lookups are excluded because they run in the background. Method and results: `docs/benchmark.md`.
+p99 under 5 ms per request on a warm cache for the signature and IP paths, measured by benchmarks that CI runs: one for verify and decide in core, one through the Express middleware inside a running app. rDNS lookups are excluded because they run in the background. Method and results: `docs/benchmark.md`.
 
 ## 11. Testing
 
@@ -303,6 +309,7 @@ p99 under 5 ms per request on a warm cache for the signature and IP paths, measu
 - Interop edge cases: parameterized covered components, dictionary-form Signature-Agent, multiple signatures on one request, legacy kid derivation, nonce persistence, clock skew, sf-string serialization.
 - Spoof cases: a claimed ClaudeBot from an AWS address, a claimed Googlebot from a non-crawler Google Cloud address, a valid-looking Signature-Agent not in the directory.
 - Proxy cases, header stripping, failure injection, policy precedence, guards, breaker, kill switches, throttle timing, emitters, end-to-end tests against example apps with a mock ingest server.
+- End-to-end (`pnpm test:e2e`, its own CI job): the four apps in `examples/` (Express, an Express sign-up route, Next.js 16 with proxy.ts, Next.js 15 with middleware.ts on Node.js) started from the built packages, with verified, spoofed, unknown, human, forged-header and throttled-burst requests, and the counters payload and remote override through a mock ingest server.
 
 ## 12. Defaults
 

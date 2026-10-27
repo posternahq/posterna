@@ -1,7 +1,7 @@
 import type { AgentRef, DirectoryIndex } from "../directory/index-builder";
 import { type DirectoryOptions, DirectoryStore } from "../directory/store";
 import type { OperatorRecord } from "../directory/types";
-import { looksAutomated } from "./automation";
+import { automationSignal } from "./automation";
 import { identifyClaim } from "./claim";
 import {
   compileTrust,
@@ -21,7 +21,7 @@ import {
 } from "./rdns";
 import { type NormalizedRequest, normalizeRequest, type RequestLike } from "./request";
 import { CLOUDFLARE_LIBRARY, type SignatureLibrary, verifySignatures } from "./signature-path";
-import type { VerdictResult } from "./types";
+import type { ReasonCode, VerdictResult } from "./types";
 
 /** Configuration for {@link createVerifier}. Defaults follow docs/SPEC.md section 12. */
 export interface VerifierOptions extends ProxyOptions {
@@ -129,18 +129,23 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
   let errors = 0;
   let lastError: string | null = null;
 
-  const failOpen = (request: NormalizedRequest | null, message: string): VerdictResult => {
+  const failOpen = (
+    request: NormalizedRequest | null,
+    message: string,
+    reason: ReasonCode,
+  ): VerdictResult => {
     errors++;
     lastError = message;
     let automated = true;
     try {
-      automated = request ? looksAutomated(request) : true;
+      automated = request ? automationSignal(request) !== null : true;
     } catch {
       automated = true;
     }
     return {
       verdict: automated ? "unknown_automation" : "human",
       method: "none",
+      reason,
       note: "A fail-open path was taken; the request proceeds unlabeled.",
       error: message,
     };
@@ -166,6 +171,7 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
         verdict: "declared_unverifiable",
         ...base,
         method: "none",
+        reason: "no_client_address",
         note: "The client address is unknown.",
       } as VerdictResult;
     }
@@ -183,6 +189,7 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
           verdict: "declared_unverifiable",
           ...base,
           method: "none",
+          reason: "no_dns",
           note: "Reverse DNS would decide, and this runtime has no DNS.",
         } as VerdictResult;
       }
@@ -200,6 +207,7 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
           verdict: "claimed_failed",
           ...base,
           method: "rdns",
+          reason: "rdns_mismatch",
           note: "The address is outside the operator's IP lists and its reverse DNS is not the operator's domain.",
         } as VerdictResult;
       }
@@ -208,16 +216,18 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
           verdict: "claimed_failed",
           ...base,
           method: "rdns",
+          reason: "rdns_unconfirmed",
           note: "The address is outside the operator's IP lists and has no forward-confirmed reverse DNS.",
         } as VerdictResult;
       }
       if (entry?.status === "error")
-        return failOpen(request, `reverse DNS lookup failed: ${entry.message}`);
+        return failOpen(request, `reverse DNS lookup failed: ${entry.message}`, "rdns_error");
       rdns.schedule(address.text);
       return {
         verdict: "declared_unverifiable",
         ...base,
         method: "none",
+        reason: "rdns_pending",
         note: "A reverse DNS lookup for this address is running; later requests get its result.",
       } as VerdictResult;
     }
@@ -226,14 +236,23 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
         verdict: "claimed_failed",
         ...base,
         method: "ip",
+        reason: "outside_ip_list",
         note: "The address is outside the operator's published IP lists.",
       } as VerdictResult;
     }
     const signs = (index.keys.get(operator.slug)?.keys.length ?? 0) > 0;
+    // A community token on a request that otherwise looks like a browser: the
+    // token may be an ordinary word (docs/notes/real-traffic-checks.md, item 13).
+    const reason: ReasonCode = signs
+      ? "unsigned"
+      : agent.coverage === "community" && automationSignal(request) === null
+        ? "community_token_on_browser"
+        : "nothing_published";
     return {
       verdict: "declared_unverifiable",
       ...base,
       method: "none",
+      reason,
       note: signs
         ? "The operator signs requests, and this one is not signed."
         : "The operator publishes no keys, IP lists or reverse DNS rules.",
@@ -245,10 +264,14 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
     await store.ready;
     const index = store.index;
     if (!index)
-      return failOpen(request, `directory not loaded (${store.lastError ?? "unknown reason"})`);
+      return failOpen(
+        request,
+        `directory not loaded (${store.lastError ?? "unknown reason"})`,
+        "directory_unavailable",
+      );
     const nowMs = now();
     if (!Number.isFinite(nowMs) || nowMs <= 0)
-      return failOpen(request, "the system clock returned an invalid time");
+      return failOpen(request, "the system clock returned an invalid time", "clock_invalid");
 
     const client = resolveClient(request, trust);
     guard.record(client.address);
@@ -285,6 +308,7 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
             verdict: "claimed_failed",
             ...ref(outcome.operator, signingAgent(outcome.operator, claim.userAgent)),
             method: "signature",
+            reason: outcome.code,
             note: `The signature did not verify: ${outcome.reason}.`,
           };
         case "unknown_key":
@@ -293,10 +317,11 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
             verdict: "declared_unverifiable",
             ...ref(outcome.operator, signingAgent(outcome.operator, claim.userAgent)),
             method: "signature",
+            reason: "unknown_kid",
             note: "The signing key is not one this install holds yet; a keys refresh was requested.",
           };
         case "error":
-          return failOpen(request, outcome.error);
+          return failOpen(request, outcome.error, outcome.code);
         case "no_keys":
         case "unsigned":
           break;
@@ -312,6 +337,7 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
         verdict: "declared_unverifiable",
         operator: claimed.slug,
         method: "none",
+        reason: claim.signed ? "no_keys" : "unsigned",
         note: claim.signed
           ? "This install holds no keys for the operator the Signature-Agent names."
           : "Signature-Agent names a listed operator, and the request is not signed.",
@@ -321,13 +347,16 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
       return {
         verdict: "declared_unverifiable",
         method: "none",
+        reason: "unlisted_signature_agent",
         note: "Signature-Agent names a key directory that is not in the operator directory; nothing was fetched.",
       };
     }
-    return looksAutomated(request)
+    const signal = automationSignal(request);
+    return signal
       ? {
           verdict: "unknown_automation",
           method: "none",
+          reason: signal,
           note: "Automated, and claims no agent in the directory.",
         }
       : { verdict: "human", method: "none" };
@@ -343,6 +372,7 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
         return failOpen(
           request,
           `unexpected error: ${error instanceof Error ? error.message : String(error)}`,
+          "unexpected_error",
         );
       }
     },

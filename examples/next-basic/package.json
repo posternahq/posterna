@@ -1,0 +1,23 @@
+{
+  "name": "@posterna/example-next-basic",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Posterna in a Next.js 16 app, through proxy.ts.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@posterna/next": "workspace:*",
+    "next": "16.4.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.43",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "6.0.3"
+  }
+}

@@ -39,6 +39,7 @@
       },
       "expected": {
         "verdict": "claimed_failed",
+        "reason": "expired",
         "operator": "example-signer",
         "agent": "ExampleAgent",
         "purpose": "agent",

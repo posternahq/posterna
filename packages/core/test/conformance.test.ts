@@ -39,6 +39,7 @@ interface RequestSpec {
 }
 interface Expected {
   verdict: string;
+  reason?: string | null;
   operator?: string | null;
   agent?: string | null;
   purpose?: string | null;
@@ -288,6 +289,8 @@ async function runVerify(vector: VerifyVector, api: "fetch" | "node"): Promise<v
         const result = await verifier.verify(input, { remoteAddress });
         const where = `${vector.id} [${api}] step ${index + 1}`;
         expect(result.verdict, where).toBe(expected.verdict);
+        if (expected.reason !== undefined)
+          expect(result.reason ?? null, `${where}: ${result.note}`).toBe(expected.reason);
         if (expected.operator !== undefined)
           expect(result.operator ?? null, where).toBe(expected.operator);
         if (expected.agent !== undefined) expect(result.agent ?? null, where).toBe(expected.agent);

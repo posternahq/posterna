@@ -1,4 +1,5 @@
 import { fieldValue, type NormalizedRequest } from "./request";
+import type { ReasonCode } from "./types";
 
 const AUTOMATION_WORDS =
   /bot|crawl|spider|slurp|scrape|fetch|headless|python|curl|wget|httpclient|okhttp|go-http|java\/|axios|node-fetch|undici|libwww|scrapy|playwright|puppeteer|selenium/i;
@@ -12,10 +13,16 @@ const AUTOMATION_WORDS =
  * into fingerprinting: no timing, no ordering, no client hints, no history.
  */
 export function looksAutomated(request: NormalizedRequest): boolean {
+  return automationSignal(request) !== null;
+}
+
+/** Which of those signals fired, as a reason code, or null for a browser. */
+export function automationSignal(request: NormalizedRequest): ReasonCode | null {
   const userAgent = fieldValue(request, "user-agent");
-  if (!userAgent) return true;
-  if (!/^Mozilla\/\d/.test(userAgent)) return true;
-  if (AUTOMATION_WORDS.test(userAgent)) return true;
-  if (!fieldValue(request, "accept") || !fieldValue(request, "accept-language")) return true;
-  return false;
+  if (!userAgent) return "no_user_agent";
+  if (!/^Mozilla\/\d/.test(userAgent)) return "non_browser_user_agent";
+  if (AUTOMATION_WORDS.test(userAgent)) return "automation_token";
+  if (!fieldValue(request, "accept")) return "missing_accept";
+  if (!fieldValue(request, "accept-language")) return "missing_accept_language";
+  return null;
 }

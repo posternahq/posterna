@@ -1,0 +1,50 @@
+{
+  "id": "proxy/no-socket-cidrs",
+  "description": "Without a socket address, trusted proxy CIDRs are skipped from the right of X-Forwarded-For.",
+  "spec": [
+    "4.2"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "trustedProxies": [
+      "10.0.0.0/8"
+    ]
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": null,
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-forwarded-for",
+            "203.0.113.9, 192.0.2.77, 10.0.0.5"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "reason": null,
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "192.0.2.77"
+        }
+      }
+    }
+  ]
+}

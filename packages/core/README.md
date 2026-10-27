@@ -41,6 +41,10 @@ const response = enforcementResponse(decision, result); // null means let the re
 
 The full reference is [docs/policy.md](https://github.com/posternahq/posterna/blob/main/docs/policy.md).
 
+## Counters
+
+`createCounters({ sdk, source: engine })` aggregates requests by hour, verdict, reason code, operator, agent, purpose, path group, action and enforced. With a site key (`POSTERNA_SITE_KEY`) it sends them to the Posterna cloud every 60 seconds and on exit, and applies the cloud's monitor override to the engine. Without one it sends nothing. Recording never blocks or slows a request, and no address, URL or header value is ever kept or sent. The adapters set this up for you.
+
 Signatures are verified with Cloudflare's [web-bot-auth](https://github.com/cloudflare/web-bot-auth) packages. The operator directory snapshot comes from [`@posterna/directory`](https://www.npmjs.com/package/@posterna/directory) and is refreshed in the background from posterna.com when signed directory files are available.
 
 See the [specification](https://github.com/posternahq/posterna/blob/main/docs/SPEC.md), sections 4 and 5. MIT licensed.

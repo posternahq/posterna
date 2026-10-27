@@ -1,0 +1,22 @@
+# The policy the end-to-end tests run the examples with. The examples
+# themselves ship in monitor mode, like every real install.
+version: 1
+mode: enforce
+defaults:
+  claimed_failed: block
+purposes:
+  training: block
+paths:
+  "/api/items":
+    unknown_automation: { action: throttle, rate: 3/min }
+signup:
+  "/signup":
+    verified: lift
+    declared_unverifiable: cap
+    claimed_failed: challenge
+    unknown_automation: challenge
+  "/api/signup":
+    verified: lift
+    declared_unverifiable: cap
+    claimed_failed: challenge
+    unknown_automation: challenge

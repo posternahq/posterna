@@ -39,6 +39,7 @@
       },
       "expected": {
         "verdict": "declared_unverifiable",
+        "reason": "unsigned",
         "operator": "example-signer",
         "agent": "ExampleAgent",
         "purpose": "agent",

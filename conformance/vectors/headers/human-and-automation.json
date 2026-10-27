@@ -34,6 +34,7 @@
       },
       "expected": {
         "verdict": "human",
+        "reason": null,
         "operator": null,
         "method": "none",
         "error": false
@@ -62,6 +63,7 @@
       },
       "expected": {
         "verdict": "unknown_automation",
+        "reason": "non_browser_user_agent",
         "operator": null,
         "method": "none",
         "error": false
@@ -86,6 +88,7 @@
       },
       "expected": {
         "verdict": "unknown_automation",
+        "reason": "missing_accept",
         "operator": null,
         "method": "none",
         "error": false

@@ -35,6 +35,7 @@
       },
       "expected": {
         "verdict": "human",
+        "reason": null,
         "method": "none",
         "error": false
       }

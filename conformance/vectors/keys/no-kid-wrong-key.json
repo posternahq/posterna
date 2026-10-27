@@ -38,6 +38,7 @@
       },
       "expected": {
         "verdict": "claimed_failed",
+        "reason": "signature_invalid",
         "operator": "nokid-signer",
         "agent": "NoKidAgent",
         "purpose": "user_fetch",

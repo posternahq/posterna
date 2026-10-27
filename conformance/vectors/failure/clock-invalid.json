@@ -41,6 +41,7 @@
       },
       "expected": {
         "verdict": "unknown_automation",
+        "reason": "clock_invalid",
         "operator": null,
         "agent": null,
         "purpose": null,

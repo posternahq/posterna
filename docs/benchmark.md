@@ -1,6 +1,6 @@
 # Hot path benchmark
 
-`pnpm bench` runs `packages/core/bench/verify.bench.ts`. CI runs it in the `Bench` job on every push and pull request, and the job fails when any scenario's p99 is 5 ms or more (docs/SPEC.md section 10).
+`pnpm bench` runs two benchmarks: `packages/core/bench/verify.bench.ts` (verify and decide, called directly) and `packages/express/bench/middleware.bench.ts` (the same requests through the Express middleware in a running app). CI runs both in the `Bench` job on every push and pull request, and the job fails when any scenario's p99 is 5 ms or more (docs/SPEC.md section 10). Shared setup is in `packages/core/bench/fixtures.ts`.
 
 ## Method
 
@@ -15,10 +15,22 @@
 - **Excluded:** reverse DNS, which runs in the background and never on the request path (`dns: null` in the benchmark), and directory refreshes.
 - **Reported:** p50, p95, p99 and max per scenario, with the verdict and decision. The run fails on p99 of 5 ms or more, or on an unexpected verdict or decision. The `claimed_failed` scenario is a flood of 5,500 failed claims, so the breaker trips after the first 20 and later blocks are recorded as not enforced, as they would be in production.
 
+## Through the Express middleware
+
+The second benchmark starts an Express app with `posterna()` in front of a trivial route, sends 5,500 requests per scenario over HTTP on the loopback interface (500 warm-up), and times only the middleware for each request:
+- stripping inbound headers;
+- `verify()` and `decide()`;
+- setting `req.posterna` and the verdict headers;
+- counting (local-only, no site key);
+- the block or throttle response when there is one.
+
+The requests come from 127.0.0.1 with `X-Forwarded-For` naming the client, and the middleware trusts the loopback proxy, as behind nginx. The HTTP client and Express routing are not timed.
+
 ## Results
 
 | Machine | Signature p99 | IP p99 | Worst p99 | Headroom |
 |---|---|---|---|---|
+| Apple M3, Node 24.13, macOS (26 October 2026), Express middleware | 0.232 ms | 0.025 ms | 0.232 ms | about 21x |
 | Apple M3, Node 24.13, macOS (26 October 2026), verify and decide | 0.176 ms | 0.007 ms | 0.176 ms | about 28x |
 | Apple M3, Node 24.13, macOS (26 October 2026), verify only | 0.170 ms | 0.005 ms | 0.170 ms | about 29x |
 | GitHub Actions `ubuntu-latest`, 2 vCPUs (AMD EPYC 7763), Node 22.23 (26 October 2026, commit `eab371d`), verify and decide | 1.284 ms | 0.049 ms | 1.284 ms | about 3.9x |

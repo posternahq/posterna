@@ -18,7 +18,9 @@ const NOT_FOUND = new Set(["ENOTFOUND", "ENODATA", "NXDOMAIN", "ENONAME"]);
 export async function nodeDnsResolver(): Promise<DnsResolver | null> {
   try {
     const specifier = "node:dns";
-    const dns = (await import(/* webpackIgnore: true */ specifier)) as typeof import("node:dns");
+    const dns = (await import(
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ specifier
+    )) as typeof import("node:dns");
     const promises = dns.promises;
     if (!promises?.reverse) return null;
     const quiet = async (lookup: Promise<string[]>) => {

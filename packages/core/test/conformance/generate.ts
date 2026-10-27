@@ -437,6 +437,8 @@ async function signed(base: RequestSpec, ...signatures: SignSpec[]): Promise<Req
 
 interface Expected {
   verdict: string;
+  /** The reason code; null when the result must carry none (verified and human). */
+  reason: string | null;
   operator?: string | null;
   agent?: string | null;
   purpose?: string | null;
@@ -485,14 +487,16 @@ const signerHeaders = (
   ]);
 const verifiedSigner: Expected = {
   verdict: "verified_by_signature",
+  reason: null,
   operator: "example-signer",
   agent: "ExampleAgent",
   purpose: "agent",
   method: "signature",
   error: false,
 };
-const failedSigner = (method = "signature"): Expected => ({
+const failedSigner = (reason: string, method = "signature"): Expected => ({
   verdict: "claimed_failed",
+  reason,
   operator: "example-signer",
   agent: "ExampleAgent",
   purpose: "agent",
@@ -552,7 +556,7 @@ async function signatureVectors(): Promise<void> {
           created: NOW - 200,
           expires: NOW - 100,
         }),
-        expected: failedSigner(),
+        expected: failedSigner("expired"),
       },
     ],
   );
@@ -582,7 +586,7 @@ async function signatureVectors(): Promise<void> {
           created: NOW + 120,
           expires: NOW + 200,
         }),
-        expected: failedSigner(),
+        expected: failedSigner("created_in_future"),
       },
     ],
   );
@@ -597,7 +601,7 @@ async function signatureVectors(): Promise<void> {
           created: NOW - 10,
           expires: NOW + 590,
         }),
-        expected: failedSigner(),
+        expected: failedSigner("validity_too_long"),
       },
     ],
   );
@@ -611,7 +615,7 @@ async function signatureVectors(): Promise<void> {
           key: "signer-a",
           authority: "other.example",
         }),
-        expected: failedSigner(),
+        expected: failedSigner("signature_invalid"),
       },
     ],
   );
@@ -623,7 +627,7 @@ async function signatureVectors(): Promise<void> {
     "signature/tampered-component",
     "A covered component (@path) changed after signing fails.",
     ["4.4"],
-    [{ request: { ...tampered, path: "/changed" }, expected: failedSigner() }],
+    [{ request: { ...tampered, path: "/changed" }, expected: failedSigner("signature_invalid") }],
   );
   const replay = await signed(request(signerHeaders()), { key: "signer-a", nonceSeed: "replayed" });
   verifyVector(
@@ -632,7 +636,7 @@ async function signatureVectors(): Promise<void> {
     ["4.4", "12"],
     [
       { request: replay, expected: verifiedSigner },
-      { request: replay, expected: failedSigner() },
+      { request: replay, expected: failedSigner("nonce_replayed") },
     ],
   );
   const twoAgents = 'sig1="https://signer.example", sig2="https://signer.example"';
@@ -708,6 +712,7 @@ async function signatureVectors(): Promise<void> {
         ),
         expected: {
           verdict: "unknown_automation",
+          reason: "library_unsupported",
           operator: null,
           agent: null,
           purpose: null,
@@ -734,6 +739,7 @@ async function signatureVectors(): Promise<void> {
         ]),
         expected: {
           verdict: "unknown_automation",
+          reason: "library_unsupported",
           operator: null,
           agent: null,
           purpose: null,
@@ -773,6 +779,7 @@ async function signatureVectors(): Promise<void> {
   );
   const unattributable: Expected = {
     verdict: "declared_unverifiable",
+    reason: "unsigned",
     operator: "example-signer",
     agent: "ExampleAgent",
     purpose: "agent",
@@ -838,6 +845,7 @@ async function signatureVectors(): Promise<void> {
     });
   const labelVerified: Expected = {
     verdict: "verified_by_signature",
+    reason: null,
     operator: "label-signer",
     agent: "LabelAgent",
     purpose: "agent",
@@ -867,7 +875,7 @@ async function signatureVectors(): Promise<void> {
     steps: [
       {
         request: await label("k9"),
-        expected: { ...labelVerified, verdict: "declared_unverifiable" },
+        expected: { ...labelVerified, verdict: "declared_unverifiable", reason: "unknown_kid" },
       },
     ],
     expected_state: { keys_refresh_requested: true },
@@ -876,6 +884,7 @@ async function signatureVectors(): Promise<void> {
     signed(request(signerHeaders('sig1="https://nokid.example"', ua.noKidAgent)), { key, keyid });
   const noKidVerified: Expected = {
     verdict: "verified_by_signature",
+    reason: null,
     operator: "nokid-signer",
     agent: "NoKidAgent",
     purpose: "user_fetch",
@@ -901,7 +910,7 @@ async function signatureVectors(): Promise<void> {
     [
       {
         request: await noKid("unlabeled-key", "rogue"),
-        expected: { ...noKidVerified, verdict: "claimed_failed" },
+        expected: { ...noKidVerified, verdict: "claimed_failed", reason: "signature_invalid" },
       },
     ],
   );
@@ -929,6 +938,7 @@ async function draftVectors(): Promise<void> {
         ]),
         expected: {
           verdict: "declared_unverifiable",
+          reason: "no_keys",
           operator: "draft-test-signer",
           agent: null,
           purpose: null,
@@ -1109,7 +1119,13 @@ function ipVectors(directory: DirectoryFile): void {
     [
       {
         request: bot("192.0.2.77"),
-        expected: { verdict: "verified_by_ip", ...exampleBot, method: "ip", error: false },
+        expected: {
+          verdict: "verified_by_ip",
+          reason: null,
+          ...exampleBot,
+          method: "ip",
+          error: false,
+        },
       },
     ],
   );
@@ -1120,7 +1136,13 @@ function ipVectors(directory: DirectoryFile): void {
     [
       {
         request: bot("2001:db8:10:ff::1"),
-        expected: { verdict: "verified_by_ip", ...exampleBot, method: "ip", error: false },
+        expected: {
+          verdict: "verified_by_ip",
+          reason: null,
+          ...exampleBot,
+          method: "ip",
+          error: false,
+        },
       },
     ],
   );
@@ -1131,7 +1153,13 @@ function ipVectors(directory: DirectoryFile): void {
     [
       {
         request: bot("::ffff:192.0.2.77"),
-        expected: { verdict: "verified_by_ip", ...exampleBot, method: "ip", error: false },
+        expected: {
+          verdict: "verified_by_ip",
+          reason: null,
+          ...exampleBot,
+          method: "ip",
+          error: false,
+        },
       },
     ],
   );
@@ -1142,13 +1170,20 @@ function ipVectors(directory: DirectoryFile): void {
     [
       {
         request: bot("203.0.113.9"),
-        expected: { verdict: "claimed_failed", ...exampleBot, method: "ip", error: false },
+        expected: {
+          verdict: "claimed_failed",
+          reason: "outside_ip_list",
+          ...exampleBot,
+          method: "ip",
+          error: false,
+        },
       },
     ],
   );
   const rdnsBot = { operator: "rdns-crawler", agent: "ExampleRdnsBot", purpose: "training" };
   const pending: Expected = {
     verdict: "declared_unverifiable",
+    reason: "rdns_pending",
     ...rdnsBot,
     method: "none",
     error: false,
@@ -1162,7 +1197,13 @@ function ipVectors(directory: DirectoryFile): void {
       {
         settle_before: true,
         request: bot("203.0.113.40", ua.rdnsBot),
-        expected: { verdict: "verified_by_ip", ...rdnsBot, method: "rdns", error: false },
+        expected: {
+          verdict: "verified_by_ip",
+          reason: null,
+          ...rdnsBot,
+          method: "rdns",
+          error: false,
+        },
       },
     ],
     {
@@ -1181,7 +1222,13 @@ function ipVectors(directory: DirectoryFile): void {
       {
         settle_before: true,
         request: bot("203.0.113.41", ua.rdnsBot),
-        expected: { verdict: "claimed_failed", ...rdnsBot, method: "rdns", error: false },
+        expected: {
+          verdict: "claimed_failed",
+          reason: "rdns_mismatch",
+          ...rdnsBot,
+          method: "rdns",
+          error: false,
+        },
       },
     ],
     {
@@ -1200,7 +1247,13 @@ function ipVectors(directory: DirectoryFile): void {
       {
         settle_before: true,
         request: bot("203.0.113.42", ua.rdnsBot),
-        expected: { verdict: "claimed_failed", ...rdnsBot, method: "rdns", error: false },
+        expected: {
+          verdict: "claimed_failed",
+          reason: "rdns_unconfirmed",
+          ...rdnsBot,
+          method: "rdns",
+          error: false,
+        },
       },
     ],
     {
@@ -1214,7 +1267,7 @@ function ipVectors(directory: DirectoryFile): void {
     "ip/no-dns-runtime",
     "In a runtime without DNS (edge), a claim that reverse DNS would decide is declared_unverifiable.",
     ["4.5"],
-    [{ request: bot("203.0.113.43", ua.rdnsBot), expected: pending }],
+    [{ request: bot("203.0.113.43", ua.rdnsBot), expected: { ...pending, reason: "no_dns" } }],
     { dns: null },
   );
   verifyVector(
@@ -1226,6 +1279,7 @@ function ipVectors(directory: DirectoryFile): void {
         request: bot("203.0.113.9", "Mozilla/5.0 (compatible; QuietBot/1.0)"),
         expected: {
           verdict: "declared_unverifiable",
+          reason: "nothing_published",
           operator: "quiet-operator",
           agent: "QuietBot",
           purpose: "other",
@@ -1244,6 +1298,7 @@ function ipVectors(directory: DirectoryFile): void {
         request: bot("203.0.113.9", "CommunityBot/3.1"),
         expected: {
           verdict: "declared_unverifiable",
+          reason: "nothing_published",
           operator: "community-operator",
           agent: "CommunityBot",
           purpose: "training",
@@ -1262,6 +1317,7 @@ function ipVectors(directory: DirectoryFile): void {
         request: bot("192.0.2.77"),
         expected: {
           verdict: "verified_by_ip",
+          reason: null,
           ...exampleBot,
           method: "ip",
           error: false,
@@ -1300,6 +1356,7 @@ function ipVectors(directory: DirectoryFile): void {
         request: bot(aws, ua.claudebot),
         expected: {
           verdict: "claimed_failed",
+          reason: "outside_ip_list",
           operator: "anthropic",
           agent: "ClaudeBot",
           purpose: "training",
@@ -1318,6 +1375,7 @@ function ipVectors(directory: DirectoryFile): void {
         request: bot(gcp, ua.googlebot),
         expected: {
           verdict: "declared_unverifiable",
+          reason: "rdns_pending",
           operator: "google",
           agent: "Googlebot",
           purpose: "search",
@@ -1330,6 +1388,7 @@ function ipVectors(directory: DirectoryFile): void {
         request: bot(gcp, ua.googlebot),
         expected: {
           verdict: "claimed_failed",
+          reason: "rdns_mismatch",
           operator: "google",
           agent: "Googlebot",
           purpose: "search",
@@ -1369,6 +1428,7 @@ async function spoofSignatureVectors(): Promise<void> {
         ),
         expected: {
           verdict: "declared_unverifiable",
+          reason: "unlisted_signature_agent",
           operator: null,
           agent: null,
           purpose: null,
@@ -1394,6 +1454,7 @@ async function spoofSignatureVectors(): Promise<void> {
         ),
         expected: {
           verdict: "declared_unverifiable",
+          reason: "rdns_pending",
           operator: "google",
           agent: "Googlebot",
           purpose: "search",
@@ -1412,6 +1473,7 @@ async function spoofSignatureVectors(): Promise<void> {
         ),
         expected: {
           verdict: "claimed_failed",
+          reason: "rdns_unconfirmed",
           operator: "google",
           agent: "Googlebot",
           purpose: "search",
@@ -1429,13 +1491,14 @@ async function proxyVectors(): Promise<void> {
     request(site([["user-agent", ua.exampleBot], ...extra]), { remote_address: remote });
   const ok: Expected = {
     verdict: "verified_by_ip",
+    reason: null,
     operator: "ip-crawler",
     agent: "ExampleBot",
     purpose: "search",
     method: "ip",
     error: false,
   };
-  const failed: Expected = { ...ok, verdict: "claimed_failed" };
+  const failed: Expected = { ...ok, verdict: "claimed_failed", reason: "outside_ip_list" };
   verifyVector(
     "proxy/no-config-ignores-forwarding",
     "With no trustedProxies, X-Forwarded-For is ignored and the socket address is the client.",
@@ -1553,6 +1616,28 @@ async function proxyVectors(): Promise<void> {
     [{ request: internal, expected: verifiedSigner }],
     { config: { publicHost: SITE } },
   );
+  const apexHost = "site.example";
+  const apex = await signed(
+    request(
+      [
+        ["host", apexHost],
+        ["user-agent", ua.exampleAgent],
+        ["signature-agent", 'sig1="https://signer.example"'],
+      ],
+      { remote_address: "203.0.113.20" },
+    ),
+    { key: "signer-a", authority: apexHost, nonceSeed: "apex-host" },
+  );
+  verifyVector(
+    "proxy/public-host-list",
+    "A site served on both the apex and www lists both names: a request signed for the apex host it arrived on verifies, and an internal Host falls back to the first name.",
+    ["4.2", "4.4"],
+    [
+      { request: apex, expected: verifiedSigner },
+      { request: internal, expected: verifiedSigner },
+    ],
+    { config: { publicHost: [SITE, apexHost] } },
+  );
   verifyVector(
     "proxy/internal-host-without-public-host",
     "The same request without publicHost: the signed authority does not match the internal Host, so it fails.",
@@ -1563,7 +1648,7 @@ async function proxyVectors(): Promise<void> {
           ...internal,
           headers: internal.headers.map(([name, value]) => [name, value]) as Pair[],
         },
-        expected: failedSigner(),
+        expected: failedSigner("signature_invalid"),
       },
     ],
   );
@@ -1590,10 +1675,74 @@ async function proxyVectors(): Promise<void> {
           remote_address: "203.0.113.50",
           headers: [...internal.headers, ["x-forwarded-host", SITE]],
         },
-        expected: failedSigner(),
+        expected: failedSigner("signature_invalid"),
       },
     ],
     { config: { trustedProxies: ["10.0.0.0/8"] } },
+  );
+
+  // Next.js middleware and proxy never see the socket address.
+  const socketless = (forwardedFor: string) =>
+    request(
+      site([
+        ["user-agent", ua.exampleBot],
+        ["x-forwarded-for", forwardedFor],
+      ]),
+      {
+        remote_address: null,
+      },
+    );
+  verifyVector(
+    "proxy/no-socket-hop-count",
+    "Without a socket address (as in Next.js middleware), trustedProxies: 1 takes the last X-Forwarded-For entry, so a client-written entry to its left is ignored.",
+    ["4.2"],
+    [
+      {
+        request: socketless("198.51.100.200, 192.0.2.77"),
+        expected: { ...ok, client: { address: "192.0.2.77" } },
+      },
+      {
+        request: socketless("192.0.2.77, 203.0.113.9"),
+        expected: { ...failed, client: { address: "203.0.113.9" } },
+      },
+    ],
+    { config: { trustedProxies: 1 } },
+  );
+  verifyVector(
+    "proxy/no-socket-short-header",
+    "Without a socket address, a header with fewer entries than trustedProxies falls back to its leftmost entry, as with a socket address.",
+    ["4.2"],
+    [{ request: socketless("192.0.2.77"), expected: { ...ok, client: { address: "192.0.2.77" } } }],
+    { config: { trustedProxies: 2 } },
+  );
+  verifyVector(
+    "proxy/no-socket-cidrs",
+    "Without a socket address, trusted proxy CIDRs are skipped from the right of X-Forwarded-For.",
+    ["4.2"],
+    [
+      {
+        request: socketless("203.0.113.9, 192.0.2.77, 10.0.0.5"),
+        expected: { ...ok, client: { address: "192.0.2.77" } },
+      },
+    ],
+    { config: { trustedProxies: ["10.0.0.0/8"] } },
+  );
+  verifyVector(
+    "proxy/no-socket-no-config",
+    "Without a socket address and without trustedProxies, X-Forwarded-For is still ignored: the client is unknown and an IP claim cannot be checked.",
+    ["4.2", "9"],
+    [
+      {
+        request: socketless("192.0.2.77"),
+        expected: {
+          ...ok,
+          verdict: "declared_unverifiable",
+          reason: "no_client_address",
+          method: "none",
+          client: { address: null },
+        },
+      },
+    ],
   );
 
   vectors.push({
@@ -1607,7 +1756,7 @@ async function proxyVectors(): Promise<void> {
       {
         repeat: 200,
         request: request(BROWSER.concat([["host", SITE]]), { remote_address: "10.1.2.3" }),
-        expected: { verdict: "human", method: "none", error: false },
+        expected: { verdict: "human", reason: null, method: "none", error: false },
       },
     ],
     expected_state: { proxySuspect: true },
@@ -1623,12 +1772,12 @@ async function proxyVectors(): Promise<void> {
       {
         repeat: 159,
         request: request(BROWSER.concat([["host", SITE]]), { remote_address: "192.168.1.10" }),
-        expected: { verdict: "human", method: "none", error: false },
+        expected: { verdict: "human", reason: null, method: "none", error: false },
       },
       {
         repeat: 41,
         request: request(BROWSER.concat([["host", SITE]]), { remote_address: "203.0.113.70" }),
-        expected: { verdict: "human", method: "none", error: false },
+        expected: { verdict: "human", reason: null, method: "none", error: false },
       },
     ],
     expected_state: { proxySuspect: false },
@@ -1651,6 +1800,7 @@ function headerVectors(): void {
         ]),
         expected: {
           verdict: "human",
+          reason: null,
           method: "none",
           error: false,
           stripped: ["x-agent-operator", "x-agent-verdict", "x-posterna-action"],
@@ -1665,7 +1815,7 @@ function headerVectors(): void {
     [
       {
         request: request([["host", SITE], ...BROWSER]),
-        expected: { verdict: "human", operator: null, method: "none", error: false },
+        expected: { verdict: "human", reason: null, operator: null, method: "none", error: false },
       },
       {
         request: request([
@@ -1673,22 +1823,71 @@ function headerVectors(): void {
           ["user-agent", "curl/8.4.0"],
           ["accept", "*/*"],
         ]),
-        expected: { verdict: "unknown_automation", operator: null, method: "none", error: false },
+        expected: {
+          verdict: "unknown_automation",
+          reason: "non_browser_user_agent",
+          operator: null,
+          method: "none",
+          error: false,
+        },
       },
       {
         request: request([
           ["host", SITE],
           ["user-agent", BROWSER[0]?.[1] ?? ""],
         ]),
-        expected: { verdict: "unknown_automation", operator: null, method: "none", error: false },
+        expected: {
+          verdict: "unknown_automation",
+          reason: "missing_accept",
+          operator: null,
+          method: "none",
+          error: false,
+        },
       },
     ],
   );
 }
 
+function automationSignalVectors(): void {
+  const lacking = (headers: Pair[], reason: string): Step => ({
+    request: request([["host", SITE], ...headers]),
+    expected: {
+      verdict: "unknown_automation",
+      reason,
+      operator: null,
+      method: "none",
+      error: false,
+    },
+  });
+  const [userAgent, accept, language] = BROWSER as [Pair, Pair, Pair];
+  verifyVector(
+    "headers/automation-signals",
+    "Each signal that labels a request with no claim as automated gives its own reason code; none of them carries the header's value.",
+    ["4.6", "7"],
+    [
+      lacking([accept, language], "no_user_agent"),
+      lacking([["user-agent", "Go-http-client/2.0"], accept, language], "non_browser_user_agent"),
+      lacking(
+        [
+          [
+            "user-agent",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 HeadlessChrome/130.0.0.0",
+          ],
+          accept,
+          language,
+        ],
+        "automation_token",
+      ),
+      lacking([userAgent, language], "missing_accept"),
+      lacking([userAgent, accept], "missing_accept_language"),
+    ],
+  );
+}
+
 async function failureVectors(): Promise<void> {
-  const failOpen = (verdict: "human" | "unknown_automation"): Expected => ({
+  const failOpen = (verdict: "human" | "unknown_automation", reason: string): Expected => ({
     verdict,
+    reason,
     operator: null,
     agent: null,
     purpose: null,
@@ -1704,10 +1903,13 @@ async function failureVectors(): Promise<void> {
       `${description} Every request fails open with an error: a browser is human, a bot is unknown_automation, nothing is claimed_failed.`,
       ["4.8"],
       [
-        { request: request([["host", SITE], ...BROWSER]), expected: failOpen("human") },
+        {
+          request: request([["host", SITE], ...BROWSER]),
+          expected: failOpen("human", "directory_unavailable"),
+        },
         {
           request: request(site([["user-agent", ua.googlebot]]), { remote_address: "203.0.113.9" }),
-          expected: failOpen("unknown_automation"),
+          expected: failOpen("unknown_automation", "directory_unavailable"),
         },
       ],
       { inject: { snapshot: kind } },
@@ -1735,6 +1937,7 @@ async function failureVectors(): Promise<void> {
         request: request(site([["user-agent", ua.exampleBot]]), { remote_address: "192.0.2.77" }),
         expected: {
           verdict: "verified_by_ip",
+          reason: null,
           operator: "ip-crawler",
           agent: "ExampleBot",
           purpose: "search",
@@ -1758,6 +1961,7 @@ async function failureVectors(): Promise<void> {
           request: request(site([["user-agent", ua.rdnsBot]]), { remote_address: "203.0.113.44" }),
           expected: {
             verdict: "declared_unverifiable",
+            reason: "rdns_pending",
             operator: "rdns-crawler",
             agent: "ExampleRdnsBot",
             purpose: "training",
@@ -1768,7 +1972,7 @@ async function failureVectors(): Promise<void> {
         {
           settle_before: true,
           request: request(site([["user-agent", ua.rdnsBot]]), { remote_address: "203.0.113.44" }),
-          expected: failOpen("unknown_automation"),
+          expected: failOpen("unknown_automation", "rdns_error"),
         },
       ],
       { inject: { dns: kind }, config: { reverseDns: { timeoutMs: 50 } } },
@@ -1781,7 +1985,7 @@ async function failureVectors(): Promise<void> {
     [
       {
         request: await signed(request(signerHeaders()), { key: "signer-a" }),
-        expected: failOpen("unknown_automation"),
+        expected: failOpen("unknown_automation", "clock_invalid"),
       },
     ],
     { inject: { clock: "invalid" } },
@@ -1793,7 +1997,7 @@ async function failureVectors(): Promise<void> {
     [
       {
         request: await signed(request(signerHeaders()), { key: "signer-a" }),
-        expected: failOpen("unknown_automation"),
+        expected: failOpen("unknown_automation", "library_error"),
       },
     ],
     { inject: { signature_library: "throws" } },
@@ -1818,6 +2022,7 @@ async function main(): Promise<void> {
   await spoofSignatureVectors();
   await proxyVectors();
   headerVectors();
+  automationSignalVectors();
   await failureVectors();
   const templates = Object.fromEntries(
     ["monitor", "allow-list", "saas-signup"].map((name) => [

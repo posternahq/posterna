@@ -40,7 +40,7 @@ The fixture directory holds synthetic operators under reserved names (`.example`
       "settle_before": false,
       "repeat": 1,
       "request": { "method": "GET", "scheme": "https", "path": "/", "remote_address": "203.0.113.40", "headers": [["host", "www.site.example"], ["user-agent", "..."]] },
-      "expected": { "verdict": "verified_by_ip", "operator": "rdns-crawler", "agent": "ExampleRdnsBot", "purpose": "training", "method": "rdns", "error": false }
+      "expected": { "verdict": "verified_by_ip", "reason": null, "operator": "rdns-crawler", "agent": "ExampleRdnsBot", "purpose": "training", "method": "rdns", "error": false }
     }
   ],
   "expected_state": { "proxySuspect": false, "keys_refresh_requested": true, "fetches": 0, "errors_at_least": 1 }
@@ -53,7 +53,7 @@ The fixture directory holds synthetic operators under reserved names (`.example`
 - `inject` simulates failures: a `missing` or `malformed` snapshot, a DNS `timeout` or `error`, an `invalid` clock, or a signature library that `throws`.
 - `refresh`, when enabled, makes the runner trust `fixtures/directory-signer.json` and answer downloads from `responses` (keyed by file name under the base URL; anything else is 404). Without it, refresh is off.
 - Each step either has `"action": "refresh"` (refresh the directory now) or a `request` and its `expected` result. `headers` is an ordered list of name and value pairs because order and repeats matter. `settle_before` waits for background work (reverse DNS lookups, refreshes) before the step. `repeat` sends the same request that many times.
-- `expected` fields: `verdict` always; `operator`, `agent`, `purpose` (`null` means absent); `method`; `error` (whether `error` is set, meaning a fail-open path was taken); optionally `stripped` (inbound headers removed), `client` (the resolved client address) and `verdict_headers`.
+- `expected` fields: `verdict` always; `reason` (the reason code, `null` when there must be none); `operator`, `agent`, `purpose` (`null` means absent); `method`; `error` (whether `error` is set, meaning a fail-open path was taken); optionally `stripped` (inbound headers removed), `client` (the resolved client address) and `verdict_headers`.
 - `expected_state` is checked after all steps: the proxy guard, whether an early keys refresh was requested, how many fetches happened, and a minimum error count.
 
 ### `rfc9421`
@@ -114,6 +114,6 @@ Validation of agents.yaml documents: `cases` is a list of `{ policy, valid, mode
 
 ## Rules
 
-- **No network, no wall clock.** DNS answers come from the vector and time from `now` (plus `at` in policy vectors). A runner never makes a real network call.
+- **No network, no wall clock.** DNS answers come from the vector and time from `now` (plus `at` in policy vectors). A runner never makes a real network call. A `remote_address` of `null` is a request without a socket address, as in Next.js middleware.
 - **Throwaway keys only.** The keys in `fixtures/keys/` exist only for these tests. Never use them anywhere else. The RFC 9421 example key appears only where a published vector uses it.
 - **Every verifier or policy change adds or updates a vector.**

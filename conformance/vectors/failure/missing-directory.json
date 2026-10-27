@@ -37,6 +37,7 @@
       },
       "expected": {
         "verdict": "human",
+        "reason": "directory_unavailable",
         "operator": null,
         "agent": null,
         "purpose": null,
@@ -63,6 +64,7 @@
       },
       "expected": {
         "verdict": "unknown_automation",
+        "reason": "directory_unavailable",
         "operator": null,
         "agent": null,
         "purpose": null,

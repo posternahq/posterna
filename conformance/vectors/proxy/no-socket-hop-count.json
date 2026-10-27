@@ -1,0 +1,82 @@
+{
+  "id": "proxy/no-socket-hop-count",
+  "description": "Without a socket address (as in Next.js middleware), trustedProxies: 1 takes the last X-Forwarded-For entry, so a client-written entry to its left is ignored.",
+  "spec": [
+    "4.2"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "trustedProxies": 1
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": null,
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-forwarded-for",
+            "198.51.100.200, 192.0.2.77"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "reason": null,
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "192.0.2.77"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": null,
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-forwarded-for",
+            "192.0.2.77, 203.0.113.9"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "reason": "outside_ip_list",
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "203.0.113.9"
+        }
+      }
+    }
+  ]
+}

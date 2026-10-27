@@ -48,6 +48,7 @@
       },
       "expected": {
         "verdict": "claimed_failed",
+        "reason": "signature_invalid",
         "operator": "example-signer",
         "agent": "ExampleAgent",
         "purpose": "agent",

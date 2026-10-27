@@ -4,6 +4,26 @@ import { version } from "../package.json";
 export const VERSION: string = version;
 
 export {
+  DEBUG_PATH,
+  DEBUG_TOKEN_HEADER,
+  type DebugReport,
+  debugReport,
+  debugTokenMatches,
+} from "./adapters/debug";
+export {
+  COUNTERS_DEFAULTS,
+  type CounterBucket,
+  type Counters,
+  type CountersOptions,
+  type CountersPayload,
+  type CountersSource,
+  type CountersStatus,
+  createCounters,
+  type FlushResult,
+  hourOf,
+  runtimeName,
+} from "./counters/counters";
+export {
   decodeBase64Url,
   TRUSTED_DIRECTORY_KEYS,
   type TrustedDirectoryKey,
@@ -19,6 +39,7 @@ export {
 } from "./policy/emit";
 export {
   createPolicyEngine,
+  firstSegmentGroup,
   type PolicyEngine,
   type PolicyEngineOptions,
   type PolicyState,
@@ -51,7 +72,13 @@ export {
 } from "./verifier/headers";
 export type { DnsResolver, ReverseDnsOptions } from "./verifier/rdns";
 export type { RequestLike } from "./verifier/request";
-export type { Verdict, VerdictResult, VerificationMethod } from "./verifier/types";
+export {
+  REASON_CODES,
+  type ReasonCode,
+  type Verdict,
+  type VerdictResult,
+  type VerificationMethod,
+} from "./verifier/types";
 export {
   createVerifier,
   type Verifier,

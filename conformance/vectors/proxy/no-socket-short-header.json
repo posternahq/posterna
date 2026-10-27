@@ -1,0 +1,48 @@
+{
+  "id": "proxy/no-socket-short-header",
+  "description": "Without a socket address, a header with fewer entries than trustedProxies falls back to its leftmost entry, as with a socket address.",
+  "spec": [
+    "4.2"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "trustedProxies": 2
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": null,
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleBot/2.0; +https://crawler.example/bot)"
+          ],
+          [
+            "x-forwarded-for",
+            "192.0.2.77"
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_ip",
+        "reason": null,
+        "operator": "ip-crawler",
+        "agent": "ExampleBot",
+        "purpose": "search",
+        "method": "ip",
+        "error": false,
+        "client": {
+          "address": "192.0.2.77"
+        }
+      }
+    }
+  ]
+}

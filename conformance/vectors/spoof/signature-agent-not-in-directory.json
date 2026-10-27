@@ -43,6 +43,7 @@
       },
       "expected": {
         "verdict": "declared_unverifiable",
+        "reason": "unlisted_signature_agent",
         "operator": null,
         "agent": null,
         "purpose": null,
