@@ -107,6 +107,7 @@ Before you settle on the matcher, leave out these routes:
 - **Large uploads.** With a proxy, Next.js holds each matched request's body in memory and keeps only the first 10 MB (`experimental.proxyClientMaxBodySize` in `next.config`; Next.js 15 calls it `middlewareClientMaxBodySize`). Anything past that is cut off, with only a warning in the server log. Exclude routes that take larger uploads, or raise the limit.
 - **Webhooks** that check a signature over the raw request body. They are safest left out.
 - **Paths rewritten to another site**, such as an analytics proxy set up in `next.config` rewrites. The proxy runs before rewrites, so the verdict request headers would be passed on to that site.
+- **Health checks** from your load balancer or platform. See [Keep health checks out of Posterna](#health-checks).
 
 For example, with webhooks under `/api/webhooks` and an analytics rewrite under `/ingest`:
 
@@ -188,6 +189,44 @@ Next.js before 15.5 runs middleware only on the Edge runtime, and Next.js 16 sti
 
 Prefer the Node.js runtime wherever you can.
 
+<a id="health-checks"></a>
+
+### Keep health checks out of Posterna
+
+Load balancer and platform health checks come from private addresses: the load balancer's own nodes, the platform's checker, or `localhost` for a container's own check. Posterna's proxy guard can count them. When 80 percent of the last 200 requests come from private addresses, it decides the proxy settings must be wrong and suspends enforcement, and `posterna doctor` reports `FAIL Mode`. On a site with little other traffic, health checks alone get there: an AWS load balancer checks each target every 30 seconds by default, and on `/` unless you set a path ([target group health checks](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html)). Our own canary sites hit this on 27 October 2026.
+
+Give health checks their own path, and keep that path out of Posterna.
+
+**Express:** register the health route before Posterna. Express runs handlers in order, so the request never reaches the middleware:
+
+```js
+app.get("/healthz", (_req, res) => res.send("ok"));
+
+app.use(posterna({ trustedProxies: 1, publicHost: "www.example.com" }));
+```
+
+**Next.js:** leave the path out of the matcher, next to the other exclusions:
+
+```ts
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|healthz).*)"],
+};
+```
+
+`healthz` in that pattern also skips any path that starts with it, such as `/healthz/db`. Add it as a route handler, for example `app/healthz/route.ts` with `export function GET() { return new Response("ok"); }`.
+
+Then point the checks at that path:
+
+- **AWS Application Load Balancer:** the target group's **Health check path** (`HealthCheckPath`), which is `/` by default.
+- **Render:** the service's **Health Check Path** (`healthCheckPath` in `render.yaml`). Render checks every few seconds, for as long as the service runs ([health checks](https://render.com/docs/health-checks)).
+- **Fly.io:** the `path` of the HTTP check in `fly.toml`.
+- **Kubernetes:** the `path` of the liveness and readiness probes.
+- **Docker `HEALTHCHECK`** and other checks run inside the container: the same path, on `localhost`.
+- **Railway** checks the healthcheck path only while a deployment starts, not after it is live ([healthchecks](https://docs.railway.com/reference/healthchecks)), so it cannot trip the guard. Using the same path costs nothing.
+- **Vercel** sends no health checks.
+
+The debug route that `posterna doctor` calls (`/.well-known/posterna/debug`) must stay covered: do not exclude it.
+
 <a id="trusted-proxies"></a>
 
 ## 3. Tell Posterna about your proxies
@@ -219,6 +258,7 @@ These settings come from each host's documentation, checked on 26 October 2026, 
 | Fly.io | `trustedProxies: 2` (`3` with Cloudflare in front) | recommended | high |
 | Render | `trustedProxies: 3` | recommended | low: check with doctor |
 | AWS Application Load Balancer | `trustedProxies:` your load balancer subnets' CIDRs | recommended; **required** with CloudFront | high |
+| Amazon CloudFront, in front of any of these | the setting for the host behind it, plus CloudFront's ranges behind a load balancer; the origin request policy **AllViewerExceptHostHeader** is **required** | **required** | high: from AWS's documentation |
 | nginx on the same machine | `clientIpHeader: "x-real-ip"` and `trustedProxies: ["127.0.0.1/32", "::1/128"]`, with the nginx config below | **required**, or pass `Host` as below | high |
 
 Leave `trustForwardedHost` off on all of them.
@@ -259,8 +299,21 @@ The same values work for Express and Next.js on each host.
 - The ALB reaches your targets from private addresses in its subnets ([how Elastic Load Balancing works](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html)). List those subnets' CIDRs, or your VPC's, in `trustedProxies`.
 - Restrict your targets' security group to the load balancer's.
 - The ALB sets `X-Forwarded-For`, `X-Forwarded-Proto` and `X-Forwarded-Port`, but not `X-Forwarded-Host`, so a client's own value passes through: keep `trustForwardedHost` off. The ALB keeps `Host`, lowercased, with the port added on non-default listener ports.
-- With CloudFront in front, also trust CloudFront's origin-facing ranges (service `CLOUDFRONT_ORIGIN_FACING` in [ip-ranges.json](https://ip-ranges.amazonaws.com/ip-ranges.json)). CloudFront replaces `Host` with the origin's domain ([request and response behavior](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/RequestAndResponseBehaviorCustomOrigin.html)).
-- CloudFront can add `CloudFront-Viewer-Address` through an origin request policy, but its documentation does not say what happens to a client's own copy ([CloudFront request headers](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/adding-cloudfront-headers.html)). Keep the CIDRs.
+- With CloudFront in front, also trust CloudFront's origin-facing ranges (service `CLOUDFRONT_ORIGIN_FACING` in [ip-ranges.json](https://ip-ranges.amazonaws.com/ip-ranges.json)), and see the CloudFront section below.
+
+<a id="cloudfront"></a>
+
+**Amazon CloudFront in front of any origin.**
+- Without an origin request policy, CloudFront sends your app only a few of the visitor's headers. It leaves out `Signature`, `Signature-Input` and `Signature-Agent`, removes `Accept` and `Accept-Language`, and replaces every `User-Agent` with `Amazon CloudFront` ([control origin requests](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/controlling-origin-requests.html), [request headers and CloudFront behavior](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/RequestAndResponseBehaviorCustomOrigin.html#request-custom-headers-behavior)). Posterna would then see no signatures and label every visitor `unknown_automation`.
+- The fix: in every cache behavior that reaches your app, set the origin request policy to the managed **AllViewerExceptHostHeader** policy (ID `b689b0a8-53d0-40ab-baf2-68738e2966ac`). It sends your app every visitor header except `Host`, with all cookies and query strings ([managed origin request policies](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html)).
+  - Console: **CloudFront** → **Distributions** → your distribution → **Behaviors** → select the behavior → **Edit** → **Cache key and origin requests** → **Cache policy and origin request policy (recommended)** → **Origin request policy**: **AllViewerExceptHostHeader** → **Save changes**.
+  - CloudFormation: `OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac` on the cache behavior.
+  - If you use a custom origin request policy instead, its headers must include at least `User-Agent`, `Accept`, `Accept-Language`, `Signature`, `Signature-Input` and `Signature-Agent`, as well as whatever your app needs.
+- CloudFront then sends the origin's domain as `Host`, so set `publicHost` to the hostname visitors use. (The **AllViewer** policy forwards the visitor's `Host` too, but your origin must then accept that name, including its TLS certificate.)
+- Responses CloudFront serves from its cache never reach your app, so they are not labeled or counted. For pages you want labeled, use the managed **CachingDisabled** cache policy (ID `4135ea2d-6df8-44a3-9df3-4b5a84be39ad`) or keep them out of the cache with `Cache-Control`.
+- CloudFront appends the visitor's address to `X-Forwarded-For`, and a load balancer behind it appends CloudFront's address. Behind an Application Load Balancer, keep CloudFront's origin-facing ranges in `trustedProxies`, as above.
+- CloudFront can add `CloudFront-Viewer-Address` through an origin request policy, but its documentation does not say what happens to a client's own copy ([CloudFront request headers](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/adding-cloudfront-headers.html)). Keep the CIDRs instead.
+- `posterna doctor` catches a missing policy: its Signature headers check fails.
 
 **nginx in front of Node on the same machine.**
 - Bind Node to `127.0.0.1` and configure nginx like this:

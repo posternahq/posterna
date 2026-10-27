@@ -21,6 +21,8 @@ interface Check {
 }
 
 const PROXY_SETTINGS = `${INSTALL_GUIDE}#trusted-proxies`;
+const HEALTH_CHECKS = `${INSTALL_GUIDE}#health-checks`;
+const CLOUDFRONT = `${INSTALL_GUIDE}#cloudfront`;
 /** The Signature-Agent the doctor request names. The site never fetches it. */
 const DOCTOR_AGENT = "https://posterna.com";
 const DIRECTORY_MAX_AGE_DAYS = 7;
@@ -288,7 +290,7 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
           name: "Signature headers",
           status: "fail",
           detail: `${missing.join(", ")} did not reach the app.`,
-          fix: "A proxy, CDN or firewall in front of the app removes them. Allow these request headers through.",
+          fix: `A proxy, CDN or firewall in front of the app removes them. Allow these request headers through. On CloudFront, set the origin request policy to AllViewerExceptHostHeader: ${CLOUDFRONT}`,
         },
   );
 
@@ -346,7 +348,7 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
       status: "fail",
       detail:
         "enforcement is suspended: most requests seem to come from internal addresses (proxy guard).",
-      fix: `Set trustedProxies for your host. See ${PROXY_SETTINGS}`,
+      fix: `Set trustedProxies for your host (${PROXY_SETTINGS}). On a quiet site, load balancer health checks can cause this too: keep them out of Posterna (${HEALTH_CHECKS}).`,
     });
   } else {
     const notes = [

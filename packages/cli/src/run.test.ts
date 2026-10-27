@@ -509,6 +509,51 @@ describe("posterna doctor", () => {
     expect(result.code).toBe(1);
   });
 
+  it("points missing signature headers at the CloudFront setting", async () => {
+    // As CloudFront without an origin request policy: the signature headers never arrive.
+    const app = await site({}, (req, _res, next) => {
+      for (const name of ["signature", "signature-input", "signature-agent"])
+        delete req.headers[name];
+      next();
+    });
+    const result = await cli(["doctor", "--url", app.url, "--base-url", await cloud("127.0.0.1")], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+    });
+    app.close();
+    expect(result.out).toContain(
+      "FAIL  Signature headers: signature, signature-input, signature-agent did not reach the app.",
+    );
+    expect(result.out).toContain(
+      "set the origin request policy to AllViewerExceptHostHeader: https://posterna.com/docs/install#cloudfront",
+    );
+    expect(result.code).toBe(1);
+  });
+
+  it("names health checks when the proxy guard has suspended enforcement", async () => {
+    const app = await site({});
+    const report = (await (
+      await fetch(`${app.url}/.well-known/posterna/debug`, {
+        headers: { "x-posterna-debug-token": "doctor-token" },
+      })
+    ).json()) as { suspensions: string[] };
+    app.close();
+    report.suspensions = ["proxy"];
+    const url = await listen(
+      createServer((_req, res) => {
+        res.setHeader("content-type", "application/json");
+        res.end(JSON.stringify(report));
+      }),
+    );
+    const result = await cli(["doctor", "--url", url, "--base-url", await cloud("127.0.0.1")], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+    });
+    expect(result.out).toContain("FAIL  Mode: enforcement is suspended");
+    expect(result.out).toContain(
+      "load balancer health checks can cause this too: keep them out of Posterna (https://posterna.com/docs/install#health-checks)",
+    );
+    expect(result.code).toBe(1);
+  });
+
   it("catches forged forwarding headers being trusted", async () => {
     const app = await site({ trustedProxies: ["127.0.0.0/8"], trustForwardedHost: true });
     const result = await cli(["doctor", "--url", app.url, "--base-url", await cloud("127.0.0.1")], {
