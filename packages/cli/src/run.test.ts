@@ -118,6 +118,11 @@ describe("posterna init", () => {
     expect(result.out).toContain("Create src/proxy.ts");
     expect(result.out).toContain("export const proxy = withPosterna({");
     expect(result.out).not.toContain('runtime: "nodejs"');
+    expect(result.out).toContain(
+      "3. Wrap the export in next.config.ts, so agents.yaml is built into the proxy",
+    );
+    expect(result.out).toContain('import { withPosternaConfig } from "@posterna/next/config";');
+    expect(result.out).toContain("export default withPosternaConfig(nextConfig);");
     expect(readFileSync(join(cwd, ".env.local"), "utf8")).toBe(`POSTERNA_SITE_KEY=${key}\n`);
     expect(statSync(join(cwd, ".env.local")).mode & 0o777).toBe(0o600);
     expect(result.out).not.toContain(key);
@@ -161,6 +166,29 @@ describe("posterna init", () => {
     expect(existing.out).toContain(
       "export const middleware = withPosterna({ /* options as in https://posterna.com/docs/install */ }, yourMiddleware);",
     );
+
+    // A CommonJS next.config gets the require form.
+    const commonJs = await cli(["init"], {
+      cwd: project({
+        "package.json": JSON.stringify({ dependencies: { next: "15.5.28" } }),
+        "next.config.js": "module.exports = {};",
+      }),
+    });
+    expect(commonJs.out).toContain(
+      "3. Wrap the export in next.config.js, so agents.yaml is built into the middleware",
+    );
+    expect(commonJs.out).toContain(
+      'const { withPosternaConfig } = require("@posterna/next/config");',
+    );
+    expect(commonJs.out).toContain("module.exports = withPosternaConfig(nextConfig);");
+    const esm = await cli(["init"], {
+      cwd: project({
+        "package.json": JSON.stringify({ type: "module", dependencies: { next: "16.4.3" } }),
+        "next.config.js": "export default {};",
+      }),
+    });
+    expect(esm.out).toContain("3. Wrap the export in next.config.js");
+    expect(esm.out).toContain("export default withPosternaConfig(nextConfig);");
 
     const old = await cli(["init"], {
       cwd: project({ "package.json": JSON.stringify({ dependencies: { next: "14.2.18" } }) }),
@@ -438,6 +466,32 @@ describe("posterna doctor", () => {
       "FAIL  Policy: your policy was not loaded, so a built-in monitor policy without your rules is in use. The server said: No policy file at /nonexistent/agents.yaml.",
     );
     expect(result.out).toContain("Fix: Put agents.yaml in the folder the server starts in");
+    expect(result.code).toBe(1);
+  });
+
+  it("points a Next.js site without its policy at withPosternaConfig", async () => {
+    // The same report, as the Next.js adapter on Vercel sends it.
+    const app = await site({ policy: undefined, policyPath: "/var/task/agents.yaml" });
+    const report = (await (
+      await fetch(`${app.url}/.well-known/posterna/debug`, {
+        headers: { "x-posterna-debug-token": "doctor-token" },
+      })
+    ).json()) as { posterna: { adapter: string } };
+    app.close();
+    report.posterna.adapter = "@posterna/next";
+    const url = await listen(
+      createServer((_req, res) => {
+        res.setHeader("content-type", "application/json");
+        res.end(JSON.stringify(report));
+      }),
+    );
+    const result = await cli(["doctor", "--url", url, "--base-url", await cloud("127.0.0.1")], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+    });
+    expect(result.out).toContain("FAIL  Policy: your policy was not loaded");
+    expect(result.out).toContain(
+      "Fix: With the latest @posterna/next, wrap next.config in withPosternaConfig from @posterna/next/config",
+    );
     expect(result.code).toBe(1);
   });
 

@@ -133,6 +133,20 @@ function packageManager(cwd: string): string {
   return "npm install";
 }
 
+/** next.config's file name (next.config.ts when there is none yet), and whether it is CommonJS. */
+function nextConfigFile(cwd: string): { file: string; commonJs: boolean } {
+  const file =
+    [
+      "next.config.ts",
+      "next.config.mts",
+      "next.config.mjs",
+      "next.config.js",
+      "next.config.cjs",
+    ].find((name) => existsSync(join(cwd, name))) ?? "next.config.ts";
+  const type = readJson(join(cwd, "package.json"))?.type;
+  return { file, commonJs: file.endsWith(".cjs") || (file.endsWith(".js") && type !== "module") };
+}
+
 /** The code to add, printed for the person to paste. `posterna init` never edits code. */
 export function codeToAdd(framework: Framework, cwd: string): string[] {
   const install = packageManager(cwd);
@@ -196,10 +210,28 @@ export function codeToAdd(framework: Framework, cwd: string): string[] {
     if (framework.major === 15 && !framework.nodeMiddleware) {
       lines.push(
         "",
-        "   Next.js before 15.5 runs middleware on the Edge runtime, which cannot read agents.yaml",
-        "   or do reverse DNS. Upgrade to 15.5 or later, or pass the policy text as `policy`.",
+        "   Next.js before 15.5 runs middleware on the Edge runtime, which cannot do reverse DNS.",
+        "   Upgrade to 15.5 or later where you can.",
       );
     }
+    const config = nextConfigFile(cwd);
+    lines.push(
+      "",
+      `3. Wrap the export in ${config.file}, so agents.yaml is built into the ${exportName}`,
+      "   (hosts such as Vercel deploy it without the file):",
+      "",
+      ...(config.commonJs
+        ? [
+            '   const { withPosternaConfig } = require("@posterna/next/config");',
+            "",
+            "   module.exports = withPosternaConfig(nextConfig);",
+          ]
+        : [
+            '   import { withPosternaConfig } from "@posterna/next/config";',
+            "",
+            "   export default withPosternaConfig(nextConfig);",
+          ]),
+    );
     return lines;
   }
   return [

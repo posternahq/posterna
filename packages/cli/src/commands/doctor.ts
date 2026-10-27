@@ -301,7 +301,7 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
             name: "Policy",
             status: "fail",
             detail: `your policy was not loaded, so a built-in monitor policy without your rules is in use. The server said: ${(policy.problem ?? "no reason given").split("\n")[0]}`,
-            fix: policyFix(policy.problem ?? ""),
+            fix: policyFix(policy.problem ?? "", report.posterna.adapter),
           }
         : {
             name: "Policy",
@@ -376,12 +376,20 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
   return failed === 0 ? 0 : 1;
 }
 
+const BUILD_IN_POLICY =
+  "With the latest @posterna/next, wrap next.config in withPosternaConfig from @posterna/next/config, so agents.yaml is built into the proxy, and deploy again.";
+
 /** The fix for a policy that fell back, from the reason the server gave. */
-function policyFix(problem: string): string {
+function policyFix(problem: string, adapter: string): string {
+  const next = adapter === "@posterna/next";
   if (problem.includes("Node 20.16"))
-    return "Run the server on Node.js 20.16 or later, or pass the policy text as `policy`.";
+    return next
+      ? `${BUILD_IN_POLICY} Or run the server on Node.js 20.16 or later.`
+      : "Run the server on Node.js 20.16 or later, or pass the policy text as `policy`.";
   if (problem.startsWith("No policy file"))
-    return "Put agents.yaml in the folder the server starts in, or set POSTERNA_POLICY to its path. `posterna init` writes one.";
+    return next
+      ? `${BUILD_IN_POLICY} \`posterna init\` writes agents.yaml if there is none.`
+      : "Put agents.yaml in the folder the server starts in, or set POSTERNA_POLICY to its path. `posterna init` writes one.";
   if (problem.includes("invalid"))
     return "Run `posterna policy check` on agents.yaml and fix what it reports.";
   return "Check the [posterna] lines in the server log.";
