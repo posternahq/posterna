@@ -1,0 +1,64 @@
+{
+  "id": "proxy/client-forwarded-host-ignored-by-default",
+  "description": "A client's own X-Forwarded-Host, passed through by a trusted proxy, cannot choose the signed host unless the site opts in: the Host header is used and the signature verifies.",
+  "spec": [
+    "4.2",
+    "9"
+  ],
+  "type": "verify",
+  "now": "2026-10-26T12:00:00Z",
+  "config": {
+    "trustedProxies": [
+      "10.0.0.0/8"
+    ]
+  },
+  "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "10.0.0.5",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "x-forwarded-for",
+            "203.0.113.60"
+          ],
+          [
+            "x-forwarded-host",
+            "victim.example"
+          ],
+          [
+            "signature",
+            "sig1=:kCw3gUCPMweVtKwa6iPPwTMiFHbdEW4Py2TF4iYeLNvNyzmONoyew70nYR8C2kY18h1o0AstTRil45XrGcG2Bw==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015995;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793016060;nonce=\"j4CJGC4OV66JA+DMtfvWjpfl0jsHnHrusvqYhaKWZM3w+f7M4NWkGeFgulVG8R3BR1Tu6NJ0N1GxSBt2y5Jgnw==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "verified_by_signature",
+        "reason": null,
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    }
+  ]
+}

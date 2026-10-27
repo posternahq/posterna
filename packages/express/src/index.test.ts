@@ -199,6 +199,27 @@ paths:
     });
   });
 
+  it("takes the signed host from X-Forwarded-Host only when the site opts in", async () => {
+    const report = async (options: PosternaOptions) => {
+      const { get } = await start({ debugToken: "t0ken", ...options });
+      const response = await get(DEBUG_PATH, {
+        ...BROWSER,
+        "x-forwarded-host": "www.site.example",
+        "x-posterna-debug-token": "t0ken",
+      });
+      return ((await response.json()) as { authority: unknown }).authority;
+    };
+    expect(await report({})).toMatchObject({
+      host: expect.stringMatching(/^127\.0\.0\.1:\d+$/),
+      source: "host",
+    });
+    expect(await report({ trustForwardedHost: true })).toEqual({
+      host: "www.site.example",
+      source: "x-forwarded-host",
+      scheme: "http",
+    });
+  });
+
   it("has no debug route without a token", async () => {
     const { get } = await start({ debugToken: null });
     const response = await get(DEBUG_PATH, { ...BROWSER, "x-posterna-debug-token": "" });

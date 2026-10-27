@@ -190,6 +190,7 @@ export function posterna(options: PosternaOptions = {}): PosternaMiddleware {
       trustedProxies: options.trustedProxies,
       forwardedHeader: options.forwardedHeader,
       publicHost: options.publicHost,
+      trustForwardedHost: options.trustForwardedHost,
       directory: directoryOptions(options, env),
       ...(options.dns !== undefined ? { dns: options.dns } : {}),
     });

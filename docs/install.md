@@ -147,7 +147,8 @@ This step matters most. Posterna checks crawlers against their operators' publis
   - A hop count `N` means the client is the address `N` hops to the left of the socket peer in `X-Forwarded-For`. So `1` is the last entry, appended by the one proxy in front of you.
   - A list of CIDRs skips trusted addresses from the right of `X-Forwarded-For`.
   - Without the setting, forwarding headers are ignored.
-- **`publicHost`**: the hostname agents sign, or a list of them, for example `["www.example.com", "example.com"]`. Set it on every host. Several hosts below pass a client's own `X-Forwarded-Host` through to your app. If you rely on that header instead of `publicHost`, a client could choose the host signatures are checked against.
+- **`publicHost`**: the hostname agents sign, or a list of them, for example `["www.example.com", "example.com"]`. Without it, Posterna uses the `Host` header your app receives, which is right only when your proxy passes the original one through. Setting it is the safest choice on every host, and required where the proxy changes `Host`.
+- **`trustForwardedHost`**: off by default, and best left off. When on, the signed host comes from `X-Forwarded-Host` sent by a trusted proxy. Several hosts below pass a client's own `X-Forwarded-Host` through to your app, so a client could then choose the host signatures are checked against. Turn it on only behind a proxy that overwrites the header, and only if you cannot set `publicHost` (for example, an app serving many customer domains).
 - **`forwardedHeader`**: keep the default, `x-forwarded-for`. None of the hosts below maintains the RFC 7239 `Forwarded` header, and some pass a client's copy through unchanged.
 
 Next.js never gives middleware or a proxy the socket address. With `trustedProxies` set, Posterna reads `X-Forwarded-For` from its right end; without it, there is no client address, and IP checks are off. When `next start` is reached directly, with no proxy in front, Next.js passes on an `X-Forwarded-For` the client sent itself. Always run Next.js behind your host's proxy or your own.
@@ -160,10 +161,12 @@ These settings come from each host's documentation, checked on 26 October 2026, 
 |---|---|---|---|
 | Railway | `2` | recommended | medium |
 | Vercel | `1` | recommended | medium |
-| Fly.io | `2` (`3` with Cloudflare in front) | **required** | high |
-| Render | `3` | **required** | low: check with doctor |
-| AWS Application Load Balancer | your load balancer subnets' CIDRs | **required** | high |
-| nginx on the same machine | `["127.0.0.1/32", "::1/128"]` | **required**, or set the headers below | high |
+| Fly.io | `2` (`3` with Cloudflare in front) | recommended | high |
+| Render | `3` | recommended | low: check with doctor |
+| AWS Application Load Balancer | your load balancer subnets' CIDRs | recommended; **required** with CloudFront | high |
+| nginx on the same machine | `["127.0.0.1/32", "::1/128"]` | **required**, or pass `Host` as below | high |
+
+Leave `trustForwardedHost` off on all of them.
 
 The same values work for Express and Next.js on each host.
 
@@ -182,7 +185,7 @@ The same values work for Express and Next.js on each host.
 
 **Fly.io.**
 - Fly Proxy appends the client address to `X-Forwarded-For`, followed by your app's own shared or dedicated address ([request headers](https://docs.fly.io/networking/request-headers)). So the client is two hops from your app, and `1` would give your app's own address. Fly's documentation warns that the header must be treated with caution to avoid spoofing.
-- Fly Proxy does not set `X-Forwarded-Host`; a test request's forged value passed through. So `publicHost` is required.
+- Fly Proxy keeps the original `Host` header. It does not set `X-Forwarded-Host`: a test request's forged value passed through, which is why `trustForwardedHost` must stay off here.
 - With Cloudflare in front, add one hop.
 - Machines talking over Fly's private network (6PN) bypass Fly Proxy entirely ([private networking](https://docs.fly.io/networking/private-networking)).
 
@@ -196,7 +199,7 @@ The same values work for Express and Next.js on each host.
 - By default an ALB appends the client address to `X-Forwarded-For` (`append` mode). Never use `preserve`, which passes the header through unmodified ([X-Forwarded headers](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/x-forwarded-headers.html)).
 - The ALB reaches your targets from private addresses in its subnets ([how Elastic Load Balancing works](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html)). List those subnets' CIDRs, or your VPC's, in `trustedProxies`.
 - Restrict your targets' security group to the load balancer's.
-- The ALB sets `X-Forwarded-For`, `X-Forwarded-Proto` and `X-Forwarded-Port`, but not `X-Forwarded-Host`, so set `publicHost`.
+- The ALB sets `X-Forwarded-For`, `X-Forwarded-Proto` and `X-Forwarded-Port`, but not `X-Forwarded-Host`, so a client's own value passes through: keep `trustForwardedHost` off. The ALB keeps `Host`, lowercased, with the port added on non-default listener ports.
 - With CloudFront in front, also trust CloudFront's origin-facing ranges (service `CLOUDFRONT_ORIGIN_FACING` in [ip-ranges.json](https://ip-ranges.amazonaws.com/ip-ranges.json)). CloudFront replaces `Host` with the origin's domain ([request and response behavior](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/RequestAndResponseBehaviorCustomOrigin.html)).
 
 **nginx in front of Node on the same machine.**
@@ -207,13 +210,12 @@ The same values work for Express and Next.js on each host.
     proxy_pass http://127.0.0.1:3000;
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Host $host;
     proxy_set_header X-Forwarded-Proto $scheme;
   }
   ```
 
 - `$proxy_add_x_forwarded_for` is the client's header with `$remote_addr` appended ([proxy module](https://nginx.org/en/docs/http/ngx_http_proxy_module.html)).
-- By default nginx sends the upstream's name as `Host`, not the original one.
+- By default nginx sends the upstream's name as `Host`, not the original one; `proxy_set_header Host $host` fixes that (or set `publicHost`). nginx passes a client's `X-Forwarded-Host` through unless you set it, so keep `trustForwardedHost` off.
 - `proxy_set_header` lines are inherited from an outer block only when the inner block has none of its own.
 - If a CDN sits in front of nginx, either use nginx's [realip module](https://nginx.org/en/docs/http/ngx_http_realip_module.html) with the CDN's ranges, or add those ranges to `trustedProxies`.
 
@@ -282,7 +284,7 @@ No address, URL, header value or body ever leaves your server. Without a site ke
 | `POSTERNA_COUNTERS_INTERVAL_MS` | Counter flush interval, for tests (at least 1000). Default 60 seconds. |
 
 Adapter options take precedence over the environment. Both adapters accept:
-- `trustedProxies`, `forwardedHeader` and `publicHost`;
+- `trustedProxies`, `forwardedHeader`, `publicHost` and `trustForwardedHost`;
 - `policy` (agents.yaml text or a parsed policy) and `policyPath`;
 - `headers`, to rename the verdict request headers;
 - `siteKey`, `baseUrl` and `debugToken`;

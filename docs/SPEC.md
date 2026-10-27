@@ -85,14 +85,15 @@ On startup, core loads the bundled snapshot, then refreshes in the background: d
 
 ### 4.1 Inputs
 
-A Fetch API `Request` or a Node `IncomingMessage`, plus configuration: `trustedProxies`, `publicHost`, `directory` options. Output is a `VerdictResult`; the verifier never throws to its caller.
+A Fetch API `Request` or a Node `IncomingMessage`, plus configuration: `trustedProxies`, `forwardedHeader`, `publicHost`, `trustForwardedHost`, `directory` options. Output is a `VerdictResult`; the verifier never throws to its caller.
 
 ### 4.2 Client IP and host resolution
 
 - `trustedProxies`: a list of CIDRs (or a hop count) for the proxies in front of the app. The client IP is the rightmost address in `X-Forwarded-For` (or `Forwarded`) that is not a trusted proxy. With no configuration, the socket address is used and `X-Forwarded-For` is ignored.
 - `forwardedHeader` (`x-forwarded-for` by default, or `forwarded`) names the one header the trusted proxies maintain. The other is never read, so a client cannot inject it. Forwarding headers are read only when the socket peer is a trusted proxy. With a hop count N, the client is the address N hops to the left of the socket. An unreadable entry ends the walk at the nearest trusted hop.
 - No socket address (Next.js middleware and proxy never see it): with `trustedProxies` set, the forwarding header is read from its right end, as if the socket peer were a trusted proxy. With CIDRs, trusted entries are skipped from the right; with a hop count N, the client is the Nth entry from the right, or the leftmost when there are fewer. Without `trustedProxies`, forwarding headers are still ignored and the client address is unknown.
-- `publicHost`: the hostname agents sign (`@authority`), or a list of them for a site served on several names. If set, it is used: the request's own host when it is in the list, else the first entry. Otherwise `X-Forwarded-Host` is honored only from a trusted proxy, else `Host`. Several hosting proxies pass a client's `X-Forwarded-Host` through, so `docs/install.md` tells every install to set `publicHost`, and `posterna doctor` checks that a forged one is ignored.
+- `publicHost`: the hostname agents sign (`@authority`), or a list of them for a site served on several names. If set, it is used: the request's own host when it is in the list, else the first entry. Otherwise the `Host` header (for a Fetch request without one, the URL's host).
+- `trustForwardedHost` (off by default): take the host from `X-Forwarded-Host` (its last value) when a trusted proxy sent the request; `publicHost` still wins. Several hosting proxies (Fly.io, AWS load balancers, nginx unless configured) pass a client's own `X-Forwarded-Host` through. Reading it by default would let a client choose the host signatures are checked against, and so replay a signature captured on another site within its validity window. A site opts in only behind a proxy that overwrites the header. `posterna doctor` sends a forged one and fails if it is believed.
 - Runtime proxy guard: if 80 percent or more of the last 200 requests resolve to private, loopback, link-local or carrier-grade NAT addresses, the install marks itself `proxySuspect`, suspends all enforcement, and reports the state. This is the misconfiguration that would make real Googlebot look spoofed. Requests with no address at all are not counted.
 
 ### 4.3 Identifying the claim

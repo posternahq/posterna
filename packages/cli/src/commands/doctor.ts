@@ -215,7 +215,7 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
           name: "Signed host",
           status: "fail",
           detail: `the app took the signed host from an X-Forwarded-Host that doctor forged (${FORGED_HOST}). Any client can choose the host signatures are checked against.`,
-          fix: `Set publicHost: "${expectedHost}" in the Posterna options.`,
+          fix: `Your proxy passes a client's X-Forwarded-Host through. Remove trustForwardedHost and set publicHost: "${expectedHost}" in the Posterna options.`,
         }
       : report.authority.host === expectedHost
         ? {
@@ -227,7 +227,7 @@ export async function doctor(io: Io, flags: DoctorFlags): Promise<number> {
             name: "Signed host",
             status: "fail",
             detail: `agents sign ${expectedHost}, but the app checks ${report.authority.host ?? "no host"} (from ${report.authority.source}).`,
-            fix: `Set publicHost: "${expectedHost}" in the Posterna options.`,
+            fix: `Set publicHost: "${expectedHost}" in the Posterna options, or have your proxy pass the original Host header.`,
           },
   );
 

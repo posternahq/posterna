@@ -1654,7 +1654,7 @@ async function proxyVectors(): Promise<void> {
   );
   verifyVector(
     "proxy/forwarded-host-from-trusted-proxy",
-    "X-Forwarded-Host from a trusted proxy supplies the signed host.",
+    "With trustForwardedHost, X-Forwarded-Host from a trusted proxy supplies the signed host.",
     ["4.2", "4.4"],
     [
       {
@@ -1662,11 +1662,44 @@ async function proxyVectors(): Promise<void> {
         expected: verifiedSigner,
       },
     ],
+    { config: { trustedProxies: ["10.0.0.0/8"], trustForwardedHost: true } },
+  );
+  verifyVector(
+    "proxy/forwarded-host-ignored-by-default",
+    "Without trustForwardedHost, X-Forwarded-Host is ignored even from a trusted proxy: the internal Host header is the signed host, so the signature fails.",
+    ["4.2", "4.4"],
+    [
+      {
+        request: { ...internal, headers: [...internal.headers, ["x-forwarded-host", SITE]] },
+        expected: failedSigner("signature_invalid"),
+      },
+    ],
+    { config: { trustedProxies: ["10.0.0.0/8"] } },
+  );
+  const behindPassThroughProxy = await signed(
+    request(
+      [
+        ["host", SITE],
+        ["user-agent", ua.exampleAgent],
+        ["signature-agent", 'sig1="https://signer.example"'],
+        ["x-forwarded-for", "203.0.113.60"],
+        // A proxy that passes the client's own X-Forwarded-Host through.
+        ["x-forwarded-host", "victim.example"],
+      ],
+      { remote_address: "10.0.0.5" },
+    ),
+    { key: "signer-a", authority: SITE, nonceSeed: "pass-through-proxy" },
+  );
+  verifyVector(
+    "proxy/client-forwarded-host-ignored-by-default",
+    "A client's own X-Forwarded-Host, passed through by a trusted proxy, cannot choose the signed host unless the site opts in: the Host header is used and the signature verifies.",
+    ["4.2", "9"],
+    [{ request: behindPassThroughProxy, expected: verifiedSigner }],
     { config: { trustedProxies: ["10.0.0.0/8"] } },
   );
   verifyVector(
     "proxy/forwarded-host-from-untrusted-client",
-    "X-Forwarded-Host from a client that is not a trusted proxy is ignored.",
+    "X-Forwarded-Host from a client that is not a trusted proxy is ignored, even with trustForwardedHost.",
     ["4.2", "9"],
     [
       {
@@ -1678,7 +1711,7 @@ async function proxyVectors(): Promise<void> {
         expected: failedSigner("signature_invalid"),
       },
     ],
-    { config: { trustedProxies: ["10.0.0.0/8"] } },
+    { config: { trustedProxies: ["10.0.0.0/8"], trustForwardedHost: true } },
   );
 
   // Next.js middleware and proxy never see the socket address.

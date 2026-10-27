@@ -171,6 +171,7 @@ export function createPosterna(options: PosternaNextOptions = {}): Posterna {
     trustedProxies: options.trustedProxies,
     forwardedHeader: options.forwardedHeader,
     publicHost: options.publicHost,
+    trustForwardedHost: options.trustForwardedHost,
     directory: directoryOptions(options, env),
   });
   let engine: PolicyEngine;

@@ -18,6 +18,13 @@ export interface ProxyOptions {
    * first entry.
    */
   publicHost?: string | readonly string[];
+  /**
+   * Take the signed host from X-Forwarded-Host when a trusted proxy sent the
+   * request. Off by default: many proxies pass a client's own X-Forwarded-Host
+   * through, which would let the client choose the host signatures are checked
+   * against. Turn it on only behind a proxy that overwrites the header.
+   */
+  trustForwardedHost?: boolean;
 }
 
 export interface Trust {
@@ -25,6 +32,7 @@ export interface Trust {
   hops: number;
   header: "x-forwarded-for" | "forwarded";
   publicHosts: string[];
+  trustForwardedHost: boolean;
 }
 
 export function compileTrust(options: ProxyOptions): Trust {
@@ -39,6 +47,7 @@ export function compileTrust(options: ProxyOptions): Trust {
     )
       .map((host) => host.trim().toLowerCase())
       .filter((host) => host.length > 0),
+    trustForwardedHost: options.trustForwardedHost === true,
   };
 }
 
@@ -168,9 +177,10 @@ export function resolveClient(request: NormalizedRequest, trust: Trust): Resolve
 
   let host: string | null;
   let hostSource: string;
-  const forwardedHost = viaTrustedProxy
-    ? lastValue(fieldValue(request, "x-forwarded-host"))
-    : undefined;
+  const forwardedHost =
+    viaTrustedProxy && trust.trustForwardedHost
+      ? lastValue(fieldValue(request, "x-forwarded-host"))
+      : undefined;
   if (forwardedHost) {
     host = forwardedHost.toLowerCase();
     hostSource = "x-forwarded-host";

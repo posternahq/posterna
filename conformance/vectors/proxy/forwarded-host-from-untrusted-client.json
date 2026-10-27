@@ -1,6 +1,6 @@
 {
   "id": "proxy/forwarded-host-from-untrusted-client",
-  "description": "X-Forwarded-Host from a client that is not a trusted proxy is ignored.",
+  "description": "X-Forwarded-Host from a client that is not a trusted proxy is ignored, even with trustForwardedHost.",
   "spec": [
     "4.2",
     "9"
@@ -10,7 +10,8 @@
   "config": {
     "trustedProxies": [
       "10.0.0.0/8"
-    ]
+    ],
+    "trustForwardedHost": true
   },
   "steps": [
     {

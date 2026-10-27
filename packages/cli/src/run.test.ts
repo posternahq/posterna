@@ -296,7 +296,7 @@ describe("posterna doctor", () => {
   });
 
   it("catches forged forwarding headers being trusted", async () => {
-    const app = await site({ trustedProxies: ["127.0.0.0/8"] });
+    const app = await site({ trustedProxies: ["127.0.0.0/8"], trustForwardedHost: true });
     const result = await cli(["doctor", "--url", app.url, "--base-url", await cloud("127.0.0.1")], {
       env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
     });
@@ -308,8 +308,22 @@ describe("posterna doctor", () => {
     expect(result.out).toContain(
       `FAIL  Signed host: the app took the signed host from an X-Forwarded-Host that doctor forged (${FORGED_HOST})`,
     );
-    expect(result.out).toContain(`Fix: Set publicHost: "${new URL(app.url).host}"`);
+    expect(result.out).toContain(
+      `Fix: Your proxy passes a client's X-Forwarded-Host through. Remove trustForwardedHost and set publicHost: "${new URL(app.url).host}"`,
+    );
     expect(result.out).toContain("2 checks failed.");
+  });
+
+  it("ignores a forged X-Forwarded-Host unless the site opts in", async () => {
+    const app = await site({ trustedProxies: ["127.0.0.0/8"] });
+    const result = await cli(["doctor", "--url", app.url, "--base-url", await cloud("127.0.0.1")], {
+      env: { POSTERNA_DEBUG_TOKEN: "doctor-token" },
+    });
+    app.close();
+    expect(result.out).toContain(
+      `PASS  Signed host: signatures are checked against ${new URL(app.url).host}.`,
+    );
+    expect(result.out).toContain("1 check failed.");
   });
 
   it("reports a wrong client address with the fix", async () => {
