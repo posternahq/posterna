@@ -599,16 +599,24 @@ async function signatureVectors(): Promise<void> {
   );
   verifyVector(
     "signature/validity-too-long",
-    "A signature valid for 600 seconds, longer than the 300 second maximum, fails.",
+    "A signature valid for 7,200 seconds, longer than the 3,600 second maximum, fails; one valid for 600 seconds, like DuckAssistBot's, verifies.",
     ["4.4", "12"],
     [
       {
         request: await signed(request(signerHeaders()), {
           key: "signer-a",
           created: NOW - 10,
-          expires: NOW + 590,
+          expires: NOW + 7190,
         }),
         expected: failedSigner("validity_too_long"),
+      },
+      {
+        request: await signed(request(signerHeaders()), {
+          key: "signer-a",
+          created: NOW - 10,
+          expires: NOW + 590,
+        }),
+        expected: verifiedSigner,
       },
     ],
   );

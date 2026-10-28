@@ -128,7 +128,7 @@ Signature-Agent members of a type other than `directory`, or whose value is not 
 
 - Only operators whose `directory_url` is in the loaded directory are eligible. A `Signature-Agent` naming an unknown URL is a claim that cannot be verified: `declared_unverifiable`, never a network fetch.
 - Keys come from keys.json. Match by kid; when the operator uses no kid, try each key; when the kid is unknown, the request is `declared_unverifiable` and an early keys refresh is scheduled.
-- Verify the RFC 9421 signature with Cloudflare's libraries over the covered components the drafts require (including `@authority` and `signature-agent`), checking `created` and `expires` with 60 seconds of clock skew and a maximum validity window of 5 minutes, the `tag` parameter where the drafts define it, and nonce replay against a per-instance LRU.
+- Verify the RFC 9421 signature with Cloudflare's libraries over the covered components the drafts require (including `@authority` and `signature-agent`), checking `created` and `expires` with 60 seconds of clock skew and a maximum validity window of 1 hour (`maxSignatureValidity`; raised from 5 minutes on 28 October 2026, when DuckAssistBot was seen signing with valid 10-minute windows), the `tag` parameter where the drafts define it, and nonce replay against a per-instance LRU.
 - Valid: `verified_by_signature`. Present but invalid: `claimed_failed`.
 - Key selection: by kid, then by the key's RFC 7638 thumbprint, then every key when the operator publishes no kid. Known test keys (the RFC 9421 example key) are never loaded. The `alg` parameter is optional, as in the drafts.
 - Each Web Bot Auth signature on a request is checked on its own; one valid signature verifies the request.
@@ -337,7 +337,7 @@ p99 under 5 ms per request on a warm cache for the signature and IP paths, measu
 | Setting | Default |
 |---|---|
 | Clock skew | 60 s |
-| Max signature validity | 300 s |
+| Max signature validity | 3600 s |
 | Nonce LRU | 10,000 entries |
 | rDNS timeout, positive TTL, negative TTL | 1 s, 24 h, 1 h |
 | directory.json refresh | 24 h with jitter |

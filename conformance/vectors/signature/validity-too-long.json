@@ -1,6 +1,6 @@
 {
   "id": "signature/validity-too-long",
-  "description": "A signature valid for 600 seconds, longer than the 300 second maximum, fails.",
+  "description": "A signature valid for 7,200 seconds, longer than the 3,600 second maximum, fails; one valid for 600 seconds, like DuckAssistBot's, verifies.",
   "spec": [
     "4.4",
     "12"
@@ -8,6 +8,45 @@
   "type": "verify",
   "now": "2026-10-26T12:00:00Z",
   "steps": [
+    {
+      "request": {
+        "method": "GET",
+        "scheme": "https",
+        "path": "/",
+        "remote_address": "203.0.113.20",
+        "headers": [
+          [
+            "host",
+            "www.site.example"
+          ],
+          [
+            "user-agent",
+            "Mozilla/5.0 (compatible; ExampleAgent/1.0; +https://signer.example/agent)"
+          ],
+          [
+            "signature-agent",
+            "sig1=\"https://signer.example\""
+          ],
+          [
+            "signature",
+            "sig1=:g0MYvZI62PiD1atwrLpErHXm5m6w3HOWUAfxLyb10Ta0yKSp3PBdmoNRO0ewvfhuIOBetwu4l+9WPiWHTJeeBA==:"
+          ],
+          [
+            "signature-input",
+            "sig1=(\"@authority\" \"signature-agent\";key=\"sig1\");created=1793015990;keyid=\"MELuiVZZAluU6cSeWEDstQJL-6zktBukYpaYiB3CkTE\";alg=\"ed25519\";expires=1793023190;nonce=\"OC+5J5aO10cmobBu4k7vWkOMWYMTHYAoqzI+5sDMVLkY4TW0jPPwwis/mAeugWxmFDHI18mFHvUaF3gHq9DCpQ==\";tag=\"web-bot-auth\""
+          ]
+        ]
+      },
+      "expected": {
+        "verdict": "claimed_failed",
+        "reason": "validity_too_long",
+        "operator": "example-signer",
+        "agent": "ExampleAgent",
+        "purpose": "agent",
+        "method": "signature",
+        "error": false
+      }
+    },
     {
       "request": {
         "method": "GET",
@@ -38,8 +77,8 @@
         ]
       },
       "expected": {
-        "verdict": "claimed_failed",
-        "reason": "validity_too_long",
+        "verdict": "verified_by_signature",
+        "reason": null,
         "operator": "example-signer",
         "agent": "ExampleAgent",
         "purpose": "agent",

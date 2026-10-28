@@ -24,11 +24,19 @@ import { CLOUDFLARE_LIBRARY, type SignatureLibrary, verifySignatures } from "./s
 import type { ReasonCode, VerdictResult } from "./types";
 
 /** Configuration for {@link createVerifier}. Defaults follow docs/SPEC.md section 12. */
+/** The default longest signature validity window, in seconds (docs/SPEC.md section 4.4). */
+export const DEFAULT_MAX_SIGNATURE_VALIDITY = 3600;
+
 export interface VerifierOptions extends ProxyOptions {
   directory?: DirectoryOptions;
   /** Clock skew allowed on created and expires, in seconds. Default 60. */
   clockSkew?: number;
-  /** Longest signature validity window accepted, in seconds. Default 300. */
+  /**
+   * Longest signature validity window (`expires - created`) accepted, in
+   * seconds. Default 3600: raised from 300 on 28 October 2026, when
+   * DuckAssistBot was seen signing with valid 600-second windows. The drafts
+   * recommend at most 24 hours. Set it lower for a stricter site.
+   */
   maxSignatureValidity?: number;
   /** Nonces remembered for replay detection. Default 10,000. */
   nonceCacheSize?: number;
@@ -115,7 +123,7 @@ export function createVerifier(options: VerifierOptions = {}): Verifier {
   const guard = new ProxyGuard();
   const nonces = new Lru<string, true>(options.nonceCacheSize ?? 10_000);
   const clockSkew = options.clockSkew ?? 60;
-  const maxValidity = options.maxSignatureValidity ?? 300;
+  const maxValidity = options.maxSignatureValidity ?? DEFAULT_MAX_SIGNATURE_VALIDITY;
   const library = options.signatureLibrary ?? CLOUDFLARE_LIBRARY;
   const store = new DirectoryStore(options.directory ?? {}, {
     now,
