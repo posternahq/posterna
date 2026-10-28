@@ -9,3 +9,4 @@ saveExact: true
 # binary as an optional dependency, so it works without its postinstall.
 ignoredBuiltDependencies:
   - esbuild
+  - fs-ext-extra-prebuilt

@@ -1,0 +1,19 @@
+{
+  "name": "@posterna/wordpress-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Posterna WordPress plugin. GPLv2 or later; not published to npm. PHP tools come from Composer.",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "zip": "bash bin/build-zip.sh",
+    "env:start": "bash bin/build-zip.sh && wp-env start",
+    "env:stop": "wp-env stop",
+    "test:php": "composer test",
+    "test:wp": "bash bin/test-wp.sh",
+    "lint:php": "composer lint",
+    "plugin-check": "bash bin/plugin-check.sh"
+  },
+  "devDependencies": {
+    "@wordpress/env": "12.0.0"
+  }
+}

@@ -1,0 +1,19 @@
+# Files that do not ship in the plugin zip or to WordPress.org.
+# bin/build-zip.sh copies an allow-list instead; this file is for tools that read .distignore.
+/.wordpress-org
+/.wp-env.json
+/.distignore
+/bin
+/build
+/dist
+/docs
+/node_modules
+/tests
+/vendor
+/composer.json
+/composer.lock
+/package.json
+/phpcs.xml.dist
+/phpunit.xml.dist
+/README.md
+/RELEASING.md

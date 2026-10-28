@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/wp-env.json",
+  "core": null,
+  "phpVersion": "8.0",
+  "testsEnvironment": false,
+  "plugins": [
+    "https://downloads.wordpress.org/plugin/woocommerce.zip",
+    "https://downloads.wordpress.org/plugin/plugin-check.zip"
+  ],
+  "mappings": {
+    "wp-content/plugins/posterna": "./build/posterna",
+    "wp-content/mu-plugins": "./tests/wp/mu-plugins",
+    "wp-content/posterna-tests": "./tests/wp"
+  },
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_LOG": true,
+    "WP_DEBUG_DISPLAY": false
+  }
+}
