@@ -1,0 +1,62 @@
+name: WordPress.org deploy
+
+# Deploys the WordPress plugin in packages/wordpress to the WordPress.org
+# plugin directory (SVN) when a tag like wordpress-v1.0.1 is pushed.
+#
+# Disabled until the plugin is approved: the job runs only after the
+# repository variable WPORG_DEPLOY_ENABLED is set to "true" and the secrets
+# SVN_USERNAME and SVN_PASSWORD are added to the wordpress-org environment.
+# One-time setup: packages/wordpress/RELEASING.md.
+
+on:
+  push:
+    tags:
+      - "wordpress-v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wordpress-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to WordPress.org
+    if: ${{ vars.WPORG_DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: wordpress-org
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check the tag matches the plugin version
+        id: version
+        working-directory: packages/wordpress
+        run: |
+          tag="${GITHUB_REF_NAME#wordpress-v}"
+          header=$(sed -n 's/^ \* Version: *//p' posterna.php | tr -d '[:space:]')
+          stable=$(sed -n 's/^Stable tag: *//p' readme.txt | tr -d '[:space:]')
+          if [ "$tag" != "$header" ] || [ "$tag" != "$stable" ]; then
+            echo "Tag $tag does not match Version $header and Stable tag $stable." >&2
+            exit 1
+          fi
+          if grep -q '^Contributors: WPORG_USERNAME' readme.txt; then
+            echo "readme.txt still has the WPORG_USERNAME placeholder." >&2
+            exit 1
+          fi
+          echo "version=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        working-directory: packages/wordpress
+        run: bash bin/build-zip.sh
+
+      - name: Deploy
+        uses: 10up/action-wordpress-plugin-deploy@2.3.0
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: posterna
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_DIR: packages/wordpress/build/posterna
+          ASSETS_DIR: packages/wordpress/.wordpress-org

@@ -94,3 +94,68 @@ jobs:
         run: pnpm test:e2e
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+
+  # The WordPress plugin: every conformance vector through the PHP port, the
+  # port checks, and the WordPress Coding Standards (packages/wordpress).
+  wordpress-php:
+    name: WordPress plugin (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.0", "8.4"]
+    defaults:
+      run:
+        working-directory: packages/wordpress
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: sodium
+          tools: composer:v2
+          coverage: none
+
+      - name: Install
+        run: composer install --no-interaction --no-progress
+
+      - name: Unit and conformance tests
+        run: composer test
+
+      - name: Coding standards (PHPCS)
+        run: composer lint
+
+  # The plugin in a real WordPress (wp-env, Docker) with WooCommerce: labeling,
+  # counters, admin pages, sign-ups, fail-open cases, uninstall, Plugin Check.
+  wordpress-e2e:
+    name: WordPress end-to-end (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.0", "8.4"]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: End-to-end
+        run: pnpm --filter @posterna/wordpress-plugin test:wp
+        env:
+          WP_ENV_PHP_VERSION: ${{ matrix.php }}
+          POSTERNA_E2E_LIVE: "0"
+
+      - name: Plugin Check
+        if: matrix.php == '8.4'
+        run: pnpm --filter @posterna/wordpress-plugin plugin-check
