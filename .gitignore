@@ -31,3 +31,4 @@ posterna-keys/
 # WordPress plugin: Composer tools and build output
 packages/wordpress/vendor/
 packages/wordpress/build/
+packages/wordpress/.phpunit.result.cache

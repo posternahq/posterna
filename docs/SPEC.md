@@ -24,6 +24,7 @@ Principles, in priority order:
 | `@posterna/express` | MIT | Express middleware |
 | `@posterna/next` | MIT | Next.js integration (middleware.ts on Next 15, proxy.ts on Next 16; check current Next.js docs) |
 | `posterna` | MIT | CLI: `init`, `doctor`, `robots`, `policy check` |
+| WordPress plugin (`packages/wordpress`) | GPLv2 or later (code), CC BY 4.0 (bundled data) | PHP port of the verifier, monitor only (section 14). Released to WordPress.org, not npm |
 
 `conformance/` holds language-neutral test vectors (JSON) so future PHP and Python ports can prove they match.
 
@@ -349,4 +350,18 @@ p99 under 5 ms per request on a warm cache for the signature and IP paths, measu
 
 ## 13. Not in v1
 
-WordPress plugin, Python adapter, markdown shaping for agents, cost classes, crawl-to-referral threshold, alerts, analytics exports, billing, self-hosted collector, a shared rate-limit store across instances, CDN edge modules, HTTP 402 payments, attribution.
+Enforcement in the WordPress plugin, Python adapter, markdown shaping for agents, cost classes, crawl-to-referral threshold, alerts, analytics exports, billing, self-hosted collector, a shared rate-limit store across instances, CDN edge modules, HTTP 402 payments, attribution.
+
+## 14. WordPress plugin
+
+`packages/wordpress` is the WordPress plugin `posterna` (slug and text domain), version 1.0.0. It requires WordPress 6.5 and PHP 8.0. Release steps: `packages/wordpress/RELEASING.md`; review notes and the differences from core in detail: `packages/wordpress/docs/REVIEW-NOTES.md`.
+
+- Monitor only. It labels and counts; it never blocks, throttles or challenges a request or a sign-up. There is no policy engine and no agents.yaml: the `monitor` and `allow-list` templates only drive the suggested robots.txt lines (5.6), which the plugin prints and never writes.
+- The verifier is a PHP port of sections 4.2 to 4.8 with the same verdicts, reason codes and fail-open rules. The RFC 9421, Web Bot Auth and Structured Fields code is a port of what core uses from Cloudflare's libraries (no maintained PHP library supports PHP 8.0 without pulling in PSR-7), checked by every `verify`, `rfc9421`, `key_directory` and `robots` vector in `conformance/`. `decide` and `policy_check` vectors do not apply. Ed25519 uses libsodium; RSA-PSS keys fail open as `library_unsupported`.
+- The check runs on `plugins_loaded`, before the theme, for every request except wp-admin, WP-Cron and WP-CLI. Inbound `X-Agent-*` and `X-Posterna-*` are removed from `$_SERVER` when the plugin file loads, and the verdict is passed on as `X-Agent-*` request headers. `posterna_get_verdict()` returns it; the `posterna_verdict` action fires once, on `init`.
+- Client address: `REMOTE_ADDR` by default, or one header (optionally only from listed proxy CIDRs), or a hop count of `X-Forwarded-For`. `publicHost` is the host of `home_url()` and `site_url()`.
+- Reverse DNS runs only in WP-Cron (`dns_get_record`, at most 20 addresses and 10 seconds per run); results are cached in transients for 24 hours, 1 hour, or 1 minute after an error. PHP cannot interrupt a lookup, so an answer slower than the 1 second timeout is recorded as an error, as core would have.
+- Nonces for replay detection are transients kept for 3,660 seconds. The generation ratchet (3.1) is saved in an option instead of process memory, because each request is its own process.
+- Counters go to one table, `{prefix}posterna_counts`: hourly rows by kind (`page` or `signup`), verdict, reason, operator, agent, purpose and path group (7), with at most 50 path groups per hour and 90 days of retention. Logged-in users are not counted. Response bytes are not known and are sent as 0.
+- Both network features are off until an administrator turns them on: directory updates (directory.json daily, keys.json hourly and early on an unknown kid, from `https://posterna.com/v1/`, signature-checked as in 3.1) and the counters connection (a site key; every five minutes; the payload of section 7 with `sdk.name` `posterna-wordpress`, `mode` `monitor`, `bytes` 0 and `policyHash` null; sign-up rows are not sent). The remote `modeOverride` is parsed and recorded; in monitor-only 1.0 it changes nothing.
+
