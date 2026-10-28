@@ -81,7 +81,7 @@ What follows from them:
 - **Gemini.** The Gemini app sends a bare `Google` User-Agent, so real Gemini fetches count as `unknown_automation` and are never tied to Google. A bare `Google` is too generic to match safely (item 13); leave it unmatched unless Google documents it. Google's API fetcher, by contrast, names itself `GoogleAgent-URLContext` and verifies.
 - **Meta AI** fetched as Meta-WebIndexer, not Meta-ExternalFetcher, and did not sign.
 - **Grok** fetched with the same kind of browser User-Agent as xAI's API fetcher.
-- **Perplexity and Copilot** sent nothing that reached the lab. Perplexity's API fetcher did reach it with a browser User-Agent, so the app's own fetcher may be stopped before the site (posterna.com is behind Cloudflare); Copilot's answer suggests it reads Bing's index rather than the page. The retest without the robots tag failed the same way, so the tag was not the cause; for Perplexity, check the CDN's security events for the minute of the attempt.
+- **Perplexity and Copilot** sent nothing that reached the lab. Perplexity's API fetcher did reach it with a browser User-Agent, so the app's own fetcher may be stopped before the site (posterna.com is behind Cloudflare); Copilot's answer suggests it reads Bing's index rather than the page. The retest without the robots tag failed the same way, so the tag was not the cause. Cloudflare, in front of posterna.com, blocked no request to the lab that day (its only blocks were scanners probing for WordPress files), so Perplexity's app most likely never sent its request: the failure is on Perplexity's side.
 
 ## Making these measurable
 
