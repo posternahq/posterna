@@ -1,5 +1,12 @@
 # @posterna/express
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [ede5a4c]
+  - @posterna/core@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes

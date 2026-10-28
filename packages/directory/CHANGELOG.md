@@ -1,5 +1,11 @@
 # @posterna/directory
 
+## 0.1.3
+
+### Patch Changes
+
+- c047866: DuckDuckGo: DuckAssistBot is listed as the agent that signs with DuckDuckGo's key directory, from a dated public observation of Duck.ai's signed requests (28 October 2026).
+
 ## 0.1.2
 
 ### Patch Changes

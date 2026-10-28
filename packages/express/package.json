@@ -1,6 +1,6 @@
 {
   "name": "@posterna/express",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Express middleware for Posterna: verify AI agents and crawlers and apply policy.",
   "keywords": [
     "ai-agents",

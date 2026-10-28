@@ -1,6 +1,6 @@
 {
   "name": "posterna",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The Posterna command line: set up agent verification, diagnose deployments and check policy.",
   "keywords": [
     "ai-agents",

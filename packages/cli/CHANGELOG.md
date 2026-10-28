@@ -1,5 +1,14 @@
 # posterna
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [c047866]
+- Updated dependencies [ede5a4c]
+  - @posterna/directory@0.1.3
+  - @posterna/core@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
