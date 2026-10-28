@@ -1,0 +1,31 @@
+{
+  "name": "posternahq/posterna-wordpress",
+  "description": "Development tools for the Posterna WordPress plugin. Nothing from Composer ships in the plugin.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=8.0"
+  },
+  "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "phpunit/phpunit": "^9.6",
+    "symfony/yaml": "^5.4",
+    "wp-coding-standards/wpcs": "^3.4",
+    "yoast/phpunit-polyfills": "^2.0"
+  },
+  "config": {
+    "platform": {
+      "php": "8.0.30"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    },
+    "sort-packages": true
+  },
+  "scripts": {
+    "test": "phpunit --testsuite unit",
+    "lint": "phpcs",
+    "fix": "phpcbf"
+  }
+}

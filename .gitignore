@@ -27,3 +27,7 @@ packages/directory/raw/*
 # Private keys never enter the repository (docs/KEYS.md)
 *.jwk.json
 posterna-keys/
+
+# WordPress plugin: Composer tools and build output
+packages/wordpress/vendor/
+packages/wordpress/build/

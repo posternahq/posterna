@@ -1,0 +1,71 @@
+/* Posterna admin page and dashboard widget. */
+
+.posterna .posterna-lede {
+	max-width: 52rem;
+	font-size: 14px;
+}
+
+.posterna .posterna-table {
+	max-width: 64rem;
+	margin-bottom: 1rem;
+}
+
+.posterna .posterna-table .num,
+.posterna-widget .num {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.posterna .posterna-card {
+	max-width: 52rem;
+	margin: 1rem 0;
+	padding: 0.25rem 1rem;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-left-width: 4px;
+}
+
+.posterna .posterna-setup {
+	border-left-color: #2271b1;
+}
+
+.posterna .posterna-ok {
+	border-left-color: #00a32a;
+}
+
+.posterna .posterna-warn {
+	border-left-color: #dba617;
+}
+
+.posterna .posterna-kv th {
+	width: 18rem;
+	padding: 6px 10px 6px 0;
+}
+
+.posterna .posterna-kv td {
+	padding: 6px 10px;
+	word-break: break-all;
+}
+
+.posterna .posterna-indent {
+	margin-left: 1.75rem;
+}
+
+.posterna .posterna-hosts {
+	max-width: 52rem;
+	margin: 0.5rem 0 1rem;
+}
+
+.posterna .posterna-robots {
+	max-width: 52rem;
+}
+
+.posterna-widget {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.posterna-widget td {
+	padding: 4px 0;
+	border-bottom: 1px solid #f0f0f1;
+}
