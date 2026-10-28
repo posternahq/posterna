@@ -69,6 +69,8 @@ Each week the consumer products are asked by hand, in their own apps, to open a 
 | Perplexity | No request reached the lab (it reported "Failed to fetch content", twice) | | |
 | Microsoft Copilot | No request reached the lab (it reported that no relevant content could be retrieved) | | |
 
+Retest the same day, after the cap was raised to 3,600 seconds and run-tagged pages lost their robots tag: Duck.ai's DuckAssistBot request was `verified_by_signature` (the first verified signature from a real product), and Perplexity and Copilot again sent nothing that reached the lab.
+
 Duck.ai's signature: `Signature-Agent: "https://assistbot.duckduckgo.com"` (string form), tag `web-bot-auth`, alg `ed25519`, keyid `Ov3HDsa8JQ39dPEYFvFFN-cUpnz9yNI8LDvr-5LeiBM` (the key in DuckDuckGo's key directory), a 600-second window, no nonce, covering `@authority` and `signature-agent`. Duck.ai then declined to read the page because it was marked `noindex`.
 
 What follows from them:
@@ -79,7 +81,7 @@ What follows from them:
 - **Gemini.** The Gemini app sends a bare `Google` User-Agent, so real Gemini fetches count as `unknown_automation` and are never tied to Google. A bare `Google` is too generic to match safely (item 13); leave it unmatched unless Google documents it. Google's API fetcher, by contrast, names itself `GoogleAgent-URLContext` and verifies.
 - **Meta AI** fetched as Meta-WebIndexer, not Meta-ExternalFetcher, and did not sign.
 - **Grok** fetched with the same kind of browser User-Agent as xAI's API fetcher.
-- **Perplexity and Copilot** sent nothing that reached the lab. Perplexity's API fetcher did reach it with a browser User-Agent, so the app's own fetcher may be stopped before the site (posterna.com is behind Cloudflare); Copilot's answer suggests it reads Bing's index rather than the page. Both are to be retried now that run-tagged pages carry no robots tag.
+- **Perplexity and Copilot** sent nothing that reached the lab. Perplexity's API fetcher did reach it with a browser User-Agent, so the app's own fetcher may be stopped before the site (posterna.com is behind Cloudflare); Copilot's answer suggests it reads Bing's index rather than the page. The retest without the robots tag failed the same way, so the tag was not the cause; for Perplexity, check the CDN's security events for the minute of the attempt.
 
 ## Making these measurable
 
