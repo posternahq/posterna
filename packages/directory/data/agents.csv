@@ -62,7 +62,7 @@ devin-ai,Devin AI,community,Devin,community,agent,false,Devin,Devin,honors,false
 diffbot,Diffbot,community,Diffbot,community,other,false,Diffbot,Diffbot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 diffbot,Diffbot,community,Diffbot-User,community,user_fetch,false,Diffbot-User,Diffbot-User,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 direqt,Direqt,community,Anomura,community,search,false,Anomura,Anomura,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-duckduckgo,DuckDuckGo,researched,DuckAssistBot,researched,search,false,DuckAssistBot,DuckAssistBot,honors,false,live,https://duckduckgo.com/duckassistbot.json,486,,https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot
+duckduckgo,DuckDuckGo,researched,DuckAssistBot,researched,search,false,DuckAssistBot,DuckAssistBot,honors,true,live,https://duckduckgo.com/duckassistbot.json,486,,https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot
 duckduckgo,DuckDuckGo,researched,DuckDuckBot,researched,search,false,DuckDuckBot,DuckDuckBot,honors,false,live,https://duckduckgo.com/duckduckbot.json,486,,https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot
 echobox,Echobox,community,Echobot Bot,community,training,false,Echobot Bot,Echobot Bot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 echobox,Echobox,community,EchoboxBot,community,other,false,EchoboxBot,EchoboxBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json

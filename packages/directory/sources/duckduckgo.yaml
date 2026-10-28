@@ -2,7 +2,7 @@ slug: duckduckgo
 name: DuckDuckGo
 website: https://duckduckgo.com/
 docs_url: https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot
-checked_on: "2026-10-26"
+checked_on: "2026-10-28"
 
 # DuckAssistBot has the operator "Unclear at this time." in robots.json; it is
 # DuckDuckGo's crawler. DuckDuckBot has no entry in robots.json.
@@ -21,6 +21,9 @@ sources:
   - id: wba-survey-data
     url: https://modpagespeed.com/data/web-bot-auth-2026-10-19/results.tsv
     title: Web Bot Auth key directory probe results, 19 October 2026 (third party)
+  - id: lab-observation
+    url: https://github.com/posternahq/posterna/blob/main/docs/notes/real-traffic-checks.md#manual-lab-observations
+    title: Posterna real-traffic checks, manual lab observations, 28 October 2026 (first-party observation)
 
 agents:
   - name: DuckDuckBot
@@ -78,14 +81,17 @@ signing:
   directory_url: https://assistbot.duckduckgo.com/.well-known/http-message-signatures-directory
   basis: reported
   status: null
-  covers: []
+  covers: [DuckAssistBot]
   note: >-
     DuckDuckGo's help pages do not mention HTTP message signatures or Web Bot
     Auth. A third-party survey (mod_pagespeed blog, probe of 19 October 2026)
     lists this directory, which it took from Cloudflare Radar, but does not say
-    which DuckDuckGo agent signs; the host name suggests DuckAssistBot, which
-    is not confirmed, so covers is left empty. On 2026-10-26 the URL returned
-    200 with content type application/http-message-signatures-directory+json
-    and one Ed25519 key with a kid. https://duckduckgo.com/ returns 404 for the
-    well-known path.
-  sources: [wba-survey, wba-survey-data]
+    which DuckDuckGo agent signs. On 2026-10-28 Posterna's agent lab saw
+    Duck.ai fetch a page as DuckAssistBot/1.2, signed with the key in this
+    directory (keyid Ov3HDsa8JQ39dPEYFvFFN-cUpnz9yNI8LDvr-5LeiBM, alg ed25519,
+    Signature-Agent "https://assistbot.duckduckgo.com", 600-second window, no
+    nonce), recorded in the public observation note, so covers lists
+    DuckAssistBot. On 2026-10-26 the URL returned 200 with content type
+    application/http-message-signatures-directory+json and one Ed25519 key
+    with a kid. https://duckduckgo.com/ returns 404 for the well-known path.
+  sources: [wba-survey, wba-survey-data, lab-observation]
