@@ -59,6 +59,8 @@ Page and API traffic, applied by the middleware:
 
 `allow` and `block` can be written as a bare word or as `{ action: block }`.
 
+Coming soon: `charge`. It is planned and not yet accepted by the policy parser, which reports it as an unknown action.
+
 Sign-up scopes, returned to the application and never applied by the middleware:
 
 - `lift`: skip a friction step (for example an email confirmation) for this request.
