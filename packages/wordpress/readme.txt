@@ -1,5 +1,5 @@
 === Posterna ===
-Contributors: WPORG_USERNAME
+Contributors: posterna
 Tags: ai, crawlers, bots, web bot auth, robots.txt
 Requires at least: 6.5
 Tested up to: 7.1

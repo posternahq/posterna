@@ -115,5 +115,5 @@ Left out because their documentation does not confirm a header or behavior: WP E
 
 ## Before submitting
 
-- Replace `WPORG_USERNAME` in `readme.txt` with the WordPress.org username that submits, then rebuild the zip.
+- Submit from the WordPress.org account `posterna` (email hello@posterna.com), the username in the readme's `Contributors:` line, with two-factor authentication on.
 - If submitting after 9 December 2026, test with WordPress 7.2 and update "Tested up to".

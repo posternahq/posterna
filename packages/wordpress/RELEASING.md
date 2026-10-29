@@ -6,9 +6,11 @@ and does not use Changesets.
 
 ## First submission (once)
 
-1. Replace `WPORG_USERNAME` on the `Contributors:` line of `readme.txt` with
-   your WordPress.org username (case-sensitive). The build script warns while
-   the placeholder is there, and the deploy workflow refuses to run.
+1. Create the WordPress.org account `posterna` with the email hello@posterna.com
+   (WordPress.org identifies an organization's official plugin mostly by the
+   account's email address). `readme.txt` already lists `Contributors: posterna`;
+   if the account ends up with another username, change that line to match
+   (case-sensitive) and rebuild.
 2. Make sure two-factor authentication is on for your WordPress.org account.
    It is required to submit.
 3. Build the zip: `pnpm --filter @posterna/wordpress-plugin zip`. It writes
