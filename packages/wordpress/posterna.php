@@ -1,7 +1,6 @@
 <?php
 /**
  * Plugin Name:       Posterna
- * Plugin URI:        https://posterna.com
  * Description:       See which AI agents and crawlers visit your site and whether they are who they say they are. Monitor only: nothing is blocked.
  * Version:           1.0.0
  * Requires at least: 6.5

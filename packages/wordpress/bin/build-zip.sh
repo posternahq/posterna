@@ -15,6 +15,14 @@ if [ -z "$version" ] || [ "$version" != "$stable" ] || [ "$version" != "$constan
   exit 1
 fi
 
+# WordPress.org refuses an upload whose Plugin URI and Author URI are the same.
+plugin_uri=$(sed -n 's/^ \* Plugin URI: *//p' posterna.php | tr -d '[:space:]')
+author_uri=$(sed -n 's/^ \* Author URI: *//p' posterna.php | tr -d '[:space:]')
+if [ -n "$plugin_uri" ] && [ "$plugin_uri" = "$author_uri" ]; then
+  echo "Plugin URI and Author URI are both $plugin_uri; WordPress.org refuses that. Remove one or make them differ." >&2
+  exit 1
+fi
+
 if grep -q '^Contributors: WPORG_USERNAME' readme.txt; then
   echo "Warning: readme.txt still says 'Contributors: WPORG_USERNAME'." >&2
   echo "Replace it with your WordPress.org username before you build the zip you submit." >&2
