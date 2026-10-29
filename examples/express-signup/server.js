@@ -5,7 +5,7 @@ const app = express();
 
 const agents = posterna({
   // Use the setting for your host:
-  // https://github.com/posternahq/posterna/blob/main/docs/install.md#trusted-proxies
+  // https://posterna.com/docs/hosts#settings-by-host
   trustedProxies: ["127.0.0.1/32", "::1/128"],
   publicHost: process.env.PUBLIC_HOST || undefined,
 });

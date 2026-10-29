@@ -227,7 +227,7 @@ describe("@posterna/next", () => {
   });
 
   it("hands a Server Action's sign-up recommendation on in a header the client cannot set", async () => {
-    // The pattern in docs/install.md: Server Actions post to the page's own path.
+    // The pattern in docs/signup.md: Server Actions post to the page's own path.
     const proxy = withPosterna(options(), (req) => {
       if (req.method !== "POST" || req.nextUrl.pathname !== "/signup") return;
       const decision = getPosterna(req)?.decide({ kind: "signup" });

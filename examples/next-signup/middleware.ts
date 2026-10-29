@@ -5,7 +5,7 @@ import { withPosterna } from "@posterna/next";
 // withPosternaConfig in next.config.ts.
 export const middleware = withPosterna({
   // Use the setting for your host:
-  // https://github.com/posternahq/posterna/blob/main/docs/install.md#trusted-proxies
+  // https://posterna.com/docs/hosts#settings-by-host
   trustedProxies: 1,
   publicHost: process.env.PUBLIC_HOST || undefined,
 });

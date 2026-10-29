@@ -29,7 +29,8 @@
     "changeset": "changeset",
     "directory:sign": "pnpm --filter @posterna/directory data:sign",
     "conformance:generate": "tsx packages/core/test/conformance/generate.ts",
-    "test:e2e": "vitest run --config vitest.e2e.config.ts"
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "docs:hosts": "tsx scripts/docs-hosts.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.3",

@@ -5,7 +5,7 @@ import { sign } from "web-bot-auth";
 import { signerFromJWK } from "web-bot-auth/crypto";
 import { VERSION } from "../index";
 import { baseUrl, type Io } from "../io";
-import { INSTALL_GUIDE } from "./init";
+import { HOST_SETTINGS } from "./init";
 
 export interface DoctorFlags {
   url?: string;
@@ -20,9 +20,9 @@ interface Check {
   fix?: string;
 }
 
-const PROXY_SETTINGS = `${INSTALL_GUIDE}#trusted-proxies`;
-const HEALTH_CHECKS = `${INSTALL_GUIDE}#health-checks`;
-const CLOUDFRONT = `${INSTALL_GUIDE}#cloudfront`;
+const PROXY_SETTINGS = HOST_SETTINGS;
+const HEALTH_CHECKS = "https://posterna.com/docs/hosts#health-checks";
+const CLOUDFRONT = "https://posterna.com/docs/hosts#cloudfront";
 /** The Signature-Agent the doctor request names. The site never fetches it. */
 const DOCTOR_AGENT = "https://posterna.com";
 const DIRECTORY_MAX_AGE_DAYS = 7;

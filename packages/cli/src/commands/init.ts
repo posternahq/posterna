@@ -26,11 +26,13 @@ const TEMPLATE_HINTS: Record<TemplateName, string> = {
   "saas-signup": "allow-list, plus recommendations for your sign-up page",
 };
 
-/** The install guide as posterna.com serves it (the GitHub copy is not public yet). */
+/** The quickstart as posterna.com serves it. */
 export const INSTALL_GUIDE = "https://posterna.com/docs/install";
+/** The proxy settings for each host, from docs/data/hosts.json. */
+export const HOST_SETTINGS = "https://posterna.com/docs/hosts#settings-by-host";
 const MATCHER = '"/((?!_next/static|_next/image|favicon.ico).*)"';
 
-/** A host recognized from its config file, with the client-address setting docs/install.md gives for it. */
+/** A host recognized from its config file, with the client-address setting docs/data/hosts.json gives for it. */
 export interface Host {
   name: string;
   file: string;
@@ -76,7 +78,7 @@ function addressLines(host: Host | null, indent: string): string[] {
   if (!host) {
     return [
       `${indent}// Set clientIpHeader or trustedProxies for your host:`,
-      `${indent}// ${INSTALL_GUIDE}#trusted-proxies`,
+      `${indent}// ${HOST_SETTINGS}`,
     ];
   }
   return [

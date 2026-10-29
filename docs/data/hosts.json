@@ -1,0 +1,120 @@
+{
+  "about": "The one source of the proxy settings per host. The tables in docs/install.md and docs/hosts.md are generated from it with `pnpm docs:hosts`, and posterna.com renders the quickstart snippets from it. The evidence for each row is in docs/hosts.md.",
+  "checked": "26 October 2026",
+  "hosts": [
+    {
+      "id": "railway",
+      "tab": "Railway",
+      "name": "Railway, with or without Cloudflare in front",
+      "quickstart": true,
+      "table": true,
+      "lines": ["clientIpHeader: \"x-real-ip\","],
+      "clientAddress": "`clientIpHeader: \"x-real-ip\"`",
+      "publicHost": "recommended",
+      "confidence": "high: confirmed on a live site",
+      "section": "hosts.md#railway",
+      "extra": null
+    },
+    {
+      "id": "vercel",
+      "tab": "Vercel",
+      "name": "Vercel",
+      "quickstart": true,
+      "table": true,
+      "lines": ["clientIpHeader: \"x-vercel-forwarded-for\","],
+      "clientAddress": "`clientIpHeader: \"x-vercel-forwarded-for\"`",
+      "publicHost": "recommended",
+      "confidence": "high: confirmed on a live site (IPv4)",
+      "section": "hosts.md#vercel",
+      "extra": null
+    },
+    {
+      "id": "fly",
+      "tab": "Fly.io",
+      "name": "Fly.io",
+      "quickstart": true,
+      "table": true,
+      "lines": ["trustedProxies: 2, // 3 with Cloudflare in front"],
+      "clientAddress": "`trustedProxies: 2` (`3` with Cloudflare in front)",
+      "publicHost": "recommended",
+      "confidence": "high",
+      "section": "hosts.md#flyio",
+      "extra": null
+    },
+    {
+      "id": "render",
+      "tab": "Render",
+      "name": "Render",
+      "quickstart": true,
+      "table": true,
+      "lines": [
+        "trustedProxies: 3, // check with posterna doctor; use 2 if it reports a forged address"
+      ],
+      "clientAddress": "`trustedProxies: 3`",
+      "publicHost": "recommended",
+      "confidence": "low: check with doctor",
+      "section": "hosts.md#render",
+      "extra": "`3` comes from a Render employee's demonstration, not Render's documentation ([Render](hosts.md#render))."
+    },
+    {
+      "id": "aws-alb",
+      "tab": "AWS load balancer",
+      "name": "AWS Application Load Balancer",
+      "quickstart": true,
+      "table": true,
+      "lines": [
+        "trustedProxies: [\"10.0.0.0/16\"], // replace with your load balancer subnets' CIDRs"
+      ],
+      "clientAddress": "`trustedProxies:` your load balancer subnets' CIDRs",
+      "publicHost": "recommended; **required** with CloudFront",
+      "confidence": "high",
+      "section": "hosts.md#aws-application-load-balancer",
+      "extra": "The load balancer checks each target every 30 seconds by default, on `/`: [give health checks their own path](hosts.md#health-checks)."
+    },
+    {
+      "id": "cloudfront",
+      "tab": "CloudFront",
+      "name": "Amazon CloudFront, in front of any of these",
+      "quickstart": false,
+      "table": true,
+      "lines": [],
+      "clientAddress": "the setting for the host behind it, plus CloudFront's ranges behind a load balancer; the origin request policy **AllViewerExceptHostHeader** is **required**",
+      "publicHost": "**required**",
+      "confidence": "high: from AWS's documentation",
+      "section": "hosts.md#cloudfront",
+      "extra": null
+    },
+    {
+      "id": "nginx",
+      "tab": "nginx",
+      "name": "nginx on the same machine",
+      "quickstart": true,
+      "table": true,
+      "lines": [
+        "clientIpHeader: \"x-real-ip\",",
+        "trustedProxies: [\"127.0.0.1/32\", \"::1/128\"],"
+      ],
+      "clientAddress": "`clientIpHeader: \"x-real-ip\"` and `trustedProxies: [\"127.0.0.1/32\", \"::1/128\"]`, with the nginx config below",
+      "publicHost": "**required**, or pass `Host` as below",
+      "confidence": "high",
+      "section": "hosts.md#nginx-in-front-of-node-on-the-same-machine",
+      "extra": "Bind Node to `127.0.0.1` and add [the `proxy_set_header` lines](hosts.md#nginx-in-front-of-node-on-the-same-machine) to nginx."
+    },
+    {
+      "id": "other",
+      "tab": "Other",
+      "name": "Any other host",
+      "quickstart": true,
+      "table": false,
+      "lines": [
+        "// Set clientIpHeader or trustedProxies for your host:",
+        "// https://posterna.com/docs/hosts#settings-by-host"
+      ],
+      "clientAddress": null,
+      "publicHost": null,
+      "confidence": null,
+      "section": "hosts.md#settings-by-host",
+      "extra": "Find your host's setting in [Hosts and proxies](hosts.md#settings-by-host)."
+    }
+  ]
+}

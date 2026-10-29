@@ -10,7 +10,7 @@ const app = express();
 const agents = posterna({
   // The proxies in front of the app. This example assumes nginx on the same
   // machine; use the setting for your host from
-  // https://github.com/posternahq/posterna/blob/main/docs/install.md#trusted-proxies
+  // https://posterna.com/docs/hosts#settings-by-host
   trustedProxies: ["127.0.0.1/32", "::1/128"],
   // The hostname agents sign. Set it in production, for example "www.example.com".
   publicHost: process.env.PUBLIC_HOST || undefined,

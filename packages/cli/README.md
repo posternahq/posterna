@@ -11,4 +11,4 @@ The [Posterna](https://posterna.com) command line.
 | `posterna robots` | Print robots.txt and Content Signals from `agents.yaml` |
 | `posterna policy check` | Validate `agents.yaml`, with line and column for every problem |
 
-`init` never edits your code. `doctor` sends forged forwarding headers along with a signed request, to make sure your proxy settings ignore them. See the [install guide](https://github.com/posternahq/posterna/blob/main/docs/install.md). MIT licensed.
+`init` never edits your code. `doctor` sends forged forwarding headers along with a signed request, to make sure your proxy settings ignore them. See the [quickstart](https://posterna.com/docs/install) and [Check with doctor](https://posterna.com/docs/doctor). MIT licensed.

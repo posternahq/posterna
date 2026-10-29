@@ -9,7 +9,7 @@ Next.js integration for [Posterna](https://posterna.com). It verifies which AI a
 import { withPosterna } from "@posterna/next";
 
 export const proxy = withPosterna({
-  clientIpHeader: "x-real-ip", // the setting for your host: https://posterna.com/docs/install#trusted-proxies
+  clientIpHeader: "x-real-ip", // the setting for your host: https://posterna.com/docs/hosts#settings-by-host
   publicHost: "www.example.com",
 });
 
@@ -34,4 +34,4 @@ export default withPosternaConfig({
 - Next.js never gives middleware the socket address: set `clientIpHeader` or `trustedProxies` for your host, or IP checks stay off.
 - `withPosternaConfig` copies `agents.yaml` into each build; without it, the proxy reads the file at run time, which needs Node 20.16 or later and does not work on Vercel. On the Edge runtime there is no reverse DNS.
 
-See the [install guide](https://github.com/posternahq/posterna/blob/main/docs/install.md). Next.js 15 and 16 are supported. MIT licensed.
+See the [quickstart](https://posterna.com/docs/install) and [Next.js details](https://posterna.com/docs/nextjs). Next.js 15 and 16 are supported. MIT licensed.

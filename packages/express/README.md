@@ -11,7 +11,7 @@ import { posterna } from "@posterna/express";
 const app = express();
 app.use(
   posterna({
-    trustedProxies: 1, // the setting for your host: https://posterna.com/docs/install#trusted-proxies
+    trustedProxies: 1, // the setting for your host: https://posterna.com/docs/hosts#settings-by-host
     publicHost: "www.example.com",
   }),
 );
@@ -33,4 +33,4 @@ app.post("/signup", (req, res) => {
 - Serves `/.well-known/posterna/debug` for `posterna doctor` when `POSTERNA_DEBUG_TOKEN` is set.
 - `middleware.flush()` sends pending counters (for graceful shutdown); `middleware.close()` stops background work.
 
-Set `trustedProxies` and `publicHost` for your host: see the [install guide](https://github.com/posternahq/posterna/blob/main/docs/install.md). Express 4.21 or later and 5 are supported. MIT licensed.
+Set `trustedProxies` or `clientIpHeader`, and `publicHost`, for your host: see the [quickstart](https://posterna.com/docs/install) and [Hosts and proxies](https://posterna.com/docs/hosts). Express 4.21 or later and 5 are supported. MIT licensed.

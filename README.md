@@ -1,6 +1,6 @@
 # Posterna
 
-Verify which AI agents and crawlers are calling your site, and decide what each may do.
+See which AI agents are really hitting your site, and set rules for each one, inside your own app.
 
 **Status: early release (0.1).** The API may change before 1.0; every change is in each package's changelog.
 
@@ -37,7 +37,9 @@ npx posterna init
 npm install @posterna/express   # or: npm install @posterna/next
 ```
 
-The full guide, with the settings for each host and how to check a deployment with `posterna doctor`, is [docs/install.md](docs/install.md).
+The [quickstart](docs/install.md) has the three steps. The settings for each host are in [docs/hosts.md](docs/hosts.md), and how to check a deployment with `posterna doctor` is in [docs/doctor.md](docs/doctor.md).
+
+On WordPress, use the plugin instead: [docs/wordpress.md](docs/wordpress.md). It is monitor only.
 
 ## Packages
 
@@ -48,6 +50,7 @@ The full guide, with the settings for each host and how to check a deployment wi
 | [`@posterna/next`](packages/next) | Next.js integration | MIT |
 | [`posterna`](packages/cli) | CLI: `init`, `doctor`, `robots`, `policy check` | MIT |
 | [`@posterna/directory`](packages/directory) | The open operator directory and its build pipeline | CC BY 4.0 (data), MIT (code) |
+| [WordPress plugin](packages/wordpress) | The plugin `posterna` for WordPress: a PHP port of the verifier, monitor only. Released to WordPress.org, not npm ([docs/wordpress.md](docs/wordpress.md)) | GPLv2 or later |
 
 [`conformance/`](conformance) holds language-neutral JSON test vectors, so ports to other languages can prove they behave the same.
 
@@ -72,4 +75,4 @@ Report vulnerabilities to hello@posterna.com. See [SECURITY.md](SECURITY.md).
 
 ## License
 
-Code is MIT ([LICENSE](LICENSE)). Directory data is CC BY 4.0, and community records come from the ai.robots.txt project under MIT ([packages/directory/LICENSE](packages/directory/LICENSE), [NOTICE](packages/directory/NOTICE)).
+Code is MIT ([LICENSE](LICENSE)), except the WordPress plugin, which is GPLv2 or later ([packages/wordpress/LICENSE](packages/wordpress/LICENSE)). Directory data is CC BY 4.0, and community records come from the ai.robots.txt project under MIT ([packages/directory/LICENSE](packages/directory/LICENSE), [NOTICE](packages/directory/NOTICE)).

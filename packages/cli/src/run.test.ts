@@ -233,7 +233,7 @@ describe("posterna init", () => {
 
     const unknown = await cli(["init"], { cwd: project({ "package.json": next }) });
     expect(unknown.out).toContain("// Set clientIpHeader or trustedProxies for your host:");
-    expect(unknown.out).toContain("// https://posterna.com/docs/install#trusted-proxies");
+    expect(unknown.out).toContain("// https://posterna.com/docs/hosts#settings-by-host");
     for (const result of [railway, fly, unknown]) {
       expect(result.out).not.toContain("trustedProxies: 1");
       expect(result.out).not.toContain("github.com");
@@ -524,7 +524,7 @@ describe("posterna doctor", () => {
       "FAIL  Signature headers: signature, signature-input, signature-agent did not reach the app.",
     );
     expect(result.out).toContain(
-      "set the origin request policy to AllViewerExceptHostHeader: https://posterna.com/docs/install#cloudfront",
+      "set the origin request policy to AllViewerExceptHostHeader: https://posterna.com/docs/hosts#cloudfront",
     );
     expect(result.code).toBe(1);
   });
@@ -549,7 +549,7 @@ describe("posterna doctor", () => {
     });
     expect(result.out).toContain("FAIL  Mode: enforcement is suspended");
     expect(result.out).toContain(
-      "load balancer health checks can cause this too: keep them out of Posterna (https://posterna.com/docs/install#health-checks)",
+      "load balancer health checks can cause this too: keep them out of Posterna (https://posterna.com/docs/hosts#health-checks)",
     );
     expect(result.code).toBe(1);
   });
