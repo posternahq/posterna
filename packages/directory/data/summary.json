@@ -1,30 +1,30 @@
 {
-  "version": "2026-10-28",
-  "generated_at": "2026-10-28T17:15:47Z",
+  "version": "2026-10-31",
+  "generated_at": "2026-10-31T12:41:09Z",
   "operators": {
-    "total": 125,
+    "total": 126,
     "by_coverage": {
-      "community": 111,
+      "community": 112,
       "researched": 14
     }
   },
   "agents": {
-    "total": 226,
+    "total": 228,
     "by_coverage": {
-      "community": 160,
+      "community": 162,
       "researched": 66
     },
     "by_purpose": {
       "ads": 6,
-      "agent": 36,
+      "agent": 37,
       "other": 58,
       "preview": 5,
       "search": 36,
-      "training": 45,
+      "training": 46,
       "user_fetch": 40
     },
     "by_robots_policy": {
-      "honors": 76,
+      "honors": 78,
       "may_ignore": 27,
       "unstated": 123
     },
@@ -34,14 +34,14 @@
   "signing": {
     "live": 5,
     "none_found": 8,
-    "not_probed": 111,
+    "not_probed": 112,
     "reported": 1
   },
   "keys": 14,
   "ip_lists": {
     "total": 23,
     "fetched": 23,
-    "prefixes": 7645
+    "prefixes": 7684
   },
   "reverse_dns_rules": 4
 }

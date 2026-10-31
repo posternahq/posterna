@@ -1,3 +1,18 @@
 {
-  "findings": []
+  "findings": [
+    {
+      "operator": "perplexity",
+      "kind": "evidence",
+      "value": "ip list perplexity-user URL: https://www.perplexity.com/perplexity-user.json",
+      "source": "https://docs.perplexity.ai/docs/resources/perplexity-crawlers",
+      "detail": "not_found"
+    },
+    {
+      "operator": "perplexity",
+      "kind": "evidence",
+      "value": "ip list perplexitybot URL: https://www.perplexity.com/perplexitybot.json",
+      "source": "https://docs.perplexity.ai/docs/resources/perplexity-crawlers",
+      "detail": "not_found"
+    }
+  ]
 }
