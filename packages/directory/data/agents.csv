@@ -66,7 +66,8 @@ duckduckgo,DuckDuckGo,researched,DuckAssistBot,researched,search,false,DuckAssis
 duckduckgo,DuckDuckGo,researched,DuckDuckBot,researched,search,false,DuckDuckBot,DuckDuckBot,honors,false,live,https://duckduckgo.com/duckduckbot.json,486,,https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot
 echobox,Echobox,community,Echobot Bot,community,training,false,Echobot Bot,Echobot Bot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 echobox,Echobox,community,EchoboxBot,community,other,false,EchoboxBot,EchoboxBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-elevenlabs,ElevenLabs,community,ElevenlabsBot,community,user_fetch,false,ElevenlabsBot,ElevenlabsBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+elevenlabs,ElevenLabs,community,ElevenlabsBot,community,user_fetch,false,ElevenlabsBot,ElevenlabsBot,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+elevenlabs,ElevenLabs,community,ElevenlabsCrawler,community,training,false,ElevenlabsCrawler,ElevenlabsCrawler,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 exa,Exa,community,ExaBot,community,other,false,ExaBot,ExaBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 exa,Exa,community,ExaSearchBot,community,search,false,ExaSearchBot,ExaSearchBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 exa,Exa,community,ExaUser,community,user_fetch,false,ExaUser,ExaUser,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
@@ -161,8 +162,8 @@ panscient,Panscient,community,panscient.com,community,other,false,panscient.com,
 parallel,Parallel,community,Shap-User,community,user_fetch,false,Shap-User,Shap-User,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 parallel,Parallel,community,ShapBot,community,other,false,ShapBot,ShapBot,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 payhawk,Payhawk,community,Payhawk Invoice Fetching Agent,community,agent,false,Payhawk Invoice Fetching Agent,Payhawk Invoice Fetching Agent,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
-perplexity,Perplexity,researched,Perplexity-User,researched,user_fetch,false,Perplexity-User,Perplexity-User,may_ignore,false,none_found,https://www.perplexity.com/perplexity-user.json,4,,https://docs.perplexity.ai/docs/resources/perplexity-crawlers
-perplexity,Perplexity,researched,PerplexityBot,researched,search,false,PerplexityBot,PerplexityBot,honors,false,none_found,https://www.perplexity.com/perplexitybot.json,8,,https://docs.perplexity.ai/docs/resources/perplexity-crawlers
+perplexity,Perplexity,researched,Perplexity-User,researched,user_fetch,false,Perplexity-User,Perplexity-User,may_ignore,false,none_found,https://www.perplexity.com/perplexity-user.json,10,,https://docs.perplexity.ai/docs/resources/perplexity-crawlers
+perplexity,Perplexity,researched,PerplexityBot,researched,search,false,PerplexityBot,PerplexityBot,honors,false,none_found,https://www.perplexity.com/perplexitybot.json,13,,https://docs.perplexity.ai/docs/resources/perplexity-crawlers
 phind,phind,community,PhindBot,community,user_fetch,false,PhindBot,PhindBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 poggio,Poggio,community,Poggio-Citations,community,user_fetch,false,Poggio-Citations,Poggio-Citations,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 poseidon-research,Poseidon Research,community,Poseidon Research Crawler,community,search,false,Poseidon Research Crawler,Poseidon Research Crawler,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
@@ -178,6 +179,7 @@ quillbot,Quillbot,community,quillbot.com,community,other,false,quillbot.com,quil
 reflection,Reflection,community,Reflectionbot,community,agent,false,Reflectionbot,Reflectionbot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 rois,ROIS,community,Cotoyogi,community,other,false,Cotoyogi,Cotoyogi,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 sb-intuitions,SB Intuitions,community,SBIntuitionsBot,community,other,false,SBIntuitionsBot,SBIntuitionsBot,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
+scry,Scry,community,ScryBot,community,agent,false,ScryBot,ScryBot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 semrush,Semrush,community,SemrushBot-OCOB,community,other,false,SemrushBot-OCOB,SemrushBot-OCOB,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 semrush,Semrush,community,SemrushBot-SWA,community,user_fetch,false,SemrushBot-SWA,SemrushBot-SWA,honors,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
 sidetrade,Sidetrade,community,Sidetrade indexer bot,community,training,false,Sidetrade indexer bot,Sidetrade indexer bot,unstated,false,not_probed,,,,https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/main/robots.json
