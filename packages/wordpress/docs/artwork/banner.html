@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Posterna banner</title>
+<style>
+  @font-face { font-family: "Plex Sans"; src: url("fonts/ibm-plex-sans-latin-wght.woff2") format("woff2"); font-weight: 100 700; }
+  @font-face { font-family: "Plex Mono"; src: url("fonts/ibm-plex-mono-latin-400.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Plex Mono"; src: url("fonts/ibm-plex-mono-latin-500.woff2") format("woff2"); font-weight: 500; }
+
+  :root {
+    --bg: #0f1413;
+    --panel: #151c1a;
+    --ink: #e6e9e4;
+    --muted: #9aa39f;
+    --rule: #26302d;
+    --verified: #4fb3a3;
+    --unverifiable: #d9a441;
+    --failed: #e06a57;
+    --automation: #9aa4ae;
+  }
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 772px; height: 250px; overflow: hidden;
+    background: var(--bg); color: var(--ink);
+    font-family: "Plex Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+  }
+  .left {
+    position: absolute; left: 40px; top: 0; bottom: 0; width: 292px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+  .brand svg { width: 25px; height: 25px; display: block; }
+  h1 {
+    margin: 18px 0 12px; font-size: 25px; line-height: 1.14; font-weight: 600; letter-spacing: -0.02em;
+  }
+  .sub { margin: 0; font-size: 13px; line-height: 1.4; color: var(--muted); }
+
+  .log {
+    position: absolute; right: 32px; top: 50%; transform: translateY(-50%);
+    width: 384px; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px;
+    overflow: hidden;
+  }
+  .head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 8px 14px; border-bottom: 1px solid var(--rule); font-size: 11.5px;
+  }
+  .head .title { font-weight: 500; }
+  .head .note { color: var(--muted); }
+  ol { list-style: none; margin: 0; padding: 3px 0; font-family: "Plex Mono", monospace; font-size: 11px; }
+  li {
+    display: grid; grid-template-columns: 94px 96px 1fr; column-gap: 12px; align-items: center;
+    padding: 0 14px; height: 26px;
+  }
+  li + li { border-top: 1px solid var(--rule); }
+  .agent.none { color: var(--muted); }
+  .stamp {
+    justify-self: start; font-weight: 500; font-size: 10.5px; line-height: 1.25;
+    padding: 1px 6px; border: 1px solid currentColor; border-radius: 3px; white-space: nowrap;
+  }
+  .verified { color: var(--verified); }
+  .unverifiable { color: var(--unverifiable); }
+  .failed { color: var(--failed); }
+  .automation { color: var(--automation); }
+</style>
+</head>
+<body>
+  <div class="left">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#4fb3a3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 21.5h18"/><path d="M5.5 21.5V10.5a6.5 6.5 0 0 1 13 0v11"/><path d="M12 4v17.5"/>
+        <circle cx="10.2" cy="14" r="0.9" fill="#4fb3a3" stroke="none"/><circle cx="13.8" cy="14" r="0.9" fill="#4fb3a3" stroke="none"/>
+      </svg>
+      Posterna
+    </div>
+    <h1>See which AI agents are really visiting your site.</h1>
+    <p class="sub">Monitor only: it labels and counts, never blocks.</p>
+  </div>
+
+  <div class="log">
+    <div class="head"><span class="title">Requests to your site</span><span class="note">monitor mode</span></div>
+    <ol>
+      <li><span class="path">/blog/</span><span class="agent">Googlebot</span><span class="stamp verified">verified (IP)</span></li>
+      <li><span class="path">/pricing/</span><span class="agent">DuckAssistBot</span><span class="stamp verified">verified (signature)</span></li>
+      <li><span class="path">/feed/</span><span class="agent">GrokBot</span><span class="stamp unverifiable">unverifiable</span></li>
+      <li><span class="path">/shop/</span><span class="agent">GPTBot</span><span class="stamp failed">claimed, failed</span></li>
+      <li><span class="path">/wp-login.php</span><span class="agent none">none</span><span class="stamp automation">unknown automation</span></li>
+    </ol>
+  </div>
+</body>
+</html>

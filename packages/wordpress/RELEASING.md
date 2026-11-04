@@ -37,9 +37,10 @@ https://plugins.svn.wordpress.org/posterna/. The workflow
 3. Settings, Secrets and variables, Actions, Variables: add the repository
    variable `WPORG_DEPLOY_ENABLED` with the value `true`. Until it exists the
    deploy job is skipped.
-4. Replace the placeholder images in `packages/wordpress/.wordpress-org/`
-   (banners and icons) if you want; the workflow uploads that folder as the
-   plugin page's assets.
+4. The banners and icons in `packages/wordpress/.wordpress-org/` are made
+   from `docs/artwork/` (edit the HTML, then run `docs/artwork/render.sh`).
+   The workflow uploads that folder as the plugin page's assets with each
+   release.
 
 ## Each release
 

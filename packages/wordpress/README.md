@@ -24,7 +24,8 @@ The bundled directory data is CC BY 4.0 (`data/README.md`).
 | `tests/unit/` | PHPUnit: every conformance vector, plus port checks |
 | `tests/wp/` | End-to-end helpers for wp-env (never shipped) |
 | `bin/` | Build, end-to-end and Plugin Check scripts |
-| `.wordpress-org/` | Banner (1544x500, 772x250) and icon (256x256, 128x128) placeholders for the plugin page; replace them with final artwork. The deploy workflow uploads this folder to SVN `assets/`. |
+| `.wordpress-org/` | Banners (1544x500, 772x250) and icons (256x256, 128x128) for the plugin page. The deploy workflow uploads this folder to SVN `assets/`. |
+| `docs/artwork/` | Source for those images, in posterna.com's style: edit `banner.html` or `icon.html`, then run `render.sh` (needs Google Chrome) |
 
 ## Development
 
