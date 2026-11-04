@@ -6,19 +6,23 @@ It needs WordPress 6.5 or later and PHP 8.0 or later. The plugin is licensed GPL
 
 ## Install
 
-The plugin is not in the WordPress.org plugin directory yet. Until it is, build the zip from this repository (it needs only `bash` and `zip`):
+Posterna is in the WordPress.org plugin directory: [wordpress.org/plugins/posterna](https://wordpress.org/plugins/posterna/).
+
+1. In wp-admin, open **Plugins** > **Add New Plugin**, search for **Posterna**, click **Install Now**, then **Activate**.
+2. Open **Posterna** in the admin menu. Counting starts right away.
+3. Open **Check my setup**. If your site is behind a proxy, a load balancer or Cloudflare, choose how Posterna should find each visitor's real address in **Settings**, then check again.
+4. Optionally turn on directory updates or the connection to posterna.com in **Settings**. Both are off until you turn them on.
+
+New versions arrive like any other plugin's, in **Dashboard** > **Updates**.
+
+To try a version that is not released yet, build the zip from this repository instead (it needs only `bash` and `zip`):
 
 ```bash
 git clone https://github.com/posternahq/posterna.git
 bash posterna/packages/wordpress/bin/build-zip.sh
 ```
 
-That writes `posterna/packages/wordpress/dist/posterna-1.0.0.zip`. Then:
-
-1. In wp-admin, open **Plugins** > **Add New** > **Upload Plugin**, upload the zip and activate Posterna.
-2. Open **Posterna** in the admin menu. Counting starts right away.
-3. Open **Check my setup**. If your site is behind a proxy, a load balancer or Cloudflare, choose how Posterna should find each visitor's real address in **Settings**, then check again.
-4. Optionally turn on directory updates or the connection to posterna.com in **Settings**. Both are off until you turn them on.
+That writes `posterna/packages/wordpress/dist/posterna-<version>.zip`. Upload it in **Plugins** > **Add New Plugin** > **Upload Plugin**.
 
 ## What you get
 
