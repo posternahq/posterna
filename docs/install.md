@@ -12,7 +12,7 @@ In your project:
 npx posterna init
 ```
 
-It writes `agents.yaml` in monitor mode and prints the code for step 2; it never edits your code. It can also save a site key from the dashboard, so counts show up there ([Counters](counters.md)).
+It writes `agents.yaml` in monitor mode and prints the code for step 2; it never edits your code. It can also save a site key from the dashboard, so counts show up there ([Counters](counters.md)). The [example dashboard](https://posterna.com/example) shows posterna.com's own.
 
 ## 2. Add Posterna to your app
 
