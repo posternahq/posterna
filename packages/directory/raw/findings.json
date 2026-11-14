@@ -1,3 +1,88 @@
 {
-  "findings": []
+  "findings": [
+    {
+      "operator": "duckduckgo",
+      "kind": "evidence",
+      "value": "DuckDuckBot purpose_quote: DuckDuckBot’s job is to constantly improve our search results and offer users the best and most secure search experience possible.",
+      "source": "https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot",
+      "detail": "not_found"
+    },
+    {
+      "operator": "duckduckgo",
+      "kind": "evidence",
+      "value": "DuckDuckBot robots_quote: It respects WWW::RobotRules and originates from these IP addresses",
+      "source": "https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot",
+      "detail": "not_found"
+    },
+    {
+      "operator": "google",
+      "kind": "ip_list_link",
+      "value": "https://developers.google.com/crawling/docs/crawlers-fetchers/apis-user-agent.md.txt",
+      "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/apis-user-agent",
+      "detail": null
+    },
+    {
+      "operator": "google",
+      "kind": "ip_list_link",
+      "value": "https://developers.google.com/crawling/docs/crawlers-fetchers/feedfetcher.md.txt",
+      "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/feedfetcher",
+      "detail": null
+    },
+    {
+      "operator": "google",
+      "kind": "ip_list_link",
+      "value": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers.md.txt",
+      "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
+      "detail": null
+    },
+    {
+      "operator": "google",
+      "kind": "ip_list_link",
+      "value": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-special-case-crawlers.md.txt",
+      "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-special-case-crawlers",
+      "detail": null
+    },
+    {
+      "operator": "google",
+      "kind": "ip_list_link",
+      "value": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers.md.txt",
+      "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers",
+      "detail": null
+    },
+    {
+      "operator": "google",
+      "kind": "ip_list_link",
+      "value": "https://developers.google.com/crawling/docs/crawlers-fetchers/overview-google-crawlers.md.txt",
+      "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/overview-google-crawlers",
+      "detail": null
+    },
+    {
+      "operator": "google",
+      "kind": "ip_list_link",
+      "value": "https://developers.google.com/crawling/docs/crawlers-fetchers/read-aloud-user-agent.md.txt",
+      "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/read-aloud-user-agent",
+      "detail": null
+    },
+    {
+      "operator": "perplexity",
+      "kind": "evidence",
+      "value": "ip list perplexity-user URL: https://www.perplexity.com/perplexity-user.json",
+      "source": "https://docs.perplexity.ai/docs/resources/perplexity-crawlers",
+      "detail": "not_found"
+    },
+    {
+      "operator": "perplexity",
+      "kind": "evidence",
+      "value": "ip list perplexitybot URL: https://www.perplexity.com/perplexitybot.json",
+      "source": "https://docs.perplexity.ai/docs/resources/perplexity-crawlers",
+      "detail": "not_found"
+    },
+    {
+      "operator": "xai",
+      "kind": "evidence",
+      "value": "Grok Bot purpose_quote: Each Bot works on a persistent cloud computer with a browser, filesystem, and terminal, so tasks finish in your real tools instead of as chat drafts.",
+      "source": "https://docs.x.ai/grok-bot/overview",
+      "detail": "not_found"
+    }
+  ]
 }
