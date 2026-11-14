@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-28T17",
-  "generated_at": "2026-10-28T17:15:47Z",
+  "version": "2026-11-14T13",
+  "generated_at": "2026-11-14T13:38:46Z",
   "operators": {
     "amazon": {
       "directory_url": "https://kzejmtkesloc1.keydirectory.signer.ap-northeast-1.on.aws/.well-known/http-message-signatures-directory",
@@ -10,40 +10,40 @@
     },
     "browserbase": {
       "directory_url": "https://www.browserbase.com/.well-known/http-message-signatures-directory",
-      "fetched_at": "2026-10-28T17:14:39.808Z",
+      "fetched_at": "2026-11-14T13:37:43.006Z",
       "status": "live",
       "keys": [
         {
           "jwk": {
             "kty": "OKP",
             "crv": "Ed25519",
-            "x": "baZHj7Gs2PdgNXnMAa_aDAeXYnNPVpZ_oWesyOx6vmQ",
+            "x": "9gbnAZOuReDdQM6_t2hqaxYK0DpIkICl7tvMIXVcDBc",
             "use": "sig",
-            "kid": "DJuTDnlBxNZzalQhhvktwvkF3lWss-T56g7s4xubuhU"
+            "kid": "55U0GjHcGmsubLfmro6FsIWTuE4wJV7oQosxZOj09Fo"
           },
-          "thumbprint": "DJuTDnlBxNZzalQhhvktwvkF3lWss-T56g7s4xubuhU",
-          "kid": "DJuTDnlBxNZzalQhhvktwvkF3lWss-T56g7s4xubuhU",
-          "first_seen": "2026-10-26T21:32:57.945Z",
-          "last_seen": "2026-10-28T17:14:39.808Z"
+          "thumbprint": "55U0GjHcGmsubLfmro6FsIWTuE4wJV7oQosxZOj09Fo",
+          "kid": "55U0GjHcGmsubLfmro6FsIWTuE4wJV7oQosxZOj09Fo",
+          "first_seen": "2026-11-14T13:37:43.006Z",
+          "last_seen": "2026-11-14T13:37:43.006Z"
         },
         {
           "jwk": {
             "kty": "OKP",
             "crv": "Ed25519",
-            "x": "mvA9KzO4FvA77I_vw1rOR2wmZ8L9XiQ1jU3_NTUet7E",
+            "x": "W_Nb5TtBsxkTiXINmK-ruTqID9AKfq8FYtUhAFr_SWQ",
             "use": "sig",
-            "kid": "NVhTndQWodGQ47Kmhm1bhTdt0swWS7EHmUEMo-opsXU"
+            "kid": "uzW0cY_yvjX-4HSUPJ1cM-Jvp2xKo0abhnf_H-P0wkE"
           },
-          "thumbprint": "NVhTndQWodGQ47Kmhm1bhTdt0swWS7EHmUEMo-opsXU",
-          "kid": "NVhTndQWodGQ47Kmhm1bhTdt0swWS7EHmUEMo-opsXU",
-          "first_seen": "2026-10-26T21:32:57.945Z",
-          "last_seen": "2026-10-28T17:14:39.808Z"
+          "thumbprint": "uzW0cY_yvjX-4HSUPJ1cM-Jvp2xKo0abhnf_H-P0wkE",
+          "kid": "uzW0cY_yvjX-4HSUPJ1cM-Jvp2xKo0abhnf_H-P0wkE",
+          "first_seen": "2026-11-14T13:37:43.006Z",
+          "last_seen": "2026-11-14T13:37:43.006Z"
         }
       ]
     },
     "duckduckgo": {
       "directory_url": "https://assistbot.duckduckgo.com/.well-known/http-message-signatures-directory",
-      "fetched_at": "2026-10-28T17:14:52.955Z",
+      "fetched_at": "2026-11-14T13:37:55.576Z",
       "status": "live",
       "keys": [
         {
@@ -56,13 +56,13 @@
           "thumbprint": "Ov3HDsa8JQ39dPEYFvFFN-cUpnz9yNI8LDvr-5LeiBM",
           "kid": "Ov3HDsa8JQ39dPEYFvFFN-cUpnz9yNI8LDvr-5LeiBM",
           "first_seen": "2026-10-26T21:33:10.953Z",
-          "last_seen": "2026-10-28T17:14:52.955Z"
+          "last_seen": "2026-11-14T13:37:55.576Z"
         }
       ]
     },
     "google": {
       "directory_url": "https://agent.bot.goog/.well-known/http-message-signatures-directory",
-      "fetched_at": "2026-10-28T17:15:01.850Z",
+      "fetched_at": "2026-11-14T13:38:03.654Z",
       "status": "live",
       "keys": [
         {
@@ -80,7 +80,7 @@
           "thumbprint": "_fmS_hfpckRfp1x7fDExtVKVaYtcu1WJX1Io5LIow24",
           "kid": "mhxuPw",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-28T17:15:01.850Z"
+          "last_seen": "2026-11-14T13:38:03.654Z"
         },
         {
           "jwk": {
@@ -97,7 +97,7 @@
           "thumbprint": "c8D-_KOv7e9F83sFV2aCQUY5EuDbEVp5_sN86S8bKTc",
           "kid": "Ggh50g",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-28T17:15:01.850Z"
+          "last_seen": "2026-11-14T13:38:03.654Z"
         },
         {
           "jwk": {
@@ -114,7 +114,7 @@
           "thumbprint": "cBovpyiY9PIQIFEfaw7w_0Wwwwx4UF2LY6w0lQURHBU",
           "kid": "cYSMkA",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-28T17:15:01.850Z"
+          "last_seen": "2026-11-14T13:38:03.654Z"
         },
         {
           "jwk": {
@@ -131,7 +131,7 @@
           "thumbprint": "I10hzgxlf59i39kdp5Lib4Tfbg-FO4ZMwmAEDwG88bY",
           "kid": "bUCe2A",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-28T17:15:01.850Z"
+          "last_seen": "2026-11-14T13:38:03.654Z"
         },
         {
           "jwk": {
@@ -148,69 +148,74 @@
           "thumbprint": "ImfgehCo9CQ0CTvJyuAY3dt6p5xMvJVutWoGpHtmVME",
           "kid": "DYiMjA",
           "first_seen": "2026-10-26T21:33:17.803Z",
-          "last_seen": "2026-10-28T17:15:01.850Z"
+          "last_seen": "2026-11-14T13:38:03.654Z"
         }
       ]
     },
     "meta": {
       "directory_url": "https://www.meta.com/.well-known/http-message-signatures-directory",
-      "fetched_at": "2026-10-28T17:15:11.426Z",
+      "fetched_at": "2026-11-14T13:38:12.886Z",
       "status": "live",
       "keys": [
         {
           "jwk": {
             "kty": "OKP",
             "crv": "Ed25519",
-            "x": "vMEYr406dhzH8Tf8ClCCvt8D-MBTAkBHsnqz10iM5c0"
+            "x": "vMEYr406dhzH8Tf8ClCCvt8D-MBTAkBHsnqz10iM5c0",
+            "kid": "2h6d-naMeNYCEY_tziKuRgyrXhviX1wPZnK3YvpkJpo"
           },
           "thumbprint": "2h6d-naMeNYCEY_tziKuRgyrXhviX1wPZnK3YvpkJpo",
-          "kid": null,
+          "kid": "2h6d-naMeNYCEY_tziKuRgyrXhviX1wPZnK3YvpkJpo",
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-28T17:15:11.426Z"
+          "last_seen": "2026-11-14T13:38:12.886Z"
         },
         {
           "jwk": {
             "kty": "OKP",
             "crv": "Ed25519",
-            "x": "tKt3iCHBs2ZlHWb2n-MKjXvfPyj7SkHSXM02IBIdNRc"
+            "x": "tKt3iCHBs2ZlHWb2n-MKjXvfPyj7SkHSXM02IBIdNRc",
+            "kid": "6CdRjLYItMBcIR0Sn0QS97MEDoUm3Xmr7dV9DwEOU7E"
           },
           "thumbprint": "6CdRjLYItMBcIR0Sn0QS97MEDoUm3Xmr7dV9DwEOU7E",
-          "kid": null,
+          "kid": "6CdRjLYItMBcIR0Sn0QS97MEDoUm3Xmr7dV9DwEOU7E",
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-28T17:15:11.426Z"
+          "last_seen": "2026-11-14T13:38:12.886Z"
         },
         {
           "jwk": {
             "kty": "OKP",
             "crv": "Ed25519",
-            "x": "zyr8gublkmFR2NH1NrOb8YxX_37l-j-MpDAnJLvSAJY"
+            "x": "zyr8gublkmFR2NH1NrOb8YxX_37l-j-MpDAnJLvSAJY",
+            "kid": "co8Mqi_ams-_h9I-gXZ-NsG1BfSN34LTyIZaw9hUUGk"
           },
           "thumbprint": "co8Mqi_ams-_h9I-gXZ-NsG1BfSN34LTyIZaw9hUUGk",
-          "kid": null,
+          "kid": "co8Mqi_ams-_h9I-gXZ-NsG1BfSN34LTyIZaw9hUUGk",
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-28T17:15:11.426Z"
+          "last_seen": "2026-11-14T13:38:12.886Z"
         },
         {
           "jwk": {
             "kty": "OKP",
             "crv": "Ed25519",
-            "x": "vZZN3dwDUvU8CGzrB_GVsstowD79eAYgLNM-Jof2Di0"
+            "x": "vZZN3dwDUvU8CGzrB_GVsstowD79eAYgLNM-Jof2Di0",
+            "kid": "Iy80tzAcbbb85lkjfKieYYwxAqinLDqDUBXjVMEnI_s"
           },
           "thumbprint": "Iy80tzAcbbb85lkjfKieYYwxAqinLDqDUBXjVMEnI_s",
-          "kid": null,
+          "kid": "Iy80tzAcbbb85lkjfKieYYwxAqinLDqDUBXjVMEnI_s",
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-28T17:15:11.426Z"
+          "last_seen": "2026-11-14T13:38:12.886Z"
         },
         {
           "jwk": {
             "kty": "OKP",
             "crv": "Ed25519",
-            "x": "9SsjIMTl9VZq1ENHSf2O6546RqxEND4aY3qaSrir1aw"
+            "x": "9SsjIMTl9VZq1ENHSf2O6546RqxEND4aY3qaSrir1aw",
+            "kid": "PZZZiz0rLbE9RZJ1DyryOFQzzqVwf96kCcr44MMKP0M"
           },
           "thumbprint": "PZZZiz0rLbE9RZJ1DyryOFQzzqVwf96kCcr44MMKP0M",
-          "kid": null,
+          "kid": "PZZZiz0rLbE9RZJ1DyryOFQzzqVwf96kCcr44MMKP0M",
           "first_seen": "2026-10-26T21:33:32.203Z",
-          "last_seen": "2026-10-28T17:15:11.426Z"
+          "last_seen": "2026-11-14T13:38:12.886Z"
         }
       ]
     },
@@ -222,7 +227,7 @@
     },
     "posterna": {
       "directory_url": "https://posterna.com/.well-known/http-message-signatures-directory",
-      "fetched_at": "2026-10-28T17:15:38.440Z",
+      "fetched_at": "2026-11-14T13:38:37.378Z",
       "status": "live",
       "keys": [
         {
@@ -236,7 +241,7 @@
           "thumbprint": "jpLr0ni2ByRoYc5J6EZNt2vG6BeAti_dgtLIMLZcU3Q",
           "kid": "jpLr0ni2ByRoYc5J6EZNt2vG6BeAti_dgtLIMLZcU3Q",
           "first_seen": "2026-10-27T21:48:31.675Z",
-          "last_seen": "2026-10-28T17:15:38.440Z"
+          "last_seen": "2026-11-14T13:38:37.378Z"
         }
       ]
     }
